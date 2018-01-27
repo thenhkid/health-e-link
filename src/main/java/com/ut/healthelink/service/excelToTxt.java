@@ -109,7 +109,7 @@ public class excelToTxt {
          	       // (Works by specifying a MissingCellPolicy)
          	       Cell cell = row.getCell(cn, Row.CREATE_NULL_AS_BLANK);
          	       String text = formatter.formatCellValue(cell);
-         	       string = string + text + batch.getDelimChar();
+         	       string = string + text.trim() + batch.getDelimChar();
          	   }
             	// check to see if row is blank
             	String stringRemoveEmptyRows = string.replaceAll("(?m)^[ \t]*\r?\n", "");

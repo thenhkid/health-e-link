@@ -18,6 +18,7 @@ import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.WSMessagesIn;
 import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchMultipleTargets;
+import com.ut.healthelink.model.batchRetry;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configuration;
@@ -319,7 +320,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         clearRecords.executeUpdate();
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO transactionTranslatedIn ("
-                + "transactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31,"
+                + "batchId, transactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31,"
                 + "f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64,"
                 + "f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98,"
                 + "f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129,"
@@ -328,7 +329,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + "f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219,"
                 + "f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249,"
                 + "f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500) "
-                + "SELECT transactionInId, :configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31,"
+                + "SELECT batchId, transactionInId, :configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31,"
                 + "f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64,"
                 + "f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98,"
                 + "f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129,"
@@ -1186,16 +1187,19 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer clearMessageTable(int batchId, String mt, int transactionInId) {
-        String sql = "delete from " + mt + " where transactionInId ";
+        String sql = "delete delTable.* from "+ mt +" delTable left join "
+        		+ " transactionIn on delTable.transactionInId = transactionIn.id "
+        		+ " where ";
         int id = batchId;
         if (transactionInId == 0) {
-            sql = sql + "in (select id from transactionIn where batchId = :id);";
+        	sql = sql +  " transactionIn.batchId = :id";
         } else {
-            sql = sql + " = :id";
-            id = transactionInId;
+        	sql = sql +  " and transactionIn.id = :id";
+            id = transactionInId;     	
         }
-        Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .addScalar("id", StandardBasicTypes.INTEGER).setParameter("id", id);
+        Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        deleteTable.setParameter("id", id);
+        
         try {
             deleteTable.executeUpdate();
             return 0;
@@ -1761,13 +1765,15 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer clearTransactionInRecords(Integer batchUploadId, Integer transactionInId) {
-        String sql = "delete from transactionInRecords where ";
-        Integer id = batchUploadId;
+    	String sql = "";
+    	Integer id = batchUploadId;
         if (transactionInId == 0) {
-            sql = sql + " batchId = :id";
+            sql = "delete deltable.*  from transactioninrecords deltable "
+        		+ " left join transactionIN on deltable.transactionInId = transactionIN.id "
+        		+ " where transactionIN.batchId = :id";
         } else {
             id = transactionInId;
-            sql = sql + " transactionInId = :id";
+            sql = "delete from transactioninrecords where transactionInId = :id";
         }
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("id", id);
@@ -1784,14 +1790,16 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer clearTransactionTranslatedIn(Integer batchUploadId, Integer transactionInId) {
-
-        String sql = "delete from transactionTranslatedIn where ";
+    	
+    	String sql = "";
         Integer id = batchUploadId;
         if (transactionInId == 0) {
-            sql = sql + " batchId = :id";
+        	sql = "delete deltable.*  from transactionTranslatedIn deltable "
+            		+ " left join transactionIN on deltable.transactionInId = transactionIN.id "
+            		+ " where transactionIN.batchId = :id";
         } else {
             id = transactionInId;
-            sql = sql + " transactionInId = :id";
+            sql = "delete from  transactionTranslatedIn where transactionInId = :id";
         }
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("id", id);
@@ -1878,16 +1886,17 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer clearTransactionInErrors(Integer batchUploadId, boolean leaveFinalStatusIds) {
         try {
-            String sql = "delete from transactionInErrors where batchUploadId = :batchUploadId";
-
-            if (leaveFinalStatusIds) {
-                sql = sql + " and transactionInId not in (select id from "
-                        + "transactionIn where statusId in (:transRELId) and "
-                        + " batchId = :batchUploadId)";
-            }
-
+        	String sql = "";
+        	if (leaveFinalStatusIds) {
+        		sql = " delete delTable.* from transactionInErrors delTable "
+        			+ " left join transactionIn on delTable.transactionInId = transactionIn.id"
+        			+ " where transactionIn.batchId = :batchId"
+        			+ " and transactionIn.statusId not in (:transRELId)";
+        	} else {
+        		sql = "delete from transactionInErrors where batchUploadId = :batchId";
+        	}
             Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                    .setParameter("batchUploadId", batchUploadId);
+                    .setParameter("batchId", batchUploadId);
             if (leaveFinalStatusIds) {
                 deleteData.setParameterList("transRELId", transRELId);
             }
@@ -1895,6 +1904,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
+        	ex.printStackTrace();
             System.err.println("clearTransactionInErrors " + ex.getCause());
             return 1;
         }
@@ -2114,31 +2124,28 @@ public class transactionInDAOImpl implements transactionInDAO {
         if (foroutboundProcessing == false) {
 
             sql = "update transactionTranslatedIn set forcw = null where "
-                    + " transactionInId ";
+                    + "  ";
             if (transactionId == 0) {
-                sql = sql + "in (select id from transactionIn where ";
                 if (configId != 0) {
                     sql = sql + " configId = :configId and ";
                 }
-                sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
+                sql = sql + " batchId = :id and statusId not in ( :transRELId );";
             } else {
-                sql = sql + " = :id";
+                sql = sql + " transactionInId = :id";
                 id = transactionId;
             }
         } else {
 
             sql = "update transactionTranslatedOut set forcw = null where "
-                    + "transactionTargetId ";
+                    + " ";
 
             if (transactionId == 0) {
-                sql = sql + " in (select id from transactionTarget where ";
-
                 if (configId != 0) {
-                    sql = sql + "configId = :configId and ";
+                    sql = sql + " configId = :configId and ";
                 }
-                sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
+                sql = sql + " batchId = :id and statusId not in ( :transRELId );";
             } else {
-                sql = sql + " = :id";
+                sql = sql + " transactionTargetId = :id";
                 id = transactionId;
             }
         }
@@ -2170,21 +2177,22 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         if (foroutboundProcessing == false) {
             sql = "update transactionTranslatedIn set forcw = :targetValue where "
-                    + "REPLACE(REPLACE(trim(f" + fieldNo + "), '\n', ''), '\r', '') = :sourceValue and transactionInId ";
+                    + "REPLACE(REPLACE(trim(f" + fieldNo + "), '\n', ''), '\r', '') = :sourceValue "
+                    + " and  ";
             if (transactionId == 0) {
-                sql = sql + "in (select id from transactionIn where configId = :configId "
-                        + " and batchId = :id and statusId not in ( :transRELId ));";
+                sql = sql + " configId = :configId "
+                        + " and batchId = :id and statusId not in ( :transRELId );";
             } else {
-                sql = sql + " = :id";
+                sql = sql + " transactionInId = :id";
                 id = transactionId;
             }
         } else {
             sql = "update transactionTranslatedOut set forcw = :targetValue where "
-                    + "REPLACE(REPLACE(trim(f" + fieldNo + "), '\n', ''), '\r', '') = :sourceValue and transactionTargetId ";
+                    + "REPLACE(REPLACE(trim(f" + fieldNo + "), '\n', ''), '\r', '') = :sourceValue and  ";
             if (transactionId == 0) {
-                sql = sql + " in (select id from transactionTarget where configId = :configId and batchDLId = :id and statusId not in ( :transRELId ));";
+                sql = sql + " configId = :configId and batchId = :id and statusId not in ( :transRELId );";
             } else {
-                sql = sql + " = :id";
+                sql = sql + " transactionTargetId = :id";
                 id = transactionId;
             }
         }
@@ -2219,44 +2227,32 @@ public class transactionInDAOImpl implements transactionInDAO {
             if (foroutboundProcessing == false) {
                 if (transactionId == 0) {
                     sql = "update transactionTranslatedIn "
-                            + " JOIN (SELECT id from transactionIn WHERE configId = :configId"
-                            + " and batchId = :id and statusId not in ( :transRELId )"
-                            + ") as ti ON transactionTranslatedIn.transactionInId = ti.id "
-                            + " SET transactionTranslatedIn.F" + fieldNo + " = forcw ";
-                    if (passClear == 1) {
-                        // 1 is pass, we leave original values in fieldNo alone
-                        sql = sql + "where forcw is not null;";
-                    }
+                    		+ " SET transactionTranslatedIn.F" + fieldNo + " = forcw "
+                    		+ " WHERE configId = :configId and batchId = :id and statusId not in ( :transRELId )";
+            
                 } else {
                     sql = "update transactionTranslatedIn SET transactionTranslatedIn.F" + fieldNo + " = forcw "
                             + " where transactionInId = :id";
                     id = transactionId;
-                    if (passClear == 1) {
-                        // 1 is pass, we leave original values in fieldNo alone
-                        sql = sql + " and  forcw is not null;";
-                    }
+                    
                 }
-
+            
             } else if (transactionId == 0) {
                 sql = "update transactionTranslatedOut "
-                        + " JOIN (SELECT id from transactionTarget WHERE configId = :configId"
-                        + " and batchDLId = :id and statusId not in ( :transRELId )) as ti ON transactionTranslatedOut.transactionTargetId = ti.id "
-                        + " SET transactionTranslatedOut.F" + fieldNo + " = forcw ";
-                if (passClear == 1) {
-                    // 1 is pass, we leave original values in fieldNo alone
-                    sql = sql + "where forcw is not null;";
-                }
+                        + " SET transactionTranslatedOut.F" + fieldNo + " = forcw "
+                        + " WHERE configId = :configId"
+                        + " and batchId = :id and statusId not in ( :transRELId )";
             } else {
                 sql = "update transactionTranslatedOut "
                         + " SET transactionTranslatedOut.F" + fieldNo + " = forcw "
                         + " where transactionTargetId = :id";
-                if (passClear == 1) {
-                    // 1 is pass, we leave original values in fieldNo alone
-                    sql = sql + " and  forcw is not null;";
-                }
                 id = transactionId;
             }
-
+            
+            if (passClear == 1) {
+                // 1 is pass, we leave original values in fieldNo alone
+                sql = sql + " and forcw is not null;";
+            }
             Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setParameter("id", id);
             if (transactionId == 0) {
@@ -2286,9 +2282,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                         + "configId = :configId "
                         + " and (F" + cdt.getFieldNo()
                         + " is not null and length(F" + cdt.getFieldNo() + ") != 0  and forcw is null)"
-                        + "and transactionInId in (select id from transactionIn "
-                        + "where batchId = :id"
-                        + " and configId = :configId and statusId not in ( :transRELId ));";
+                        + " and batchId = :id"
+                        + " and configId = :configId and statusId not in ( :transRELId );";
             } else {
                 sql = "insert into transactionInerrors (batchUploadId, configId, "
                         + "transactionInId, fieldNo, errorid, cwId)"
@@ -2308,9 +2303,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + " configId = :configId "
                     + " and (F" + cdt.getFieldNo()
                     + " is not null and length(F" + cdt.getFieldNo() + ") != 0 and forcw is null)"
-                    + " and transactionTargetId in (select id from transactionTarget "
-                    + " where batchDLId = :id"
-                    + " and configId = :configId and statusId not in ( :transRELId ));";
+                    + " and  batchDLId = :id"
+                    + " and configId = :configId and statusId not in ( :transRELId );";
         } else {
             sql = "insert into transactionOutErrors (batchDownloadId, configId, "
                     + "transactionTargetId, fieldNo, errorid, cwId)"
@@ -2351,15 +2345,14 @@ public class transactionInDAOImpl implements transactionInDAO {
                             + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedIn where "
                             + "configId = :configId "
                             + " and forcw = 'MACRO_ERROR'"
-                            + " and transactionInId in (select id from transactionIn "
-                            + " where batchId = :id"
-                            + " and configId = :configId and statusId not in ( :transRELId ));";
+                            + " and  batchId = :id"
+                            + " and statusId not in ( :transRELId );";
                 } else {
                     sql = "insert into transactionInerrors (batchUploadId, configId, "
                             + "transactionInId, fieldNo, errorid, macroId)"
                             + " (select " + batchId + ", " + configId + ", transactionInId, " + cdt.getFieldNo()
                             + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedIn where "
-                            + "configId = :configId "
+                            + "configId = :configId and batchId = :id "
                             + " and forcw = 'MACRO_ERROR'"
                             + " and transactionInId = :id);";
                     id = transactionId;
@@ -2371,15 +2364,14 @@ public class transactionInDAOImpl implements transactionInDAO {
                         + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
                         + "configId = :configId "
                         + " and forcw = 'MACRO_ERROR'"
-                        + " and transactionTargetId in (select id from transactionTarget "
-                        + "where batchDLId = :id"
-                        + " and configId = :configId  and statusId not in ( :transRELId ));";
+                        + " and  batchId = :id"
+                        + " and statusId not in ( :transRELId );";
             } else {
                 sql = "insert into transactionOutErrors (batchDownloadId, configId, "
                         + "transactionTargetId, fieldNo, errorid, macroId)"
                         + "( select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
                         + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
-                        + "configId = :configId "
+                        + "configId = :configId and batchId = " +batchId 
                         + " and forcw = 'MACRO_ERROR'"
                         + " and transactionTargetId = :id);";
                 id = transactionId;
@@ -2388,6 +2380,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setParameter("id", id)
                     .setParameter("configId", configId);
+            
             if (transactionId == 0) {
                 updateData.setParameterList("transRELId", transRELId);
             }
@@ -2412,12 +2405,12 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         Integer id = batchId;
         String sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
-                + " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) "
+                + " transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId "
                 + " and  ";
         if (transactionInId == 0) {
-            sql = sql + "transactionTranslatedIn.transactionInId in (select id from transactionIn where batchId = :id ";
+            sql = sql + "transactionTranslatedIn.batchId = :id ";
         } else {
-            sql = sql + " (transactionTranslatedIn.transactionInId = :id ";
+            sql = sql + " transactionTranslatedIn.transactionInId = :id ";
             id = transactionInId;
             resetAll = true;
         }
@@ -2425,7 +2418,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         if (!resetAll) {
             sql = sql + " and statusId not in ( :transRELId )";
         }
-        sql = sql + ") SET "
+        sql = sql + " SET "
                 + "transactionTranslatedIn.F1 = transactionInRecords.F1, "
                 + "transactionTranslatedIn.F2 = transactionInRecords.F2, "
                 + "transactionTranslatedIn.F3 = transactionInRecords.F3, "
@@ -2955,7 +2948,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer executeMacro(Integer configId, Integer batchId,
             configurationDataTranslations cdt, boolean foroutboundProcessing,
             Macros macro, Integer transactionId) {
-        try {
+    		
+    		try {
         	String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField, "
                     + ":fieldA, :fieldB, :con1, :con2, :macroId, :foroutboundProcessing, :passClear, :transactionId);");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
@@ -3823,8 +3817,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + " select " + batch.getId() + ", transactionInId, " + batch.getOrgId() + ",  "
                     + "configurations.orgId, messageTypeId, " + bt.getsourceConfigId() + "," + bt.gettargetConfigId()
                     + " from transactionTranslatedIn, configurations where configurations.id = :targetConfigId"
-                    + " and configId = :sourceConfigId and transactionInId in "
-                    + "(select id from transactionIn where configId = :sourceConfigId and batchId = :batchId and statusId != 11);");
+                    + " and transactionTranslatedIn.configId = :sourceConfigId and batchId = :batchId and statusId != 11;");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("batchId", batch.getId());
             query.setParameter("targetConfigId", bt.gettargetConfigId());
@@ -4001,8 +3994,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     public List<transactionInRecords> getTransactionInRecordsForBatch(Integer batchId) {
         try {
-            String sql = ("select * from transactionInRecords where transactionInId in "
-                    + " (select id from transactionIn where batchId = :batchId);");
+            String sql = ("select * from transactionInRecords where batchId = :batchId");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setResultTransformer(
                             Transformers.aliasToBean(transactionInRecords.class))
@@ -4133,8 +4125,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer clearBatchDownloadSummaryByUploadBatchId(Integer batchId) {
-        String sql = "delete from batchDownloadSummary where transactionTargetId in ("
-                + "select id from transactionTarget where batchUploadId = :batchId);";
+        String sql = "delete delTable.* from batchDownloadSummary delTable "
+        		+ " left join transactionTarget on delTable.transactionTargetId = transactionTarget.id where transactionTarget.batchUploadId = :batchId";
         try {
             Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
             deleteTable.executeUpdate();
@@ -4149,8 +4141,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId) {
-        String sql = "delete from transactionOutRecords where transactionTargetId in ("
-                + "select id from transactionTarget where batchUploadId = :batchId);";
+        String sql = "delete delTable.* from transactionOutRecords delTable "
+        		+ " left join transactionTarget on delTable.transactionTargetId = transactionTarget.id "
+        		+ " where transactionTarget.batchUploadId = :batchId";
         try {
             Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
             deleteTable.executeUpdate();
@@ -4165,8 +4158,10 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer clearTransactionOutErrorsByUploadBatchId(Integer batchId) {
-        String sql = "delete from transactionOutErrors where transactionTargetId in ("
-                + "select id from transactionTarget where batchUploadId = :batchId);";
+        String sql = "delete delTable.* from transactionOutErrors delTable "
+        		+ "  left join transactionTarget on delTable.transactionTargetId = transactionTarget.id "
+        		+ " where transactionTarget.batchUploadId = :batchId";
+        
         try {
             Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
             deleteTable.executeUpdate();
@@ -4181,8 +4176,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId) {
-        String sql = "delete from TransactionTranslatedOut where transactionTargetId in ("
-                + "select id from transactionTarget where batchUploadId = :batchId);";
+        String sql = "delete delTable.* from TransactionTranslatedOut delTable "
+        		+ " left join transactionTarget on delTable.transactionTargetId = transactionTarget.id "
+        		+ " where transactionTarget.batchUploadId = :batchId";
         try {
             Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
             deleteTable.executeUpdate();
@@ -4202,7 +4198,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             String sql = ("insert into transactionInErrors (batchUploadId, configId, transactionInId, errorId, fieldNo)"
                     + " select " + batchId + ", " + bt.getsourceConfigId() + ", transactionInId, 9,  " + bt.getTargetOrgCol()
                     + " from transactionTranslatedIn where configId = :sourceConfigId "
-                    + " and transactionInId in (select id from transactionIn where batchId = :batchId)"
+                    + " and  batchId = :batchId"
                     + " and f" + bt.getTargetOrgCol() + "  not in (select  orgId  from configurationConnections cc, "
                     + " configurations c WHERE cc.targetConfigId = c.id and sourceConfigId = :sourceConfigId)"
                     + " and f" + bt.getTargetOrgCol() + " is not null and f" + bt.getTargetOrgCol() + " != 0"
@@ -4234,8 +4230,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + " from transactionTranslatedIn "
                     + "where configId = " + bt.getsourceConfigId() + " and (f" + bt.getTargetOrgCol() + " = :targetOrgId "
                     + " or f" + bt.getTargetOrgCol() + " = 0 or f" + bt.getTargetOrgCol() + " is null) "
-                    + "and transactionInId in (select id from transactionIn where configId = :configId "
-                    + "and batchId = :batchId and statusId != 11);");
+                    + "and batchId = :batchId and statusId != 11;");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("batchId", batchUpload);
             query.setParameter("targetOrgId", bt.gettargetOrgId());
@@ -4441,8 +4436,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer copyTransactionInRecord(Integer newTInId, Integer oldTInId) {
         try {
-            String sql = ("INSERT INTO transactioninrecords(transactionInId,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65,f66,f67,f68,f69,f70,f71,f72,f73,f74,f75,f76,f77,f78,f79,f80,f81,f82,f83,f84,f85,f86,f87,f88,f89,f90,f91,f92,f93,f94,f95,f96,f97,f98,f99,f100,f101,f102,f103,f104,f105,f106,f107,f108,f109,f110,f111,f112,f113,f114,f115,f116,f117,f118,f119,f120,f121,f122,f123,f124,f125,f126,f127,f128,f129,f130,f131,f132,f133,f134,f135,f136,f137,f138,f139,f140,f141,f142,f143,f144,f145,f146,f147,f148,f149,f150,f151,f152,f153,f154,f155,f156,f157,f158,f159,f160,f161,f162,f163,f164,f165,f166,f167,f168,f169,f170,f171,f172,f173,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f184,f185,f186,f187,f188,f189,f190,f191,f192,f193,f194,f195,f196,f197,f198,f199,f200,f201,f202,f203,f204,f205,f206,f207,f208,f209,f210,f211,f212,f213,f214,f215,f216,f217,f218,f219,f220,f221,f222,f223,f224,f225,f226,f227,f228,f229,f230,f231,f232,f233,f234,f235,f236,f237,f238,f239,f240,f241,f242,f243,f244,f245,f246,f247,f248,f249,f250,f251,f252,f253,f254,f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500)"
-                    + " select :newTInId,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65,f66,f67,f68,f69,f70,f71,f72,f73,f74,f75,f76,f77,f78,f79,f80,f81,f82,f83,f84,f85,f86,f87,f88,f89,f90,f91,f92,f93,f94,f95,f96,f97,f98,f99,f100,f101,f102,f103,f104,f105,f106,f107,f108,f109,f110,f111,f112,f113,f114,f115,f116,f117,f118,f119,f120,f121,f122,f123,f124,f125,f126,f127,f128,f129,f130,f131,f132,f133,f134,f135,f136,f137,f138,f139,f140,f141,f142,f143,f144,f145,f146,f147,f148,f149,f150,f151,f152,f153,f154,f155,f156,f157,f158,f159,f160,f161,f162,f163,f164,f165,f166,f167,f168,f169,f170,f171,f172,f173,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f184,f185,f186,f187,f188,f189,f190,f191,f192,f193,f194,f195,f196,f197,f198,f199,f200,f201,f202,f203,f204,f205,f206,f207,f208,f209,f210,f211,f212,f213,f214,f215,f216,f217,f218,f219,f220,f221,f222,f223,f224,f225,f226,f227,f228,f229,f230,f231,f232,f233,f234,f235,f236,f237,f238,f239,f240,f241,f242,f243,f244,f245,f246,f247,f248,f249,f250,f251,f252,f253,f254,f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500"
+            String sql = ("INSERT INTO transactioninrecords(batchId, transactionInId,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65,f66,f67,f68,f69,f70,f71,f72,f73,f74,f75,f76,f77,f78,f79,f80,f81,f82,f83,f84,f85,f86,f87,f88,f89,f90,f91,f92,f93,f94,f95,f96,f97,f98,f99,f100,f101,f102,f103,f104,f105,f106,f107,f108,f109,f110,f111,f112,f113,f114,f115,f116,f117,f118,f119,f120,f121,f122,f123,f124,f125,f126,f127,f128,f129,f130,f131,f132,f133,f134,f135,f136,f137,f138,f139,f140,f141,f142,f143,f144,f145,f146,f147,f148,f149,f150,f151,f152,f153,f154,f155,f156,f157,f158,f159,f160,f161,f162,f163,f164,f165,f166,f167,f168,f169,f170,f171,f172,f173,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f184,f185,f186,f187,f188,f189,f190,f191,f192,f193,f194,f195,f196,f197,f198,f199,f200,f201,f202,f203,f204,f205,f206,f207,f208,f209,f210,f211,f212,f213,f214,f215,f216,f217,f218,f219,f220,f221,f222,f223,f224,f225,f226,f227,f228,f229,f230,f231,f232,f233,f234,f235,f236,f237,f238,f239,f240,f241,f242,f243,f244,f245,f246,f247,f248,f249,f250,f251,f252,f253,f254,f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500)"
+                    + " select batchId, :newTInId,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17,f18,f19,f20,f21,f22,f23,f24,f25,f26,f27,f28,f29,f30,f31,f32,f33,f34,f35,f36,f37,f38,f39,f40,f41,f42,f43,f44,f45,f46,f47,f48,f49,f50,f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65,f66,f67,f68,f69,f70,f71,f72,f73,f74,f75,f76,f77,f78,f79,f80,f81,f82,f83,f84,f85,f86,f87,f88,f89,f90,f91,f92,f93,f94,f95,f96,f97,f98,f99,f100,f101,f102,f103,f104,f105,f106,f107,f108,f109,f110,f111,f112,f113,f114,f115,f116,f117,f118,f119,f120,f121,f122,f123,f124,f125,f126,f127,f128,f129,f130,f131,f132,f133,f134,f135,f136,f137,f138,f139,f140,f141,f142,f143,f144,f145,f146,f147,f148,f149,f150,f151,f152,f153,f154,f155,f156,f157,f158,f159,f160,f161,f162,f163,f164,f165,f166,f167,f168,f169,f170,f171,f172,f173,f174,f175,f176,f177,f178,f179,f180,f181,f182,f183,f184,f185,f186,f187,f188,f189,f190,f191,f192,f193,f194,f195,f196,f197,f198,f199,f200,f201,f202,f203,f204,f205,f206,f207,f208,f209,f210,f211,f212,f213,f214,f215,f216,f217,f218,f219,f220,f221,f222,f223,f224,f225,f226,f227,f228,f229,f230,f231,f232,f233,f234,f235,f236,f237,f238,f239,f240,f241,f242,f243,f244,f245,f246,f247,f248,f249,f250,f251,f252,f253,f254,f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500"
                     + " from transactioninrecords where transactionInId = :oldTInId");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("newTInId", newTInId);
@@ -5101,30 +5096,28 @@ public class transactionInDAOImpl implements transactionInDAO {
             if (!foroutboundProcessing) {
                 sql = "select transactionInId from transactionTranslatedIn where  F" + cdt.getFieldNo();
                 sql = sql + " like '%^^^^^%' and "
-                        + " transactionInId ";
+                        + "  ";
                 if (transactionId == 0) {
-                    sql = sql + "in (select id from transactionIn where ";
                     if (configId != 0) {
                         sql = sql + " configId = :configId and ";
                     }
-                    sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
+                    sql = sql + " batchId = :id and statusId not in ( :transRELId );";
                 } else {
-                    sql = sql + " = :id";
+                    sql = sql + "transactionInId = :id";
                     id = transactionId;
                 }
             } else {
 
                 sql = "select transactionTargetId from transactionTranslatedOut where  F" + cdt.getFieldNo();
                 sql = sql + " like '%^^^^^%' and "
-                        + " transactionTargetId ";
+                        + "  ";
                 if (transactionId == 0) {
-                    sql = sql + "in (select id from transactionTarget where ";
                     if (configId != 0) {
                         sql = sql + " configId = :configId and ";
                     }
-                    sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
+                    sql = sql + " batchDLId = :id and statusId not in ( :transRELId );";
                 } else {
-                    sql = sql + " = :id";
+                    sql = sql + " transactionTargetId = :id";
                     id = transactionId;
                 }
             }
@@ -5844,8 +5837,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 
             /* Insert transaction In Records */
             String inrecordssql = ("INSERT INTO transactioninrecords "
-                    + " (transactionInId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500) "
-                    + " select  :newtransactionInId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500"
+                    + " (batchId, transactionInId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500) "
+                    + " select  "+ newbatchId +", :newtransactionInId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500"
                     + " from transactioninrecords  where transactionInId = :transactionId");
             Query inrecords = sessionFactory.getCurrentSession().createSQLQuery(inrecordssql);
             inrecords.setParameter("newtransactionInId", newtransactionInId);
@@ -5854,8 +5847,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 
             /* Insert transaction In Records Translated */
             String translatedinrecordssql = ("INSERT INTO transactiontranslatedin "
-                    + " (transactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254,F255 , F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500) "
-                    + " select  :newtransactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500"
+                    + " (batchId, transactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254,F255 , F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500) "
+                    + " select "+newbatchId+", :newtransactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500"
                     + " from transactiontranslatedin  where transactionInId = :transactionId");
             Query translatedrecords = sessionFactory.getCurrentSession().createSQLQuery(translatedinrecordssql);
             translatedrecords.setParameter("newtransactionInId", newtransactionInId);
@@ -6124,7 +6117,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     public List<Integer> getBatchDownloadIdsFromUploadId(Integer batchUploadId) {
         try {
-            String sql = ("select batchDLId from "
+            String sql = ("select distinct batchDLId from "
                     + " transactionTarget where batchUploadId = :batchUploadId ");
 
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
@@ -6887,12 +6880,12 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + " ON transactiontranslatedOut.F" + cdt.getFieldNo()
                     + " = tbl_concat.sourcevalue "
                     + " SET transactiontranslatedOut.forCW = tbl_concat.targetvalue  "
-                    + " WHERE transactiontranslatedOut.transactionTargetId ";
+                    + " WHERE  ";
             if (transactionId > 0) {
                 id = transactionId;
-                sql = sql + " = :id";
+                sql = sql + " transactiontranslatedOut.transactionTargetId = :id";
             } else {
-                sql = sql + "in  (select id from transactionTarget where batchDLid = :id and statusId not in ( :transRELId ));";
+                sql = sql + " batchId = :id and statusId not in ( :transRELId );";
             }
 
         } else {
@@ -6901,12 +6894,12 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + " ON transactiontranslatedIn.F" + cdt.getFieldNo()
                     + " = tbl_concat.sourcevalue "
                     + " SET transactiontranslatedIn.forCW = tbl_concat.targetvalue  "
-                    + " WHERE transactiontranslatedIn.transactionInId ";
+                    + " WHERE  ";
             if (transactionId > 0) {
                 id = transactionId;
-                sql = sql + " = :id";
+                sql = sql + " transactiontranslatedIn.transactionInId = :id";
             } else {
-                sql = sql + "in  (select id from transactionin where batchid = :id and statusId not in ( :transRELId ));";
+                sql = sql + " batchid = :id and statusId not in ( :transRELId );";
             }
 
         }
@@ -7065,7 +7058,6 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId, 
     		configurationDataTranslations cdt, boolean foroutboundProcessing,  Integer transactionId) {
-
 		/**
 		 * UPDATE  transactiontranslatedin JOIN 
 		 * (select sourcevalue as matchid, targetvalue as label   from rel_crosswalkdata 
@@ -7074,6 +7066,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		 * SET transactiontranslatedin.f175 = tbl_concat.label  
 		 * WHERE transactiontranslatedin.configid = 27;
 		 */
+		
 		
         String sql;
         Integer id = batchId;
@@ -7161,5 +7154,63 @@ public class transactionInDAOImpl implements transactionInDAO {
             return 1;
         }
     }
+	
+	@Override
+	@Transactional
+    public Integer clearTransactionAttachments (Integer batchId) {
+        
+		String sql = "delete delTable.* from transactionattachments delTable left join "
+        		+ " transactionIn on delTable.transactionInId = transactionIn.id "
+        		+ " where transactionIn.batchId = :batchId";
+        
+        Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        	  deleteTable.setParameter("batchId", batchId);
+        
+        
+        try {
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionAttachments " + ex.getCause());
+            return 1;
+
+        }
+    }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public batchRetry getBatchRetryByUploadId(Integer batchUploadId,
+			Integer statusId) throws Exception {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(batchRetry.class);
+		criteria.add(Restrictions.eq("batchUploadId", batchUploadId));
+		if (statusId > 0)
+		{
+			criteria.add(Restrictions.eq("fromStatusId", statusId));
+		}		
+		criteria.addOrder(Order.desc("dateCreated"));
+		List<batchRetry> brList = criteria.list();
+		
+        if (brList.size() > 0) {
+        	return brList.get(0);
+        } else  {
+        	 return null;
+        }
+	}
+
+	@Override
+	@Transactional
+	public void saveBatchRetry(batchRetry br) throws Exception {
+		sessionFactory.getCurrentSession().save(br);
+	}
+
+	@Override
+	@Transactional
+	public void clearBatchRetry(Integer batchUploadId) throws Exception {
+		Query delBatch = sessionFactory.getCurrentSession().createQuery("delete from batchRetry where batchUploadId = :batchUploadId");
+		delBatch.setParameter("batchUploadId", batchUploadId);
+		delBatch.executeUpdate();
+		
+	}
 
 }

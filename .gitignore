@@ -8,3 +8,5 @@ bin
 org.eclipse.wst.common.project.facet.core.xml
 src/main/webapp/dspResources/.DS_Store
 .DS_Store
+/.rebel.xml.bak
+/src/main/resources/rebel.xml

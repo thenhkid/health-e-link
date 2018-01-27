@@ -73,30 +73,11 @@
                 <job-name>LoadMassBatches</job-name>
                 <job-group>processGroup</job-group>
                 <!-- <cron-expression>0 15/0 1,4,7,10,13,16,19,22 * * ?</cron-expression> -->
-                <cron-expression>0 0/5 * * * ?</cron-expression>
+                <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
-    <!-- 
-     <schedule>
-        <job>
-            <name>LoadMassBatches2</name>
-            <group>processGroup</group>
-            <description>This process will run every 10 minutes to look for large files</description>
-            <job-class>com.ut.healthelink.jobs.loadMassBatches</job-class>
-        </job>
- 
-        <trigger>
-            <cron>
-                <name>LoadMassBatchesTrigger2</name>
-                <job-name>LoadMassBatches2</job-name>
-                <job-group>processGroup</job-group>
-                <cron-expression>0 0/45 23,2,5,8,11,14,17,20 * * ?</cron-expression>
-            </cron>
-        </trigger>
-    </schedule>
-    -->
-    
+
      <schedule>
         <job>
             <name>ProcessInBoundBatches</name>
@@ -129,31 +110,11 @@
                 <job-name>ProcessMassInBoundBatches</job-name>
                 <job-group>processGroup</job-group>
                 <!-- <cron-expression>0 0/0 0,3,6,9,12,15,18,21 * * ?</cron-expression> -->
-                 <cron-expression>0 0/6 * * * ?</cron-expression>
+                 <cron-expression>0 0/2 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
-    
-    <!--  
-    <schedule>
-        <job>
-            <name>ProcessMassInBoundBatches2</name>
-            <group>processGroup</group>
-            <description>This process will run every 10 </description>
-            <job-class>com.ut.healthelink.jobs.processMassBatches</job-class>
-        </job>
- 
-        <trigger>
-            <cron>
-                <name>ProcessMassInBoundBatchesTrigger2</name>
-                <job-name>ProcessMassInBoundBatches2</job-name>
-                <job-group>processGroup</job-group>
-                <cron-expression>0 30/0 1,4,7,10,13,16,19,22 * * ?</cron-expression>
-            </cron>
-        </trigger>
-    </schedule>
-    
-    -->
+
     <schedule>
         <job>
             <name>ProcessMassOutputBatches</name>
@@ -167,7 +128,7 @@
                 <name>ProcessMassOutputBatchesTrigger</name>
                 <job-name>ProcessMassOutputBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 5/15 * * * ?</cron-expression>
+                <cron-expression>0 0/5 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
