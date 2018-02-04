@@ -107,6 +107,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -2820,7 +2821,7 @@ public class transactionInManagerImpl implements transactionInManager {
             //list files
             //we only list visible files
             File[] listOfFiles = folder.listFiles((FileFilter) HiddenFileFilter.VISIBLE);
-
+            Arrays.sort(listOfFiles, LastModifiedFileComparator.LASTMODIFIED_COMPARATOR);
             Organization orgDetails = organizationmanager.getOrganizationById(orgId);
             String defPath = "/bowlink/" + orgDetails.getcleanURL() + "/input files/";
             String outPath = fileSystem.setPath(defPath);
@@ -4568,7 +4569,7 @@ public class transactionInManagerImpl implements transactionInManager {
         }
 
         //build message
-        String message = "Batch" + batch.getutBatchName() + " contains " + rejectCount + " rejected transaction(s).";
+        String message = "Batch " + batch.getutBatchName() + " contains " + rejectCount + " rejected transaction(s).";
         message = message + "<br/><br/>Environment: " + myProps.getProperty("server.identity");
 
         message = message + "<br/><br/>Please see details below.";
