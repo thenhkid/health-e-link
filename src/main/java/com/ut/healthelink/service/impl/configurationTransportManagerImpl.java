@@ -437,6 +437,19 @@ public class configurationTransportManagerImpl implements configurationTransport
 		return configurationTransportDAO.hasConfigsWithMasstranslations(orgId, transportMethodId);
 	}
 
+	@Override
+	public void checkAndCreateDirectory(configurationRhapsodyFields rhapsodyInfo)
+			throws Exception {
+		// TODO Auto-generated method stub
+		fileSystem dir = new fileSystem();
+		String newPath = dir.addPathToProjectDir(rhapsodyInfo.getDirectory());
+		File rrDirectory = new File(newPath);
+        if (!rrDirectory.exists()) {
+        	rrDirectory.mkdir();
+        }
+
+	}
+
 	
     
     
