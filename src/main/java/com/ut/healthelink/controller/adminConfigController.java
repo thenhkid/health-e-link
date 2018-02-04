@@ -740,6 +740,7 @@ public class adminConfigController {
         /** need to get rhapsody info if any has been entered **/
         if(transportDetails.gettransportMethodId() == 5 && !transportDetails.getRhapsodyFields().isEmpty()) {
             for(configurationRhapsodyFields rhapsodyFields : transportDetails.getRhapsodyFields()) {
+            	configurationTransportManager.checkAndCreateDirectory(rhapsodyFields);
             	rhapsodyFields.setTransportId(transportId);
                 configurationTransportManager.saveTransportRhapsody(rhapsodyFields);
             }
