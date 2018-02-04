@@ -33,10 +33,10 @@
         <log4j.version>2.0-beta8</log4j.version>
         <quartz.version>2.2.1</quartz.version>
         <commons-validator.version>1.4.0</commons-validator.version>
-        <tomcat-jdbc.version>7.0.47</tomcat-jdbc.version>
         <sax.version>2.0.1</sax.version>
         <apache.poi.version>3.16</apache.poi.version>
         <xlsx.streamer.version>1.2.0</xlsx.streamer.version>
+        <commons-iocommons-io.version>2.6</commons-iocommons-io.version>
     </properties>
   
  
@@ -145,11 +145,6 @@
         </dependency>
        
         <!-- JDBC -->
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jdbc</artifactId>
-            <version>${tomcat-jdbc.version}</version>
-        </dependency>
        
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -335,6 +330,12 @@
 		    <artifactId>xlsx-streamer</artifactId>
 		    <version>${xlsx.streamer.version}</version>
 		  </dependency>
+		  
+		   <dependency>
+		    <groupId>commons-io</groupId>
+		    <artifactId>commons-io</artifactId>
+		    <version>${commons-iocommons-io.version}</version>
+		</dependency>
  
     </dependencies>
     <build>
@@ -344,8 +345,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -116,4 +116,5 @@ public interface configurationTransportManager {
     
     boolean hasConfigsWithMasstranslations(Integer orgId, Integer transportMethodId) throws Exception;
       
+    void checkAndCreateDirectory(configurationRhapsodyFields rhapsodyInfo) throws Exception;
 }

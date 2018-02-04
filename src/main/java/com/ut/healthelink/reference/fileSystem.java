@@ -393,5 +393,21 @@ public class fileSystem {
         is.close();
         return bytes;
     }
+    
+    public String addPathToProjectDir(String addOnPath) {
+        String path = "";
+        //Windows
+        if (os.indexOf("win") >= 0) {
+            path = directoryPath + addOnPath.replace("", "").replace("/", "\\");
+        } //Mac
+        else if (os.indexOf("mac") >= 0) {
+            path = directoryPath + addOnPath;
+        } //Unix or Linux or Solarix
+        else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
+            path = directoryPath + addOnPath;
+        }
+        return path;
+    }
+
 
 }
