@@ -3179,7 +3179,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             query.executeUpdate();
             return 0;
         } catch (Exception ex) {
-            System.err.println("insertLoadData " + ex.getCause());
+            System.err.println("insertLoadData failed - please check file format, error - " + ex.getCause());
             return 1;
         }
     }
