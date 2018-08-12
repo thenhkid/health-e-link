@@ -2012,19 +2012,19 @@ public class adminProcessingActivity {
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
             batchDetails.setstatusValue(processStatus.getDisplayCode());
 
-            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8, 35);
+            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8, 35, 60);
             if (!cancelStatusList.contains(batchDetails.getstatusId())) {
                 canCancel = true;
             }
 
-            List<Integer> resetStatusList = Arrays.asList(2, 22, 23, 1, 8, 35); //DNP (21) is not a final status for admin
+            List<Integer> resetStatusList = Arrays.asList(2, 22, 23, 1, 8, 35, 60); //DNP (21) is not a final status for admin
             if (!resetStatusList.contains(batchDetails.getstatusId())) {
                 canReset = true;
             }
 
             if (batchDetails.getstatusId() == 5) {
                 // now we check so we don't have to make a db hit if batch status is not 5 
-                if (transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(11, 12, 13, 16), false, false) == 0) {
+                if (transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(11,12,13,16,18,20), false, false) == 0) {
                     canSend = true;
                 }
             }

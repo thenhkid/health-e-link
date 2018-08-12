@@ -2458,10 +2458,13 @@ public class transactionInManagerImpl implements transactionInManager {
             ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
             configErrorInfo.setBatchId(batchInfo.getId());
             //these errors are not tied to transactions, tied to batch - need to write method to query them out so we don't keep adding to list
-            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), getErrorCodes(Arrays.asList(1, 2, 3, 4, 6, 9, 23)));
+            
+            List<TransErrorDetail> tedList = new ArrayList<> ();
+            tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), getErrorCodes(Arrays.asList(1, 2, 3, 4, 6, 9, 23)));
             if (tedList.size() > 0) {
                 masterTedList.addAll(tedList);
             }
+           
             /**
              * now get invalid configIds, errorId 6 - these are tied to transaction but not reportable fields since we don't know what configId it is. we don't know column that holds the field either since it didn't match with any for org, we display the first 4 columns
              */
@@ -4581,7 +4584,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
             message += "<br /><br />Sending Organization: " + transaction.getSrcOrgName();
 
-            if (!"".equals(transaction.getSrcSiteName())) {
+            if (!"".equals(transaction.getSrcSiteName()) && !transaction.getSrcSiteName().equalsIgnoreCase("null")) {
                 message += "<br /><br />Sending Site: " + transaction.getSrcSiteName();
             }
             message += "<br /><br />Target Organization: " + transaction.getTargetOrgName();

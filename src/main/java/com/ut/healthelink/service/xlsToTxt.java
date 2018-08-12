@@ -83,7 +83,6 @@ public class xlsToTxt {
 
         try {
         	String text = "";
-        	System.out.println("Start xls - " + new Date());
         	FileWriter fw = new FileWriter(newFile);
 	        
         		InputStream inp = new FileInputStream(inputFile);
@@ -99,9 +98,7 @@ public class xlsToTxt {
         	    wb.close();
 		        inp.close();
 		        fw.close();
-		        
-		        
-		        System.out.println("End xls - " + new Date());
+		
         } catch (Exception ex) {
         	ex.printStackTrace();
         	newfileName = "ERRORERRORERROR";

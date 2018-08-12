@@ -17,7 +17,13 @@
         <intercept-url access="hasAnyRole('ROLE_ADMIN')" pattern="/administrator/processing-activity/wsmessageOut/**"></intercept-url>
         <intercept-url access="hasAnyRole('ROLE_ADMIN','ROLE_PROCESSINGADMIN','ROLE_SYSTEMADMIN')" pattern="/administrator/**"></intercept-url>
         <intercept-url access="hasRole('ROLE_USER')" pattern="/profile/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/reports/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/clients/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/dashboard/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/associations/**"></intercept-url>
         <intercept-url access="hasRole('ROLE_USER')" pattern="/CareConnector/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/OrgProfile/**"></intercept-url>
+        
         <intercept-url access="hasRole('ROLE_USER')" pattern="/Health-e-Connect/**"></intercept-url>
         <intercept-url access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER','ROLE_PROCESSINGADMIN','ROLE_SYSTEMADMIN')" pattern="/FileDownload/**"></intercept-url>
         <intercept-url access="permitAll" pattern="/scheduleTask/**"></intercept-url>
