@@ -23,12 +23,6 @@ public class siteSections {
     @NoHtml
     @Column(name = "FEATURENAME", nullable = false)
     private String featureName;
-    
-    @Column(name = "url", nullable = false)
-    private String url = "";
-    
-    @Column(name = "featureDesc", nullable = true)
-    private String featureDesc = "";
 
     public int getId() {
         return id;
@@ -54,20 +48,5 @@ public class siteSections {
         this.featureName = featureName;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getFeatureDesc() {
-        return featureDesc;
-    }
-
-    public void setFeatureDesc(String featureDesc) {
-        this.featureDesc = featureDesc;
-    }
     
 }
