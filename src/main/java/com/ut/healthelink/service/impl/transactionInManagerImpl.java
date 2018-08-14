@@ -840,6 +840,15 @@ public class transactionInManagerImpl implements transactionInManager {
              * we check batch to see if the batch has any rejected records. if it does, we send an email to notify reject.email in properties file
              *
              */
+          //we populate additional audit table for mass batches
+            if (isMassBatch) {
+            	/** before we delete, we need to track the details of the batch for RR audit report **/
+        		//clean
+        		cleanAuditErrorTable(batch.getId());
+        		//populate
+        		populateAuditReport(batchUploadId, configurationManager.getMessageSpecs(batch.getConfigId()));
+            }
+            
             Integer rejectedCount = getRecordCounts(batch.getId(), rejectIds, false, true);
             
             if (rejectedCount == batch.gettotalRecordCount()) {
@@ -848,14 +857,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 sendRejectNotification(batch, rejectedCount);
             }
             
-            //we populate additional audit table for mass batches
-            if (isMassBatch) {
-            	/** before we delete, we need to track the details of the batch for RR audit report **/
-        		//clean
-        		cleanAuditErrorTable(batch.getId());
-        		//populate
-        		populateAuditReport(batchUploadId, configurationManager.getMessageSpecs(batch.getConfigId()));
-            }
+            
 
         } // end of single batch insert 
 
@@ -4581,31 +4583,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
         List<Transaction> transactions = getTransactionsByStatusId(batch.getId(), rejectIds, 5);
         for (Transaction transaction : transactions) {
-
-            message += "<br /><br />Sending Organization: " + transaction.getSrcOrgName();
-
-            if (!"".equals(transaction.getSrcSiteName()) && !transaction.getSrcSiteName().equalsIgnoreCase("null")) {
-                message += "<br /><br />Sending Site: " + transaction.getSrcSiteName();
-            }
+        	message += "<br /><br />Sending Organization: " + transaction.getSrcOrgName();
             message += "<br /><br />Target Organization: " + transaction.getTargetOrgName();
             message += "<br /><br />Referral Type: " + transaction.getSrcConfigName();
-            //message += "<br /><br />Date/Time Received: " + transaction.getdateSubmitted();
-
-            /* If Holyoke Health Center send to their primary contact */
-            List<User> orgUsers = null;
-            if (transaction.getOrgId() == 68 || transaction.getParentOrgId() == 68) {
-                if (transaction.getParentOrgId() > 0) {
-                    orgUsers = usermanager.getOrganizationContact(transaction.getParentOrgId(), 1);
-                } else {
-                    orgUsers = usermanager.getOrganizationContact(transaction.getOrgId(), 1);
-                }
-
-                if (orgUsers != null && orgUsers.size() > 0) {
-                    if (orgUsers.get(0).getStatus() == true && !"".equals(orgUsers.get(0).getEmail())) {
-                        ccAddresses.add(orgUsers.get(0).getEmail());
-                    }
-                }
-            }
         }
 
         mail.setmessageBody(message);
