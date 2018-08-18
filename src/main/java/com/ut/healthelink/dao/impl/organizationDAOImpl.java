@@ -8,6 +8,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.healthelink.dao.organizationDAO;
 import com.ut.healthelink.model.Brochure;
@@ -19,7 +20,9 @@ import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.organizationPrograms;
 import com.ut.healthelink.reference.fileSystem;
 import com.ut.healthelink.service.brochureManager;
+
 import java.util.ArrayList;
+
 import org.hibernate.criterion.Order;
 import org.hibernate.exception.SQLGrammarException;
 import org.hibernate.transform.Transformers;
@@ -82,6 +85,7 @@ public class organizationDAOImpl implements organizationDAO {
      * @return	This function will return a single organization object
      */
     @Override
+    @Transactional
     public Organization getOrganizationById(int orgId) {
         return (Organization) sessionFactory.
                 getCurrentSession().
