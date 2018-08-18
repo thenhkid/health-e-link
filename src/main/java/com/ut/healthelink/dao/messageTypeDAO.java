@@ -88,5 +88,9 @@ public interface messageTypeDAO {
     List<validationType> getValidationTypes1();
     
     List<messageType> getAssociatedMessageTypes(int orgId);
+    
+    void updateCrosswalk(Crosswalks crosswalkDetails);
+    
+    void executeSQLStatement(String sqlStmt);
 
 }

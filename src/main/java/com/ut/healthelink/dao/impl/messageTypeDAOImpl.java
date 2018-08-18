@@ -654,5 +654,36 @@ public class messageTypeDAOImpl implements messageTypeDAO {
         Query query = sessionFactory.getCurrentSession().createQuery("from validationType order by id asc");
         return query.list();
     }
+    
+    /**
+     * The 'updateCrosswalk" function will update the existing crosswalk
+     *
+     * @Table	crosswalks
+     *
+     * @param	crosswalkDetails	This will hold the crosswalk object from the form
+     *
+     * @return The function will return the id of the new crosswalk
+     *
+     */
+    @Override
+    @Transactional
+    public void updateCrosswalk(Crosswalks crosswalkDetails) {
+    	sessionFactory.getCurrentSession().update(crosswalkDetails);
+    }
+    
+    
+    @Transactional
+    public void executeSQLStatement(String sqlStmt) {
+	if(sqlStmt != null) {
+	    if(!"".equals(sqlStmt)) {
+		 //Need to insert all the fields into the crosswalk data Fields table
+                Query query = sessionFactory.getCurrentSession().createSQLQuery(sqlStmt);
+
+                query.executeUpdate();
+
+	    }
+	}
+    }
+    
 
 }
