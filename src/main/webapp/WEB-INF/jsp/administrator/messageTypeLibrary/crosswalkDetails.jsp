@@ -20,6 +20,7 @@
                             <label class="control-label" for="name">Crosswalk Name *</label>
                             <c:choose>
                                 <c:when test="${crosswalkDetails.id > 0 }">
+				    <form:hidden path="name" />
                                     <br />${crosswalkDetails.name}
                                 </c:when>
                                 <c:otherwise>
@@ -32,43 +33,31 @@
                     <spring:bind path="fileDelimiter">
                         <div id="crosswalkDelimDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="name">Delimiter *</label>
-                            <c:choose>
-                                <c:when test="${crosswalkDetails.id > 0 }">
-                                    <c:forEach items="${delimiters}" var="cwalk" varStatus="dStatus">
-                                        <c:if test="${delimiters[dStatus.index][0] == crosswalkDetails.fileDelimiter}"><br />${delimiters[dStatus.index][1]}</c:if>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <form:select path="fileDelimiter" id="delimiter" class="form-control half">
-                                        <option value="">- Select -</option>
-                                        <c:forEach items="${delimiters}" var="cwalk" varStatus="dStatus">
-                                            <option value="${delimiters[dStatus.index][0]}">${delimiters[dStatus.index][1]} </option>
-                                        </c:forEach>
-                                    </form:select>
-                                    <span id="crosswalkDelimMsg" class="control-label"></span>
-                                </c:otherwise>
-                            </c:choose>
+                            <form:select path="fileDelimiter" id="delimiter" class="form-control half">
+                                <option value="">- Select -</option>
+                                <c:forEach items="${delimiters}" var="cwalk" varStatus="dStatus">
+                                    <option value="${delimiters[dStatus.index][0]}" <c:if test="${crosswalkDetails.fileDelimiter == delimiters[dStatus.index][0]}">selected</c:if>>${delimiters[dStatus.index][1]} </option>
+                                </c:forEach>
+                            </form:select>
+                            <span id="crosswalkDelimMsg" class="control-label"></span>
                         </div>
                     </spring:bind>
-                    <spring:bind path="file">
-                        <div id="crosswalkFileDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                            <label class="control-label" for="crosswalkFile">Crosswalk File *</label>
-                            <c:choose>
-                                <c:when test="${crosswalkDetails.id > 0 }">
-                                    <br />${crosswalkDetails.fileName}
-                                </c:when>
-                                <c:otherwise>
-                                    <form:input path="file" id="crosswalkFile" type="file"  />
-                                    <span id="crosswalkFileMsg" class="control-label"></span>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                    </spring:bind>
-                    <c:if test="${crosswalkDetails.id == 0}">
+		    <c:if test="${crosswalkDetails.id > 0 }">
                         <div class="form-group">
-                            <input type="button" id="submitCrosswalkButton" rel="${btnValue}" class="btn btn-primary" value="${btnValue}"/>
+                            <label class="control-label" >Existing Crosswalk File</label>
+                            <p>${crosswalkDetails.fileName}</p>
                         </div>
                     </c:if>
+                    <spring:bind path="file">
+                        <div id="crosswalkFileDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                            <label class="control-label" for="crosswalkFile"><c:if test="${crosswalkDetails.id > 0 }">New </c:if>Crosswalk File *</label>
+                            <form:input path="file" id="crosswalkFile" type="file"  />
+                            <span id="crosswalkFileMsg" class="control-label"></span>
+                        </div>
+                    </spring:bind>
+		    <div class="form-group">
+			<input type="button" id="submitCrosswalkButton" rel="${actionValue}" class="btn btn-primary" value="${btnValue}"/>
+		    </div>
 
                     <c:if test="${crosswalkDetails.id > 0}">
                         <div id="crosswalkNameDiv" class="form-group">
@@ -103,7 +92,7 @@
 
 <script type="text/javascript">
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         $("input:text,form").attr("autocomplete", "off");
 
 

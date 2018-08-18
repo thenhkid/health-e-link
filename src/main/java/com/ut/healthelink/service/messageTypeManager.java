@@ -84,6 +84,9 @@ public interface messageTypeManager {
 	
 	List <validationType> getValidationTypes1 ();
 	
-        List<messageType> getAssociatedMessageTypes(int orgId);
+    List<messageType> getAssociatedMessageTypes(int orgId);
+        
+    Integer uploadNewFileForCrosswalk(Crosswalks crosswalkDetails) throws Exception;
+        
 
 }

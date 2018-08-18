@@ -1,32 +1,32 @@
 
 require(['./main'], function () {
-    require(['jquery'], function($) {
-        
+    require(['jquery'], function ($) {
+
         $("input:text,form").attr("autocomplete", "off");
 
         populateCrosswalks(1);
         populateExistingTranslations(0);
-        
+
         //Fade out the updated/created message after being displayed.
         if ($('.alert').length > 0) {
             $('.alert').delay(2000).fadeOut(1000);
         }
 
         //This function will get the next/prev page for the crosswalk list
-        $(document).on('click', '.nextPage', function() {
+        $(document).on('click', '.nextPage', function () {
             var page = $(this).attr('rel');
             populateCrosswalks(page);
         });
 
         //The function that will be called when the "Save" button
         //is clicked
-        $('#saveDetails').click(function(event) {
+        $('#saveDetails').click(function (event) {
             var messageTypeId = $('#translationMsgDiv').attr('rel');
 
             $.ajax({
                 url: 'translations?id=' + messageTypeId,
                 type: "POST",
-                success: function(data) {
+                success: function (data) {
                     window.location.href = "translations?msg=updated";
                 }
             });
@@ -34,11 +34,11 @@ require(['./main'], function () {
 
         //This function will launch the crosswalk overlay with the selected
         //crosswalk details
-        $(document).on('click', '.viewCrosswalk', function() {
+        $(document).on('click', '.viewCrosswalk', function () {
             $.ajax({
                 url: 'viewCrosswalk' + $(this).attr('rel'),
                 type: "GET",
-                success: function(data) {
+                success: function (data) {
                     $("#crosswalkModal").html(data);
                 }
             });
@@ -47,19 +47,20 @@ require(['./main'], function () {
 
 
         //This function will launch the new crosswalk overlay with a blank form
-        $(document).on('click', '#createNewCrosswalk', function() {
-           $.ajax({
+        $(document).on('click', '#createNewCrosswalk', function () {
+            $.ajax({
                 url: 'newCrosswalk',
                 type: "GET",
-                success: function(data) {
+                success: function (data) {
                     $("#crosswalkModal").html(data);
                 }
             });
         });
 
 
-        $(document).on('click', '#submitCrosswalkButton', function(event) {
-
+      //The function to submit the new crosswalk
+        $(document).on('click', '#submitCrosswalkButton', function (event) {
+        	
             $('#crosswalkNameDiv').removeClass("has-error");
             $('#crosswalkNameMsg').removeClass("has-error");
             $('#crosswalkNameMsg').html('');
@@ -82,20 +83,25 @@ require(['./main'], function () {
             }
 
             //Need to make sure the crosswalk name doesn't already exist.
-            $.ajax({
-                url: 'checkCrosswalkName.do',
-                type: "POST",
-                async: false,
-                data: {'name': $('#name').val(), 'orgId': 0},
-                success: function(data) {
-                    if (data == 1) {
-                        $('#crosswalkNameDiv').addClass("has-error");
-                        $('#crosswalkNameMsg').addClass("has-error");
-                        $('#crosswalkNameMsg').html('The name entered is already associated with another crosswalk in the system!');
-                        errorFound = 1;
-                    }
-                }
-            });
+            var orgId = $('#orgId').val();
+	    
+	    if(actionValue === "create") {
+
+		$.ajax({
+		    url: '../library/checkCrosswalkName.do',
+		    type: "POST",
+		    async: false,
+		    data: {'name': $('#name').val(), 'orgId': 0},
+		    success: function (data) {
+			if (data == 1) {
+			    $('#crosswalkNameDiv').addClass("has-error");
+			    $('#crosswalkNameMsg').addClass("has-error");
+			    $('#crosswalkNameMsg').html('The name entered is already associated with another crosswalk in the system!');
+			    errorFound = 1;
+			}
+		    }
+		});
+	    }
 
             //Make sure a delimiter is selected
             if ($('#delimiter').val() == '') {
@@ -118,7 +124,7 @@ require(['./main'], function () {
                 return false;
             }
 
-            $('#crosswalkdetailsform').attr('action', actionValue + 'Crosswalk');
+            $('#crosswalkdetailsform').attr('action', '../library/' + actionValue + 'Crosswalk');
             $('#crosswalkdetailsform').submit();
 
         });
@@ -126,7 +132,7 @@ require(['./main'], function () {
         //This function will handle populating the data translation table
         //The trigger will be when a crosswalk is selected along with a
         //field
-        $(document).on('change', '#crosswalk', function() {
+        $(document).on('change', '#crosswalk', function () {
             var selectedField = $('#field').val();
             var selectedFieldText = $('#field').find(":selected").text();
             var selectedCW = $(this).val();
@@ -138,7 +144,7 @@ require(['./main'], function () {
                 $.ajax({
                     url: url,
                     type: "GET",
-                    success: function(data) {
+                    success: function (data) {
                         $('#translationMsgDiv').show();
                         $("#existingTranslations").html(data);
                         //Need to clear out the select boxes
@@ -153,18 +159,18 @@ require(['./main'], function () {
         //making sure another field does not have the same process 
         //order selected. It will swap display position
         //values with the requested position.
-        $(document).on('change', '.processOrder', function() {
+        $(document).on('change', '.processOrder', function () {
             //Store the current position
             var currDspPos = $(this).attr('rel');
             var newDspPos = $(this).val();
 
-            $('.processOrder').each(function() {
+            $('.processOrder').each(function () {
                 if ($(this).attr('rel') == newDspPos) {
                     //Need to update the saved process order
                     $.ajax({
                         url: 'updateTranslationProcessOrder?currProcessOrder=' + currDspPos + '&newProcessOrder=' + newDspPos,
                         type: "POST",
-                        success: function(data) {
+                        success: function (data) {
                             $('#translationMsgDiv').show();
                             populateExistingTranslations(1);
                         }
@@ -182,7 +188,7 @@ require(['./main'], function () {
         //Function that will handle removing a line item from the
         //existing data translations. Function will also update the
         //processing orders for each displayed.
-        $(document).on('click', '.removeTranslation', function() {
+        $(document).on('click', '.removeTranslation', function () {
             var currPos = $(this).attr('rel2');
             var fieldId = $(this).attr('rel');
 
@@ -190,14 +196,14 @@ require(['./main'], function () {
             $.ajax({
                 url: 'removeTranslations?fieldId=' + fieldId + '&processOrder=' + currPos,
                 type: "POST",
-                success: function(data) {
+                success: function (data) {
                     $('#translationMsgDiv').show();
                     populateExistingTranslations(1);
                 }
             });
 
         });
-        
+
     });
 });
 
@@ -205,7 +211,7 @@ function populateExistingTranslations(reload) {
     $.ajax({
         url: 'getTranslations.do?reload=' + reload,
         type: "GET",
-        success: function(data) {
+        success: function (data) {
             $("#existingTranslations").html(data);
         }
     });
@@ -215,7 +221,7 @@ function populateCrosswalks(page) {
     $.ajax({
         url: 'getCrosswalks.do?page=' + page,
         type: "GET",
-        success: function(data) {
+        success: function (data) {
             $("#crosswalksTable").html(data);
         }
     });
