@@ -117,4 +117,8 @@ public interface configurationTransportManager {
     boolean hasConfigsWithMasstranslations(Integer orgId, Integer transportMethodId) throws Exception;
       
     void checkAndCreateDirectory(configurationRhapsodyFields rhapsodyInfo) throws Exception;
+    
+    List<configurationFormFields> getInBoundFieldsForConfigConnection(Integer inConfigId, Integer outConfigId) throws Exception;
+    
+    configurationFormFields getConfigurationFieldsByFieldDesc(int configId, String fieldDesc) throws Exception;
 }

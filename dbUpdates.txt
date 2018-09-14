@@ -1,0 +1,29 @@
+/** dropped values 09112018**/
+
+CREATE TABLE `healthelink`.`transactionindroppedvalues` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transactionInId` INT NOT NULL,
+  `batchUploadId` INT NOT NULL,
+  `configId` INT NOT NULL,
+  `fieldNo` INT NULL,
+  `fieldName` VARCHAR(255) NULL,
+  `fieldValue` TEXT NULL,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `healthelink`.`transactionindroppedvalues` 
+ADD INDEX `fk_batchUpload_idx` (`batchUploadId` ASC);
+ALTER TABLE `healthelink`.`transactionindroppedvalues` 
+ADD CONSTRAINT `fk_batchUpload`
+  FOREIGN KEY (`batchUploadId`)
+  REFERENCES `healthelink`.`batchuploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `healthelink`.`transactionindroppedvalues` 
+ADD COLUMN `reportField1Data` VARCHAR(45) NULL AFTER `fieldValue`,
+ADD COLUMN `reportField2Data` VARCHAR(45) NULL AFTER `reportField1Data`,
+ADD COLUMN `reportField3Data` VARCHAR(45) NULL AFTER `reportField2Data`,
+ADD COLUMN `reportField4Data` VARCHAR(45) NULL AFTER `reportField3Data`;
+
+ALTER TABLE `healthelink`.`transactionindroppedvalues` 
+ADD COLUMN `entity3Id` INT NULL AFTER `reportField4Data`;

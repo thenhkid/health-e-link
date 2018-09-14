@@ -1034,6 +1034,8 @@ public class transactionInManagerImpl implements transactionInManager {
         Integer cleared = clearTransactionTranslatedIn(batchUploadId, 0);
         //we clear transactionInRecords
         cleared = cleared + clearTransactionInRecords(batchUploadId, 0);
+        //we clear dropped values
+        cleared = cleared + clearTransactionInDroppedValuesByBatchId(batchUploadId);
         //clear batchDownloadSummary
         cleared = cleared + clearBatchDownloadSummaryByUploadBatchId(batchUploadId);
         //clear transactionoutrecords
@@ -5155,6 +5157,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public void clearBatchRetry(Integer batchUploadId) throws Exception {
 		transactionInDAO.clearBatchRetry(batchUploadId);
+	}
+
+	@Override
+	public Integer clearTransactionInDroppedValuesByBatchId(Integer batchUploadId) {
+		return transactionInDAO.clearTransactionInDroppedValuesByBatchId(batchUploadId);
 	}
 	
 }

@@ -2147,5 +2147,44 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         }
 
     }
+
+	@Override
+	@Transactional
+	public void insertDroppedValues(configurationFormFields cff,
+			List<String> reportHeaderCols, Integer batchUploadId, Integer entityIdFCol)
+			throws Exception {
+		String sql = "insert into transactionindroppedvalues  "
+				+ " (transactionInId, batchUploadId, configId, ";
+		if (entityIdFCol > 0) {
+			sql += " entity3Id, ";
+		}
+		sql += " fieldNo, fieldName, fieldValue, "
+				+ " "+ reportHeaderCols.get(1)+") "
+				+ " select tir.transactionInId,  "+batchUploadId+", " 
+				+ cff.getconfigId()+", ";
+		
+		if (entityIdFCol > 0) {
+			sql += " entity3Col,";
+		}
+		sql += cff.getFieldNo()+", '" + cff.getFieldLabel() +"'," 
+		+ " tir.f"+cff.getFieldNo()+", "+ reportHeaderCols.get(0)+" "
+				+ " from (select f"+cff.getFieldNo() +",";
+				
+		sql += " transactionInId , "+reportHeaderCols.get(0)+" "
+				+ " from transactioninrecords where batchid =  :batchUploadId and length(f"+cff.getFieldNo()+") > 0 and f"+cff.getFieldNo()+" is not null) tir join "
+				+ " (select f"+cff.getFieldNo()+"," ;
+				if (entityIdFCol > 0) {
+					sql += " F"+entityIdFCol+" entity3Col,";
+				}
+				sql +=	 " transactionInId from transactiontranslatedin "
+				+ " where batchid = :batchUploadId and (length(f11) = 0 or  f"+cff.getFieldNo()+" is null) and statusId = 40) tti "
+				+ " on tti.transactionInId = tir.transactionInId;";
+				
+		Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
+        
+        insertData.executeUpdate();
+		
+	}
     
 }

@@ -548,5 +548,6 @@ public interface transactionInManager {
      
      void clearBatchRetry (Integer batchUploadId) throws Exception;
      
+     Integer clearTransactionInDroppedValuesByBatchId(Integer batchUploadId);
 
 }

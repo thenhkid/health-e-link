@@ -469,4 +469,6 @@ public interface transactionInDAO {
     
     void clearBatchRetry (Integer batchUploadId) throws Exception;
     
+    Integer clearTransactionInDroppedValuesByBatchId(Integer batchUploadId);
+    
 }

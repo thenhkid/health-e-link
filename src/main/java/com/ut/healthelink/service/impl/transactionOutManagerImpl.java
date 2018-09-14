@@ -30,6 +30,7 @@ import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationDataTranslations;
 import com.ut.healthelink.model.configurationFTPFields;
 import com.ut.healthelink.model.configurationFormFields;
+import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.configurationTransport;
@@ -3103,17 +3104,18 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                    		
 	                    		//now we delete massoutput file
 		                    	massOutFile.delete();
+		                    	
 	                    	}
-	                    
+
 	                		//we need to update status
 	                		transactionInManager.updateTransactionStatus(batchUploadId, 0, 19, 40);
 	                		updateTransactionTargetStatusOutBound(batchDLId, 0, 18, 40);
-	                
-	                
-	                		
 	                		//we need to update our totals
                 			transactionInManager.updateRecordCounts(batchDownload.getId(), rejectIds, true, "totalErrorCount");
                 			transactionInManager.updateRecordCounts(batchDownload.getId(), new ArrayList<Integer>(), true, "totalRecordCount");
+                			
+                		//here we insert dropped values
+                		insertDroppedValuesForConfigPair(batchUploadDetails.getConfigId(), configDetails.getId(),batchUploadDetails.getId());
                    
 	                    //now we delete the data from transactionTranslatedIn, transactionTranslatedOut, transactionInRecords
 	                    //we will schedule a job to delete from message tables as it takes too long if we are not adding batchId there
@@ -3137,6 +3139,30 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                    
 						return 0;
 	                }
+
+	@Override
+	public void insertDroppedValuesForConfigPair(Integer inConfigId, Integer outConfigId, Integer batchUploadId)
+			throws Exception {
+		//1. get the form fields
+		List <configurationFormFields> cffList = configurationTransportManager.getInBoundFieldsForConfigConnection(inConfigId, outConfigId);
+		
+		configurationMessageSpecs cms = configurationManager.getMessageSpecs(inConfigId);
+		
+		//build our headerColStrings
+		List <String> headerInfo = configurationManager.getConfigHeaderCols(cms);
+		configurationFormFields cffForEntity3 = configurationTransportManager.getConfigurationFieldsByFieldDesc(inConfigId, "rrEntity3");
+		
+		for (configurationFormFields cff : cffList) {
+			 insertDroppedValues(cff, headerInfo, batchUploadId, cffForEntity3.getFieldNo());
+		}		
+	}
+
+	@Override
+	public void insertDroppedValues(configurationFormFields cff,
+			List <String>  headerInfo, Integer batchUploadId, Integer entityIdFCol) throws Exception {
+		transactionOutDAO.insertDroppedValues(cff, headerInfo, batchUploadId, entityIdFCol);
+		
+	}
 
 }
 

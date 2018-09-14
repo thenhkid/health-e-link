@@ -1087,5 +1087,36 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             }
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<configurationFormFields> getInBoundFieldsForConfigConnection(
+			Integer inConfigId, Integer outConfigId) throws Exception {
+		String sql = (" select inFieldLabel fieldLabel, inFieldNo fieldNo, configId from "
+				+ " (select configId, concat(saveToTableName, '_', saveToTableCol) matchCols,  "
+				+ " fieldLabel as inFieldLabel, fieldNo as inFieldNo "
+				+ " from configurationformfields where configId = :inConfigId and usefield = 1 "
+				+ " and required  = 0) inConfigInfo join  "
+				+ " (select  concat(saveToTableName, '_', saveToTableCol) matchCols "
+				+ " from configurationformfields where configId = :outConfigId  and usefield = 1) outConfigInfo"
+				+ " on  inConfigInfo.matchCols = outConfigInfo.matchCols order by inFieldNo;");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                Transformers.aliasToBean(configurationFormFields.class));
+        query.setParameter("inConfigId", inConfigId);
+        query.setParameter("outConfigId", outConfigId);
+
+        List<configurationFormFields> inboundFormFields = query.list();
+
+        return inboundFormFields;
+	}
 	
+	@Override
+    @Transactional
+    public configurationFormFields getConfigurationFieldsByFieldDesc(int configId, String fieldDesc) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
+                .add(Restrictions.eq("configId", configId))
+                .add(Restrictions.eq("fieldDesc", fieldDesc));
+
+        return (configurationFormFields) criteria.uniqueResult();
+    }
 }

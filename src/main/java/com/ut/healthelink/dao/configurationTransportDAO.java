@@ -120,5 +120,9 @@ public interface configurationTransportDAO {
     
     boolean hasConfigsWithMasstranslations(Integer orgId, Integer transportMethodId) throws Exception;
     
+    List<configurationFormFields> getInBoundFieldsForConfigConnection(Integer inConfigId, Integer outConfigId) throws Exception;
+    
+    configurationFormFields getConfigurationFieldsByFieldDesc(int configId, String fieldDesc) throws Exception;
+        
      
 }

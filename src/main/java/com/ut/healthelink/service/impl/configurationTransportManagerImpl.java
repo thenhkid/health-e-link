@@ -450,6 +450,18 @@ public class configurationTransportManagerImpl implements configurationTransport
 
 	}
 
+	@Override
+	public List<configurationFormFields> getInBoundFieldsForConfigConnection(
+			Integer inConfigId, Integer outConfigId) throws Exception {
+		return configurationTransportDAO.getInBoundFieldsForConfigConnection(inConfigId, outConfigId);
+	}
+
+	@Override
+	public configurationFormFields getConfigurationFieldsByFieldDesc(
+			int configId, String fieldDesc) throws Exception {
+		return configurationTransportDAO.getConfigurationFieldsByFieldDesc(configId, fieldDesc);
+	}
+
 	
     
     
