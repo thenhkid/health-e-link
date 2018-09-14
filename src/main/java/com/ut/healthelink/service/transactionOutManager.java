@@ -183,5 +183,8 @@ public interface transactionOutManager {
     void updateErrorStatusForTT (Integer batchDownloadId, Integer newStatusId, Integer transactionTargetId) throws Exception;
     
     void clearTransactionTranslatedOutByBatchId(Integer batchDownloadId) throws Exception;
-
+    
+    void insertDroppedValuesForConfigPair (Integer inConfigId, Integer outConfigId, Integer batchUploadId) throws Exception;
+    
+    void insertDroppedValues (configurationFormFields cff, List <String> reportHeaderCols, Integer batchUploadId, Integer entityIdFCol) throws Exception;
 }

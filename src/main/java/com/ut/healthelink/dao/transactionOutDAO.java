@@ -177,4 +177,8 @@ public interface transactionOutDAO {
    
     void clearTransactionTranslatedOutByBatchId(Integer batchDownloadId) throws Exception;
     
+    void insertDroppedValues (configurationFormFields cff, List <String> reportHeaderCols, Integer batchUploadId, Integer entityIdFCol) throws Exception;
+
+
+    
 }

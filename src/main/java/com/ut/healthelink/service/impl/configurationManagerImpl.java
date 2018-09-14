@@ -1,5 +1,6 @@
 package com.ut.healthelink.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -599,5 +600,37 @@ public class configurationManagerImpl implements configurationManager {
 	public configurationExcelDetails getExcelDetails(Integer configId, Integer orgId)
 			throws Exception {
 		return configurationDAO.getExcelDetails(configId, orgId);
+	}
+
+	@Override
+	public List <String> getConfigHeaderCols(configurationMessageSpecs cms)
+			throws Exception {
+		String selectCols = "";
+		String insertCols = "";
+		
+		if (cms.getrptField1() != 0) {
+			selectCols += ("F" + cms.getrptField1() + ",");
+			insertCols += "reportField1Data, ";
+		}
+		if (cms.getrptField1() != 0) {
+			selectCols += ("F" + cms.getrptField2() + ",");
+			insertCols += "reportField2Data, ";
+		}
+		if (cms.getrptField1() != 0) {
+			selectCols += ("F" + cms.getrptField3() + ",");
+			insertCols += "reportField3Data, ";
+		}
+		if (cms.getrptField1() != 0) {
+			selectCols += ("F" + cms.getrptField4());
+			insertCols += "reportField4Data";
+		}
+		if (insertCols.endsWith(",")) {
+			insertCols += insertCols.substring(0, insertCols.length() - 1);
+			selectCols += selectCols.substring(0, selectCols.length() - 1);
+		}
+		
+		List<String> headerCols = Arrays.asList(selectCols, insertCols);
+		
+		return headerCols;
 	}
 }

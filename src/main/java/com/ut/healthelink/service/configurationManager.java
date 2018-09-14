@@ -143,4 +143,6 @@ public interface configurationManager {
   configurationCCDElements getCCDElement(Integer elementId) throws Exception;
   
   configurationExcelDetails getExcelDetails (Integer configId, Integer orgId) throws Exception;
+  
+  List <String> getConfigHeaderCols (configurationMessageSpecs cms) throws Exception;
 }

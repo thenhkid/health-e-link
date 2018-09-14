@@ -7212,5 +7212,22 @@ public class transactionInDAOImpl implements transactionInDAO {
 		delBatch.executeUpdate();
 		
 	}
+	
+	
+	@Override
+    @Transactional
+    public Integer clearTransactionInDroppedValuesByBatchId(Integer batchUploadId) {
+    	String sql = "delete from transactionindroppedvalues where batchUploadId = :batchUploadId ";
+        
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
+        try {
+            deleteData.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionInDroppedValuesByBatchId " + ex.getCause());
+            return 1;
+        }
+    }
 
 }
