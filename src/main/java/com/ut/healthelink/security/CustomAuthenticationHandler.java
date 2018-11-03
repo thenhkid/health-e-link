@@ -38,19 +38,19 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
         
         //we do not log
-        if (request.getParameter("j_username").equalsIgnoreCase(authentication.getName())) {
+        if (request.getParameter("username").equalsIgnoreCase(authentication.getName())) {
         	usermanager.setLastLogin(authentication.getName());
         }
         /** log the admin who logged in as user**/
-        // System.out.println(request.getParameter("j_username"));
+        // System.out.println(request.getParameter("username"));
       //we log here 
         /* Need to get the userId */
         User userDetails = usermanager.getUserByUserName(authentication.getName());
         
-        if (!request.getParameter("j_username").equalsIgnoreCase(authentication.getName())) {
+        if (!request.getParameter("username").equalsIgnoreCase(authentication.getName())) {
 	        try {
 	            //log user activity
-                    User userLogDetails = usermanager.getUserByUserName(request.getParameter("j_username"));
+                    User userLogDetails = usermanager.getUserByUserName(request.getParameter("username"));
 	            UserActivity ua = new UserActivity();
 	            ua.setUserId(userLogDetails.getId());
 	            ua.setFeatureId(0);

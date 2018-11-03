@@ -51,7 +51,7 @@ require(['./main'], function () {
 	           
 	            $.ajax({
 	                url: actionValue,
-	                data: {'j_password':password},
+	                data: {'password':password},
 	                type: "POST",
 	                async: false,
 	                success: function(data) {

@@ -11,7 +11,7 @@
         <header class="login-header" role="banner">
             <div class="login-header-content">
                 <a href="<c:url value='/' />" title="Return to home page.">
-                    <span class="logo" alt="{Company Name Logo}">Massachusetts Department of Public Health</span>
+                    <span class="logo" alt="{Company Name Logo}">Rapid Registry</span>
                 </a>
             </div>
         </header>
@@ -35,15 +35,15 @@
                 </c:otherwise>
             </c:choose>
         </c:if>
-        <form role="form" id="form-admin-login" name='f' action="<c:url value='j_spring_security_check' />" method='POST'>
+        <form role="form" id="form-admin-login" name='f' action="<c:url value='/login' />" method='POST'>
             <fieldset name="login-fields" form="form-admin-login" class="basic-clearfix">
                 <div class="form-group ${not empty error ? 'has-error' : '' }">
                     <label class="control-label" for="username">Username</label>
-                    <input id="username" name='j_username' class="form-control" type="text" value="" autofocus="true" autocomplete="off" />
+                    <input id="username" name='username' class="form-control" type="text" value="" autofocus="true" autocomplete="off" />
                 </div>
                 <div class="form-group ${not empty error ? 'has-error' : '' }">
                     <label class="control-label" for="password">Password</label>
-                    <input id="password" name='j_password' class="form-control" type="password" value=""  autocomplete="off" />
+                    <input id="password" name='password' class="form-control" type="password" value=""  autocomplete="off" />
                 </div>
                 <input type="submit" value="Login" class="btn btn-primary pull-right" role="button"/>
                 <!--<label for="remember-me" class="pull-left"><input id="j_remember" name="_spring_security_remember_me" type="checkbox" value="1">&nbsp;Remember Me</label>-->
