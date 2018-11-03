@@ -1579,7 +1579,7 @@ public class adminSysAdminController {
         /** we verify existing password **/
         if (user.getRoleId() == 1 || user.getRoleId() == 4) {
 	        try  {
-	        	okToLoginAs = usermanager.authenticate(request.getParameter("j_password"), user.getEncryptedPw(), user.getRandomSalt());
+	        	okToLoginAs = usermanager.authenticate(request.getParameter("password"), user.getEncryptedPw(), user.getRandomSalt());
 	        } catch(Exception ex) {
 	        	okToLoginAs = false;
 	        }
