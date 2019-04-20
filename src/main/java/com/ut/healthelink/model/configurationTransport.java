@@ -90,7 +90,10 @@ public class configurationTransport {
     
     @Column(name = "massTranslation", nullable = false)
     private boolean massTranslation = false;
-
+    
+    @Column(name = "lineTerminator", nullable = true)
+    private String lineTerminator = "\\n";
+    
     @NoHtml
     @Column(name = "FILEEXT", nullable = false)
     private String fileExt = null;
@@ -368,6 +371,14 @@ public class configurationTransport {
 
 	public void setMassTranslation(boolean massTranslation) {
 		this.massTranslation = massTranslation;
+	}
+
+	public String getLineTerminator() {
+		return lineTerminator;
+	}
+
+	public void setLineTerminator(String lineTerminator) {
+		this.lineTerminator = lineTerminator;
 	}
 
 }

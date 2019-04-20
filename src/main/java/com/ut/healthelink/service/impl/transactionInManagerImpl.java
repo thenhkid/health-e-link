@@ -1581,8 +1581,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow) {
-        return transactionInDAO.insertLoadData(batchId, delimChar, fileWithPath, loadTableName, containsHeaderRow);
+    public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow, String lineTerminator) {
+        return transactionInDAO.insertLoadData(batchId, delimChar, fileWithPath, loadTableName, containsHeaderRow, lineTerminator);
     }
 
     @Override
@@ -1925,7 +1925,12 @@ public class transactionInManagerImpl implements transactionInManager {
                     
                     //at this point, hl7 and hr are in unencoded plain text
                     if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
-                        sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), actualFileName, loadTableName, batch.isContainsHeaderRow());
+                    	//get transport type details
+                    	String lineTerminator = "\\n";
+                    	if (batch.getConfigId() != 0) {
+                    		lineTerminator = configurationtransportmanager.getTransportDetails(batch.getConfigId()).getLineTerminator();
+                    	}
+                        sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), actualFileName, loadTableName, batch.isContainsHeaderRow(), lineTerminator);
                         File actualFile = new File(actualFileName);
                         //we are archiving it
                         File archiveFile = new File(dir.setPathFromRoot(archivePath) + batch.getutBatchName() + "_dec" + actualFileName.substring(actualFileName.lastIndexOf(".")));

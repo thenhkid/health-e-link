@@ -195,7 +195,7 @@ public interface transactionInDAO {
     
     Integer copyTransactionInStatusToTarget(Integer batchId, Integer transactionId);
     
-    Integer insertLoadData (Integer batchId, String delimChar, String fileWithPath, String tableName, boolean containsHeaderRow);
+    Integer insertLoadData (Integer batchId, String delimChar, String fileWithPath, String tableName, boolean containsHeaderRow, String lineTerminator);
     
     Integer createLoadTable (String loadTableName);
     

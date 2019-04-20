@@ -214,6 +214,17 @@
                                         </c:if>
                                     </div>
                                 </spring:bind>
+                                <spring:bind path="lineTerminator">
+                                    <div id="fileExtDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                        <label class="control-label" for="lineTerminator">Line Terminator *</label>
+                                        <form:input path="lineTerminator" id="lineTerminator" class="form-control" type="text" maxLength="40" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" />
+                                        <form:errors path="lineTerminator" cssClass="control-label" element="label" />
+                                        <span id="lineTerminatorMsg" class="control-label"></span>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="lineTerminator" />
+                                        </c:if>
+                                    </div>
+                                </spring:bind>
                                 <spring:bind path="encodingId">
                                     <div id="encodingDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="encodingId">Encoding *</label>
