@@ -1,16 +1,10 @@
 package com.ut.healthelink.reference;
 import java.io.BufferedReader;
 
-import org.apache.commons.codec.binary.Base64;
-
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,10 +16,8 @@ public class fileSystem {
 
     String dir = null;
 
-    String macDirectoryPath = "/Applications/bowlink/";
-    String winDirectoryPath = "c:\\bowlink\\";
-    String unixDirectoryPath = "/home/bowlink/";
-
+    String directoryPath = System.getProperty("directory.rootDir");
+    
     public String getDir() {
         return dir;
     }
@@ -33,26 +25,26 @@ public class fileSystem {
     public void setMessageTypeDir(String folderName) {
         //Windows
         if (os.indexOf("win") >= 0) {
-            this.dir = winDirectoryPath + folderName + "\\";
+            this.dir = directoryPath + folderName + "\\";
         } //Mac
         else if (os.indexOf("mac") >= 0) {
-            this.dir = macDirectoryPath + folderName + "/";
+            this.dir = directoryPath + folderName + "/";
         } //Unix or Linux or Solarix
         else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-            this.dir = unixDirectoryPath + folderName + "/";
+            this.dir = directoryPath + folderName + "/";
         }
     }
 
     public void setMessageTypeCrosswalksDir(String folderName) {
         //Windows
         if (os.indexOf("win") >= 0) {
-            this.dir = winDirectoryPath + folderName + "\\crosswalks\\";
+            this.dir = directoryPath + folderName + "\\crosswalks\\";
         } //Mac
         else if (os.indexOf("mac") >= 0) {
-            this.dir = macDirectoryPath + folderName + "/crosswalks/";
+            this.dir = directoryPath + folderName + "/crosswalks/";
         } //Unix or Linux or Solarix
         else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-            this.dir = unixDirectoryPath + folderName + "/crosswalks/";
+            this.dir = directoryPath + folderName + "/crosswalks/";
         }
     }
 
@@ -60,26 +52,26 @@ public class fileSystem {
 
         //Windows
         if (os.indexOf("win") >= 0) {
-            this.dir = winDirectoryPath + orgName + "\\" + folderName + "\\";
+            this.dir = directoryPath + orgName + "\\" + folderName + "\\";
         } //Mac
         else if (os.indexOf("mac") >= 0) {
-            this.dir = macDirectoryPath + orgName + "/" + folderName + "/";
+            this.dir = directoryPath + orgName + "/" + folderName + "/";
         } //Unix or Linux or Solarix
         else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-            this.dir = unixDirectoryPath + orgName + "/" + folderName + "/";
+            this.dir = directoryPath + orgName + "/" + folderName + "/";
         }
     }
-    
+
     public void setDirByName(String dirName) {
         //Windows
         if (os.indexOf("win") >= 0) {
-            this.dir = winDirectoryPath + dirName;
+            this.dir = directoryPath + dirName;
         } //Mac
         else if (os.indexOf("mac") >= 0) {
-            this.dir = macDirectoryPath + dirName;
+            this.dir = directoryPath + dirName;
         } //Unix or Linux or Solarix
         else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-            this.dir = unixDirectoryPath + dirName;
+            this.dir = directoryPath + dirName;
         }
     }
 
@@ -89,17 +81,17 @@ public class fileSystem {
             //Windows
             if (os.indexOf("win") >= 0) {
                 //C:/BowLink/
-                String dir = winDirectoryPath + orgName;
+                String dir = directoryPath + orgName;
                 File directory = new File(dir);
                 delete(directory);
             } //Mac
             else if (os.indexOf("mac") >= 0) {
-                String dir = macDirectoryPath + orgName;
+                String dir = directoryPath + orgName;
                 File directory = new File(dir);
                 delete(directory);
             } //Unix or Linux or Solarix
             else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-                String dir = unixDirectoryPath + orgName;
+                String dir = directoryPath + orgName;
                 File directory = new File(dir);
                 delete(directory);
             } else {
@@ -111,27 +103,27 @@ public class fileSystem {
         }
 
     }
-    
+
     public void createOrgDirectory(String orgName, String dirName) {
-         try {
+        try {
             //Windows
             if (os.indexOf("win") >= 0) {
                 //C:/BowLink/
-                String dir = winDirectoryPath + orgName + "\\" + dirName.replace("/", "\\");
+                String dir = directoryPath + orgName + "\\" + dirName.replace("/", "\\");
                 File directory = new File(dir);
                 if (!directory.exists()) {
                     directory.mkdir();
                 }
             } //Mac
             else if (os.indexOf("mac") >= 0) {
-                String dir = macDirectoryPath + orgName + "/" + dirName;
+                String dir = directoryPath + orgName + "/" + dirName;
                 File directory = new File(dir);
                 if (!directory.exists()) {
                     directory.mkdir();
                 }
             } //Unix or Linux or Solarix
             else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-                String dir = unixDirectoryPath + orgName + "/" + dirName;
+                String dir = directoryPath + orgName + "/" + dirName;
                 File directory = new File(dir);
                 if (!directory.exists()) {
                     directory.mkdir();
@@ -150,45 +142,48 @@ public class fileSystem {
             //Windows
             if (os.indexOf("win") >= 0) {
                 //C:/BowLink/
-                String dir = winDirectoryPath + orgName;
+                String dir = directoryPath + orgName;
                 File directory = new File(dir);
                 if (!directory.exists()) {
                     directory.mkdir();
-                    new File(winDirectoryPath + orgName + "\\crosswalks").mkdirs();
-                    new File(winDirectoryPath + orgName + "\\input files").mkdirs();
-                    new File(winDirectoryPath + orgName + "\\output files").mkdirs();
-                    new File(winDirectoryPath + orgName + "\\templates").mkdirs();
-                    new File(winDirectoryPath + orgName + "\\brochures").mkdirs();
-                    new File(winDirectoryPath + orgName + "\\attachments").mkdirs();
-                    new File(winDirectoryPath + orgName + "\\certificates").mkdirs();
+                    new File(directoryPath + orgName + "\\crosswalks").mkdirs();
+                    new File(directoryPath + orgName + "\\input files").mkdirs();
+                    new File(directoryPath + orgName + "\\output files").mkdirs();
+                    new File(directoryPath + orgName + "\\templates").mkdirs();
+                    new File(directoryPath + orgName + "\\brochures").mkdirs();
+                    new File(directoryPath + orgName + "\\attachments").mkdirs();
+                    new File(directoryPath + orgName + "\\certificates").mkdirs();
+                    new File(directoryPath + "headerimages\\" + orgName).mkdirs();
                 }
             } //Mac
             else if (os.indexOf("mac") >= 0) {
-                String dir = macDirectoryPath + orgName;
+                String dir = directoryPath + orgName;
                 File directory = new File(dir);
                 if (!directory.exists()) {
                     directory.mkdir();
-                    new File(macDirectoryPath + orgName + "/crosswalks").mkdirs();
-                    new File(macDirectoryPath + orgName + "/input files").mkdirs();
-                    new File(macDirectoryPath + orgName + "/output files").mkdirs();
-                    new File(macDirectoryPath + orgName + "/templates").mkdirs();
-                    new File(macDirectoryPath + orgName + "/brochures").mkdirs();
-                    new File(macDirectoryPath + orgName + "/attachments").mkdirs();
-                    new File(macDirectoryPath + orgName + "/certificates").mkdirs();
+                    new File(directoryPath + orgName + "/crosswalks").mkdirs();
+                    new File(directoryPath + orgName + "/input files").mkdirs();
+                    new File(directoryPath + orgName + "/output files").mkdirs();
+                    new File(directoryPath + orgName + "/templates").mkdirs();
+                    new File(directoryPath + orgName + "/brochures").mkdirs();
+                    new File(directoryPath + orgName + "/attachments").mkdirs();
+                    new File(directoryPath + orgName + "/certificates").mkdirs();
+                    new File(directoryPath + "headerimages/" + orgName).mkdirs();
                 }
             } //Unix or Linux or Solarix
             else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-                String dir = unixDirectoryPath + orgName;
+                String dir = directoryPath + orgName;
                 File directory = new File(dir);
                 if (!directory.exists()) {
                     directory.mkdir();
-                    new File(unixDirectoryPath + orgName + "/crosswalks").mkdirs();
-                    new File(unixDirectoryPath + orgName + "/input files").mkdirs();
-                    new File(unixDirectoryPath + orgName + "/output files").mkdirs();
-                    new File(unixDirectoryPath + orgName + "/templates").mkdirs();
-                    new File(unixDirectoryPath + orgName + "/brochures").mkdirs();
-                    new File(unixDirectoryPath + orgName + "/attachments").mkdirs();
-                    new File(unixDirectoryPath + orgName + "/certificates").mkdirs();
+                    new File(directoryPath + orgName + "/crosswalks").mkdirs();
+                    new File(directoryPath + orgName + "/input files").mkdirs();
+                    new File(directoryPath + orgName + "/output files").mkdirs();
+                    new File(directoryPath + orgName + "/templates").mkdirs();
+                    new File(directoryPath + orgName + "/brochures").mkdirs();
+                    new File(directoryPath + orgName + "/attachments").mkdirs();
+                    new File(directoryPath + orgName + "/certificates").mkdirs();
+                    new File(directoryPath + "headerimages/" + orgName).mkdirs();
                 }
             } else {
                 System.out.println("Your OS is not support!!");
@@ -241,22 +236,22 @@ public class fileSystem {
      *
      * @returns The function will return 0 if no delimiter was found or the count of the delimiter
      */
-    public Integer checkFileDelimiter(fileSystem dir, String fileName, String delim) {
+    public Integer checkFileDelimiter(fileSystem dir, String fileName, String delim) throws Exception {
 
         int delimCount = 0;
-
+        String errorMessage = "";
+        
         FileInputStream fileInput = null;
         try {
             File file = new File(dir.getDir() + fileName);
             fileInput = new FileInputStream(file);
-            
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        
-        
+
         BufferedReader br = new BufferedReader(new InputStreamReader(fileInput));
-        
+
         try {
             String line;
             try {
@@ -269,77 +264,81 @@ public class fileSystem {
                     break;
                 }
             } catch (IOException ex) {
+            	errorMessage = errorMessage + "<br/>" + ex.getMessage();
                 Logger.getLogger(fileSystem.class.getName()).log(Level.SEVERE, null, ex);
             }
         } finally {
             try {
                 br.close();
             } catch (IOException e) {
+            	errorMessage = errorMessage + "<br/>" + e.getMessage();
                 e.printStackTrace();
             }
         }
-
+        /** throw error message here because want to make sure file stream is closed **/
+        if (!errorMessage.equalsIgnoreCase("")) {
+        	throw new Exception(errorMessage);
+        }
         return delimCount;
     }
-    
+
     public boolean isWinMachine() {
-    	
-    	boolean winMachine = false;
+
+        boolean winMachine = false;
         //Windows
         if (os.indexOf("win") >= 0) {
-        	winMachine =  true;
-        } 
+            winMachine = true;
+        }
         return winMachine;
     }
-    
+
     public String setPath(String addOnPath) {
-    	String path = "";
-    	//Windows
+        String path = "";
+        //Windows
         if (os.indexOf("win") >= 0) {
-        	path = winDirectoryPath.replace("\\bowlink\\", "") + addOnPath.replace("", "").replace("/", "\\");  
+            path = directoryPath.replace("\\bowlink\\", "") + addOnPath.replace("", "").replace("/", "\\");
         } //Mac
         else if (os.indexOf("mac") >= 0) {
-        	path = macDirectoryPath.replace("/bowlink/", "") + addOnPath;
+            path = directoryPath.replace("/bowlink/", "") + addOnPath;
         } //Unix or Linux or Solarix
         else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-        	path = unixDirectoryPath.replace("/bowlink/", "") + addOnPath;        
+            path = directoryPath.replace("/bowlink/", "") + addOnPath;
         }
         return path;
     }
 
-    
     public String setPathFromRoot(String addOnPath) {
-    	
-    	String path = "";
-    	
-    	//Windows
+
+        String path = "";
+
+        //Windows
         if (os.indexOf("win") >= 0) {
-        	path = addOnPath.replace("", "").replace("/", "\\");  
+            path = addOnPath.replace("", "").replace("/", "\\");
         } //Mac
         else if (os.indexOf("mac") >= 0) {
-        	path = addOnPath;
+            path = addOnPath;
         } //Unix or Linux or Solarix
         else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-        	path = addOnPath;        
+            path = addOnPath;
         }
         return path;
     }
-    
-    public Integer checkFileDelimiter(File file, String delim) {
+
+    public Integer checkFileDelimiter(File file, String delim) throws Exception{
 
         int delimCount = 0;
-
+        String errorMessage = "";
         FileInputStream fileInput = null;
         try {
             fileInput = new FileInputStream(file);
-            
+
         } catch (FileNotFoundException e) {
+        	errorMessage = e.getMessage();
             e.printStackTrace();
         }
-        
-        
+
         BufferedReader br = new BufferedReader(new InputStreamReader(fileInput));
-        
+
         try {
             String line;
             try {
@@ -352,18 +351,63 @@ public class fileSystem {
                     break;
                 }
             } catch (IOException ex) {
+            	errorMessage = errorMessage + "<br/>" + ex.getMessage();
                 Logger.getLogger(fileSystem.class.getName()).log(Level.SEVERE, null, ex);
             }
         } finally {
             try {
                 br.close();
             } catch (IOException e) {
+            	errorMessage = errorMessage + "<br/>" + e.getMessage();
                 e.printStackTrace();
             }
         }
 
+        /** throw error message here because want to make sure file stream is closed **/
+        if (!errorMessage.equalsIgnoreCase("")) {
+        	throw new Exception(errorMessage);
+        }
+        
         return delimCount;
     }
 
-      
+    public byte[] loadFile(File file) throws IOException {
+        FileInputStream is = new FileInputStream(file);
+
+        long length = file.length();
+        if (length > Integer.MAX_VALUE) {
+        // File is too large
+        }
+        byte[] bytes = new byte[(int) length];
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+                && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+            offset += numRead;
+        }
+
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file " + file.getName());
+        }
+
+        is.close();
+        return bytes;
+    }
+    
+    public String addPathToProjectDir(String addOnPath) {
+        String path = "";
+        //Windows
+        if (os.indexOf("win") >= 0) {
+            path = directoryPath + addOnPath.replace("", "").replace("/", "\\");
+        } //Mac
+        else if (os.indexOf("mac") >= 0) {
+            path = directoryPath + addOnPath;
+        } //Unix or Linux or Solarix
+        else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
+            path = directoryPath + addOnPath;
+        }
+        return path;
+    }
+
+
 }

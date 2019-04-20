@@ -26,9 +26,15 @@
                             <form:input path="fieldAppendText" id="fieldAppendText" class="form-control" type="text" maxLength="255" />
                         </div>
                     </spring:bind>
+                    <spring:bind path="defaultValue">
+                        <div id="defaultValueDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                            <label class="control-label" for="defaultValue">Default Value</label>
+                            <form:input path="defaultValue" id="newdefaultValue" class="form-control" type="text" maxLength="45" />
+                        </div>
+                    </spring:bind>
                     <spring:bind path="fieldValue">
                         <div id="fieldValueDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                            <label class="control-label" for="fieldValue">Field Value *</label>
+                            <label class="control-label" for="fieldValue">Field Value</label>
                             <form:select path="fieldValue" id="newFieldValue" class="form-control half">
                                 <option value="">- Select -</option>
                                 <c:forEach items="${fields}" var="field" varStatus="fStatus">

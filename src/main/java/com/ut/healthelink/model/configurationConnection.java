@@ -47,7 +47,10 @@ public class configurationConnection {
 
     @Transient
     private Integer targetOrgCol = 0;
-
+    
+    @Transient
+    private Integer sourceSubOrgCol = 0;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -169,5 +172,13 @@ public class configurationConnection {
     public void setMessageTypeId(int messageTypeId) {
         this.messageTypeId = messageTypeId;
     }
+
+	public Integer getSourceSubOrgCol() {
+		return sourceSubOrgCol;
+	}
+
+	public void setSourceSubOrgCol(Integer sourceSubOrgCol) {
+		this.sourceSubOrgCol = sourceSubOrgCol;
+	}
 
 }

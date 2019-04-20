@@ -42,6 +42,7 @@
                                 <th scope="col" class="center-text">Primary</th>
                                 <th scope="col" class="center-text">Secondary</th>
                                 <th scope="col" class="center-text">Times Logged In</th>
+                                <th scope="col" class="center-text">Login As</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -59,7 +60,17 @@
                                                 <td class="center-text">
                                                 <c:if test="${user.mainContact == 2}">X</c:if><c:if test="${user.mainContact != 2}">--</c:if>
                                                 </td>
-                                                    <td class="center-text">${userFunctions.findTotalLogins(user.id)}</td>
+                                                <td class="center-text">${userFunctions.findTotalLogins(user.id)}</td>
+                                                <td class="center-text">
+                                                <c:if test="${user.status}">
+                                                <a href="#loginAsModal" data-toggle="modal" rel="${user.username}" class="btn btn-link loginAs" title="Login as this user">
+                                                    Login as
+                                                </a>
+                                                </c:if>
+                                                 <c:if test="${user.status == false}">
+                                                Inactive
+                                                </c:if>
+                                                </td>
                                             <td class="actions-col">
                                                 <a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="btn btn-link userEdit" title="Edit this user">
                                                     <span class="glyphicon glyphicon-edit"></span>
@@ -84,4 +95,5 @@
 
 <!-- Providers modal -->
 <div class="modal fade" id="systemUsersModal" role="dialog" tabindex="-1" aria-labeledby="Add System Users" aria-hidden="true" aria-describedby="Add new system users"></div>
+<div class="modal fade" id="loginAsModal" role="dialog" tabindex="-1" aria-labeledby="Login As User" aria-hidden="true" aria-describedby="Login As User"></div>
 

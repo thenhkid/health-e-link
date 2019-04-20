@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.ut.healthelink.validator.Phone;
+import java.util.List;
 import javax.persistence.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -22,8 +23,14 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 public class Organization {
     
     @Transient
-    private CommonsMultipartFile file = null;
-
+    private CommonsMultipartFile file = null, headerBackgroundFile = null, headerLogoFile = null;
+    
+    @Transient
+    private String headerImageDirectory = "";
+    
+    @Transient
+    private List<String> programsOffered = null;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -67,7 +74,7 @@ public class Organization {
     @Column(name = "FAX", nullable = true)
     private String fax;
 
-    @Column(name = "PUBLIC", nullable = false)
+    @Column(name = "publicOrg", nullable = false)
     private boolean publicOrg = true;
     
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
@@ -83,6 +90,36 @@ public class Organization {
     
     @Column(name = "parsingTemplate", nullable = true)
     private String parsingTemplate = null;
+    
+    @Column(name = "parentId", nullable = true)
+    private Integer parentId = 0;
+    
+    @Column(name = "LONGITUDE", nullable = true) 
+    private String longitude;
+    
+    @Column(name = "LATITUDE", nullable = true)
+    private String latitude;
+    
+    @Column(name = "ORGTYPE", nullable = false)
+    private Integer orgType = 1;
+    
+    @Column(name = "headerLogo", nullable = false)
+    private String headerLogo;
+    
+    @Column(name = "headerBackground", nullable = false)
+    private String headerBackground;
+    
+    @Column(name = "COUNTY", nullable = true)
+    private String county = "";
+    
+    @Column(name = "TOWN", nullable = true)
+    private String town = "";
+    
+    @Column(name = "ORGDESC", nullable = true)
+    private String orgDesc = "";
+    
+    @Column(name = "INFOURL", nullable = true)
+    private String infoURL = "";
 
     public int getId() {
         return id;
@@ -180,14 +217,7 @@ public class Organization {
         this.status = status;
     }
 
-    public String getcleanURL() {
-        return cleanURL;
-    }
-
-    public void setcleanURL(String cleanURL) {
-        this.cleanURL = cleanURL;
-    }
-    
+   
     public String getparsingTemplate() {
         return parsingTemplate;
     }
@@ -204,4 +234,133 @@ public class Organization {
         this.file = file;
     }
 
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getParsingTemplate() {
+        return parsingTemplate;
+    }
+
+    public void setParsingTemplate(String parsingTemplate) {
+        this.parsingTemplate = parsingTemplate;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public Integer getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(Integer orgType) {
+        this.orgType = orgType;
+    }
+
+    public String getHeaderLogo() {
+        return headerLogo;
+    }
+
+    public void setHeaderLogo(String headerLogo) {
+        this.headerLogo = headerLogo;
+    }
+
+    public String getHeaderBackground() {
+        return headerBackground;
+    }
+
+    public void setHeaderBackground(String headerBackground) {
+        this.headerBackground = headerBackground;
+    }
+
+    public String getHeaderImageDirectory() {
+        return headerImageDirectory;
+    }
+
+    public void setHeaderImageDirectory(String headerImageDirectory) {
+        this.headerImageDirectory = headerImageDirectory;
+    }
+
+    public String getcleanURL() {
+        return cleanURL;
+    }
+
+    public void setcleanURL(String cleanURL) {
+        this.cleanURL = cleanURL;
+    }
+
+    public CommonsMultipartFile getHeaderBackgroundFile() {
+        return headerBackgroundFile;
+    }
+
+    public void setHeaderBackgroundFile(CommonsMultipartFile headerBackgroundFile) {
+        this.headerBackgroundFile = headerBackgroundFile;
+    }
+
+    public CommonsMultipartFile getHeaderLogoFile() {
+        return headerLogoFile;
+    }
+
+    public void setHeaderLogoFile(CommonsMultipartFile headerLogoFile) {
+        this.headerLogoFile = headerLogoFile;
+    }
+
+    public String getCounty() {
+        return county;
+    }
+
+    public void setCounty(String county) {
+        this.county = county;
+    }
+
+    public String getTown() {
+        return town;
+    }
+
+    public void setTown(String town) {
+        this.town = town;
+    }
+
+    public String getOrgDesc() {
+        return orgDesc;
+    }
+
+    public void setOrgDesc(String orgDesc) {
+        this.orgDesc = orgDesc;
+    }
+
+    public String getInfoURL() {
+        return infoURL;
+    }
+
+    public void setInfoURL(String infoURL) {
+        this.infoURL = infoURL;
+    }
+
+    public List<String> getProgramsOffered() {
+        return programsOffered;
+    }
+
+    public void setProgramsOffered(List<String> programsOffered) {
+        this.programsOffered = programsOffered;
+    }
+    
+    
 }

@@ -4,8 +4,9 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.ut.healthelink.model.Organization;
@@ -35,11 +37,13 @@ import com.ut.healthelink.model.Brochure;
 import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.messageType;
+import com.ut.healthelink.model.organizationPrograms;
 import com.ut.healthelink.service.brochureManager;
 import com.ut.healthelink.reference.USStateList;
 import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.configurationTransportManager;
 import com.ut.healthelink.service.messageTypeManager;
+import javax.servlet.http.HttpSession;
 
 /**
  * The adminOrgController class will handle all URL requests that fall inside of the '/administrator/organizations' url path.
@@ -78,6 +82,7 @@ public class adminOrgContoller {
      * The private variable orgId will hold the orgId when viewing an organization this will be used when on a organization subsection like users, etc. We will use this private variable so we don't have to go fetch the id or the organization based on the url.
      */
     private static int orgId = 0;
+    private static int orgType = 1;
 
     /**
      * The private maxResults variable will hold the number of results to show per list page.
@@ -130,6 +135,9 @@ public class adminOrgContoller {
 
         //Get the object that will hold the states
         mav.addObject("stateList", stateList.getStates());
+        
+        List<Organization> organizations = organizationManager.getOrganizations();
+        mav.addObject("organizationList", organizations);
         return mav;
 
     }
@@ -183,6 +191,7 @@ public class adminOrgContoller {
              * Set the private variable to hold the id of the new organization.
              */
             orgId = id;
+            orgType = organization.getOrgType();
             ModelAndView mav = new ModelAndView(new RedirectView(latestorg.getcleanURL() + "/"));
             return mav;
         } else {
@@ -217,8 +226,10 @@ public class adminOrgContoller {
          * Set the private variable to hold the id of the clicked organization.
          */
         orgId = orgDetails.getId();
+        orgType = orgDetails.getOrgType();
 
         mav.addObject("id", orgId);
+        mav.addObject("selOrgType", orgType);
         mav.addObject("organization", orgDetails);
 
         //Get a list of states
@@ -226,6 +237,9 @@ public class adminOrgContoller {
 
         //Get the object that will hold the states
         mav.addObject("stateList", stateList.getStates());
+        
+        List<Organization> organizations = organizationManager.getOrganizations();
+        mav.addObject("organizationList", organizations);
 
         return mav;
 
@@ -254,6 +268,7 @@ public class adminOrgContoller {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/organizations/organizationDetails");
             mav.addObject("id", orgId);
+            mav.addObject("selOrgType", orgType);
             //Get the object that will hold the states
             mav.addObject("stateList", stateList.getStates());
             return mav;
@@ -267,6 +282,7 @@ public class adminOrgContoller {
                 ModelAndView mav = new ModelAndView();
                 mav.setViewName("/administrator/organizations/organizationDetails");
                 mav.addObject("id", orgId);
+                mav.addObject("selOrgType", orgType);
                 mav.addObject("existingOrg", "Organization " + organization.getOrgName().trim() + " already exists.");
                 //Get the object that will hold the states
                 mav.addObject("stateList", stateList.getStates());
@@ -341,6 +357,7 @@ public class adminOrgContoller {
         mav.addObject("orgName", orgName);
         
         mav.addObject("id", orgId);
+        mav.addObject("selOrgType", orgType);
         mav.addObject("configs", configurations);
         
         messageType messagetype;
@@ -388,6 +405,7 @@ public class adminOrgContoller {
 
         List<User> users = organizationManager.getOrganizationUsers(orgId);
         mav.addObject("id", orgId);
+        mav.addObject("selOrgType", orgType);
         mav.addObject("userFunctions", userManager);
         mav.addObject("userList", users);
 
@@ -440,6 +458,17 @@ public class adminOrgContoller {
     public @ResponseBody
     ModelAndView createsystemUser(@Valid @ModelAttribute(value = "userdetails") User userdetails, BindingResult result, RedirectAttributes redirectAttr, @PathVariable String cleanURL) throws Exception {
 
+    	if (userdetails.getsectionList() == null) {
+    		ModelAndView mav = new ModelAndView();
+            List<siteSections> sections = userManager.getSections();
+            mav.addObject("sections", sections);
+            mav.addObject("sectionListError", true);          
+            mav.setViewName("/administrator/organizations/users/details");
+            mav.addObject("btnValue", "Create");
+            return mav;	
+    		
+    	}
+    	
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/organizations/users/details");
@@ -461,6 +490,7 @@ public class adminOrgContoller {
             return mav;
         }
 
+        userdetails = userManager.encryptPW(userdetails);
         userManager.createUser(userdetails);
 
         ModelAndView mav = new ModelAndView("/administrator/organizations/users/details");
@@ -484,6 +514,16 @@ public class adminOrgContoller {
     public @ResponseBody
     ModelAndView updatesystemUser(@Valid @ModelAttribute(value = "userdetails") User userdetails, BindingResult result, RedirectAttributes redirectAttr, @PathVariable String cleanURL) throws Exception {
 
+    	if (userdetails.getsectionList() == null) {
+    		ModelAndView mav = new ModelAndView();
+            List<siteSections> sections = userManager.getSections();
+            mav.addObject("sections", sections);
+            mav.addObject("sectionListError", true);          
+            mav.setViewName("/administrator/organizations/users/details");
+            mav.addObject("btnValue", "Update");
+            return mav;	
+    		
+    	}
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView();
             List<siteSections> sections = userManager.getSections();
@@ -507,9 +547,19 @@ public class adminOrgContoller {
                 return mav;
             }
         }
-
+        
+        /** need to check user's password, if blank, we do not change **/
+        
+        //here we get salt and redo password
+        if (!userdetails.getPassword().equalsIgnoreCase("")) {
+        	userdetails = userManager.encryptPW(userdetails);
+        } else  {
+        	userdetails.setRandomSalt(currentUser.getRandomSalt());
+        	userdetails.setEncryptedPw(currentUser.getEncryptedPw());
+        }
+        
         userManager.updateUser(userdetails);
-
+        
         ModelAndView mav = new ModelAndView("/administrator/organizations/users/details");
         mav.addObject("success", "userUpdated");
         return mav;
@@ -584,6 +634,7 @@ public class adminOrgContoller {
 
         List<Provider> providers = organizationManager.getOrganizationProviders(orgId);
         mav.addObject("id", orgId);
+        mav.addObject("selOrgType", orgType);
         mav.addObject("providerList", providers);
 
         return mav;
@@ -610,6 +661,7 @@ public class adminOrgContoller {
 
         List<Provider> providers = providerManager.findProviders(orgId, searchTerm);
         mav.addObject("id", orgId);
+        mav.addObject("selOrgType", orgType);
         mav.addObject("searchTerm", searchTerm);
         mav.addObject("providerList", providers);
 
@@ -638,6 +690,7 @@ public class adminOrgContoller {
         providerDetails.setOrgId(orgId);
 
         mav.addObject("id", orgId);
+        mav.addObject("selOrgType", orgType);
         mav.addObject("btnValue", "Create");
         mav.addObject("providerdetails", providerDetails);
 
@@ -710,6 +763,7 @@ public class adminOrgContoller {
 
         mav.addObject("providerId", providerDetails.getId());
         mav.addObject("id", orgId);
+        mav.addObject("selOrgType", orgType);
         mav.addObject("providerdetails", providerDetails);
 
         return mav;
@@ -748,6 +802,7 @@ public class adminOrgContoller {
 
             mav.addObject("providerId", providerdetails.getId());
             mav.addObject("id", orgId);
+            mav.addObject("selOrgType", orgType);
             return mav;
         }
 
@@ -773,6 +828,7 @@ public class adminOrgContoller {
             mav.addObject("providerId", providerdetails.getId());
             mav.addObject("savedStatus", "updated");
             mav.addObject("id", orgId);
+            mav.addObject("selOrgType", orgType);
             return mav;
         } //If the "Save & Close" button was pressed.
         else {
@@ -1098,6 +1154,7 @@ public class adminOrgContoller {
 
         List<Brochure> brochures = organizationManager.getOrganizationBrochures(orgId);
         mav.addObject("id", orgId);
+        mav.addObject("selOrgType", orgType);
         mav.addObject("brochureList", brochures);
 
 
@@ -1212,6 +1269,149 @@ public class adminOrgContoller {
         brochureManager.deleteBrochure(brochureId);
 
         ModelAndView mav = new ModelAndView(new RedirectView("../brochures?msg=deleted"));
+        return mav;
+    }
+    
+    /** login as response body **/
+    @RequestMapping(value = "/{cleanURL}/loginAs", method = RequestMethod.POST)
+    public @ResponseBody
+    ModelAndView loginAs(@PathVariable String cleanURL, HttpServletRequest request) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/users/login");
+        
+        
+        //Set the id of the organization for the new provider
+        List<Organization> organization = organizationManager.getOrganizationByName(cleanURL);
+        Organization orgDetails = organization.get(0);
+        /**
+         * Set the private variable to hold the id of the clicked organization.
+         */
+        orgId = orgDetails.getId();
+        orgType = orgDetails.getOrgType();
+
+        String loginAsUser = request.getParameter("loginAsUser");
+        List <User> usersList = userManager.getUsersByStatuRolesAndOrg(true, Arrays.asList(1), Arrays.asList(orgId), true);
+        mav.addObject("usersList", usersList);
+        mav.addObject("loginAsUser", loginAsUser);
+        return mav;
+    }
+    
+    /** login as post check - response body **/
+    @RequestMapping(value = "/{cleanURL}/loginAsCheck", method = RequestMethod.POST)
+    public @ResponseBody
+    ModelAndView checkLoginAsPW(@PathVariable String cleanURL, HttpServletRequest request,  
+    		Authentication authentication) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/users/login");
+        
+        User user = userManager.getUserByUserName(authentication.getName());
+        boolean okToLoginAs = false;
+        
+        /** we verify existing password **/
+        if (user.getRoleId() == 1 || user.getRoleId() == 4) {
+	        try  {
+	        	okToLoginAs = userManager.authenticate(request.getParameter("password"), user.getEncryptedPw(), user.getRandomSalt());
+	        } catch(Exception ex) {
+	        	okToLoginAs = false;
+	        }
+        }
+        
+        if (okToLoginAs) {
+        	mav.addObject("msg", "pwmatched");
+        } else {
+        	 //Set the id of the organization for the new provider
+            List<Organization> organization = organizationManager.getOrganizationByName(cleanURL);
+            Organization orgDetails = organization.get(0);
+            orgId = orgDetails.getId();
+            orgType = orgDetails.getOrgType();
+            
+        	String loginAsUser = request.getParameter("loginAsUser");
+            List <User> usersList = userManager.getUsersByStatuRolesAndOrg(true, Arrays.asList(1), Arrays.asList(orgId), true);
+            mav.addObject("usersList", usersList);
+            mav.addObject("loginAsUser", loginAsUser);
+            
+        }
+        return mav;
+    }
+    
+    /**
+     * *********************************************************
+     * ORGANIZATION RESOURCES FUNCTIONS 
+     * *********************************************************
+     */
+    
+    /**
+     * The '/{cleanURL/resources' GET request will display the list of available resources for the selected organization.
+     *
+     * @param cleanURL	The variable that holds the organization that is being viewed
+     *
+     * @return	Will return the organization resource list page
+     *
+     * @Objects	(1) An object that holds resources found for the organization (2)	The orgId used for the menu and action bar
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/{cleanURL}/resources", method = RequestMethod.GET)
+    public ModelAndView listOrganizationResources(@PathVariable String cleanURL) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/resources");
+        
+        Organization orgDetails = organizationManager.getOrganizationById(orgId);
+        mav.addObject("id", orgId);
+        mav.addObject("selOrgType", orgType);
+        mav.addObject("organization", orgDetails);
+
+        //Get a list of message types in the system 
+        List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
+        
+        /* Get a list of modules the program uses */
+        List<Integer> usedPrograms = organizationManager.getOrganizationPrograms(orgId);
+
+        if (!messageTypes.isEmpty()) {
+            for (messageType program : messageTypes) {
+                if (usedPrograms.contains(program.getId())) {
+                    program.setUseProgram(true);
+                }
+            }
+        }
+        
+        mav.addObject("availPrograms", messageTypes);
+        
+        return mav;
+    }
+    
+    /**
+     * The '/program-modules' POST request will save the program module form.
+     *
+     * @param List<Imteger>	The list of moduleIds to use.
+     *
+     * @return	Will return the program details page.
+     *
+     * @throws Exception
+     *
+     */
+    @RequestMapping(value = "/{cleanURL}/resources", method = RequestMethod.POST)
+    public ModelAndView saveprogramModules(@RequestParam List<Integer> programIds, @RequestParam String action, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
+
+        if (programIds.isEmpty()) {
+            organizationManager.deletOrganizationPrograms(orgId);
+        } else {
+            organizationManager.deletOrganizationPrograms(orgId);
+
+            for (Integer programId : programIds) {
+                organizationPrograms newProgram = new organizationPrograms();
+                newProgram.setProgramId(programId);
+                newProgram.setOrgId(orgId);
+                organizationManager.saveOrganizationPrograms(newProgram);
+            }
+        }
+
+        redirectAttr.addFlashAttribute("savedStatus", "updatedprograms");
+
+        ModelAndView mav = new ModelAndView(new RedirectView("resources"));
         return mav;
     }
 

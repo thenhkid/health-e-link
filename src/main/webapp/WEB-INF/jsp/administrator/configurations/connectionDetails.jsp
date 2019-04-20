@@ -15,8 +15,19 @@
             <h3 class="panel-title"><c:choose><c:when test="${connectionDetails.id > 0}">Update</c:when><c:otherwise>Create New</c:otherwise></c:choose> Configuration Connection</h3>
          </div>
         <form:form id="connectionForm" modelAttribute="connectionDetails" action="addConnection.do" method="post" role="form">
-        <form:hidden path="id" />
+        <form:hidden path="id" id="connectionId" />
          <div class="modal-body">
+            <div class="form-group">
+                <label for="status">Status * </label>
+                <div>
+                    <label class="radio-inline">
+                        <form:radiobutton id="status" path="status" value="true"/>Active 
+                    </label>
+                    <label class="radio-inline">
+                        <form:radiobutton id="status" path="status" value="false"/>Inactive
+                    </label>
+                </div>
+            </div> 
             <section class="panel panel-default">
                 <div class="panel-heading">
                    <h3 class="panel-title">Source Configuration</h3>
@@ -25,7 +36,7 @@
                     <div class="form-container scrollable">
                         <div id="srcorgDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="organization">Organization *</label>
-                            <select id="organization" class="form-control half selsrcOrganization" <c:if test="${connectionDetails.id > 0}">disabled="true"</c:if>>
+                            <select id="organization" class="form-control selsrcOrganization" <c:if test="${connectionDetails.id > 0}">disabled="true"</c:if>>
                                 <option value="">- Select -</option>
                                 <c:forEach items="${organizations}" var="org" varStatus="oStatus">
                                     <option value="${organizations[oStatus.index].id}" <c:if test="${organizations[oStatus.index].id == connectionDetails.srcConfigDetails.getorgId()}">selected</c:if>>${organizations[oStatus.index].orgName} </option>
@@ -36,7 +47,7 @@
                        <spring:bind path="sourceConfigId">      
                         <div id="srcConfigDiv" class="form-group ${status.error ? 'has-error' : '' }">
                              <label class="control-label" for="messageTypeId">Configuration *</label>
-                             <form:select path="sourceConfigId" id="srcConfig" rel="${connectionDetails.sourceConfigId}" class="form-control half" disabled="${connectionDetails.id > 0 ? 'true':'false'}">
+                             <form:select path="sourceConfigId" id="srcConfig" rel="${connectionDetails.sourceConfigId}" class="form-control" disabled="${connectionDetails.id > 0 ? 'true':'false'}">
                                  <option value="">- Select -</option>
                              </form:select>
                              <c:if test="${connectionDetails.id > 0}"><form:hidden id="sourceConfigId" path="sourceConfigId"/></c:if>       
@@ -45,9 +56,7 @@
                        </spring:bind>
                         <div id="srcUsersDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="srcUsers">Authorized User(s) <span id="srcUsersFound"></span> *</label>
-                            <select multiple="true" id="srcUsers" name="srcUsers" rel="<c:forEach items='${connectionDetails.connectionSenders}' var='sender'>${sender.id},</c:forEach>" class="form-control half" >
-                                <option value="">- Select -</option>
-                            </select>
+                            <div id="srcUsersTable" style="max-height:200px; overflow: auto"></div>
                             <span id="srcUsersMsg" class="control-label"></span>
                        </div>         
                     </div>
@@ -61,7 +70,7 @@
                     <div class="form-container scrollable">
                         <div id="tgtorgDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="organization">Organization *</label>
-                            <select id="organization" class="form-control half seltgtOrganization" <c:if test="${connectionDetails.id > 0}">disabled="true"</c:if>>
+                            <select id="organization" class="form-control seltgtOrganization" <c:if test="${connectionDetails.id > 0}">disabled="true"</c:if>>
                                 <option value="">- Select -</option>
                                 <c:forEach items="${organizations}" var="org" varStatus="oStatus">
                                     <option value="${organizations[oStatus.index].id}" <c:if test="${organizations[oStatus.index].id == connectionDetails.tgtConfigDetails.getorgId()}">selected</c:if>>${organizations[oStatus.index].orgName} </option>
@@ -72,7 +81,7 @@
                       <spring:bind path="targetConfigId">        
                        <div id="tgtConfigDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="messageTypeId">Configuration *</label>
-                            <form:select path="targetConfigId" id="tgtConfig" rel="${connectionDetails.targetConfigId}" class="form-control half" disabled="${connectionDetails.id > 0 ? 'true':'false'}">
+                            <form:select path="targetConfigId" id="tgtConfig" rel="${connectionDetails.targetConfigId}" class="form-control" disabled="${connectionDetails.id > 0 ? 'true':'false'}">
                                 <option value="">- Select -</option>
                             </form:select>
                             <c:if test="${connectionDetails.id > 0}"><form:hidden id="targetConfigId" path="targetConfigId"/></c:if>    
@@ -81,9 +90,7 @@
                       </spring:bind>
                         <div id="tgtUsersDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="tgtUsers">Authorized User(s) <span id="tgtUsersFound"></span> *</label>
-                            <select multiple="true" id="tgtUsers" name="tgtUsers" rel="<c:forEach items='${connectionDetails.connectionReceivers}' var='receiver'>${receiver.id},</c:forEach>" class="form-control half" >
-                                <option value="">- Select -</option>
-                            </select>
+                            <div id="tgtUsersTable" style="max-height:200px; overflow: auto"></div>
                             <span id="tgtUsersMsg" class="control-label"></span>
                        </div>      
                     </div>
@@ -101,13 +108,16 @@
 $(function() {
     var srcOrg = $('.selsrcOrganization').val();
     var tgtOrg = $('.seltgtOrganization').val();
+    var connectionId = $('#connectionId').val();
+    
     if(srcOrg > 0) {
         populateConfigurations(srcOrg, 'srcConfig');
-        populateUsers(srcOrg, 'srcUsers');
+        populateUsers(srcOrg, 'srcUsersTable', connectionId);
     }
     if(tgtOrg > 0) {
         populateConfigurations(tgtOrg, 'tgtConfig');
-        populateUsers(tgtOrg, 'tgtUsers');
+        populateUsers(tgtOrg, 'tgtUsersTable', connectionId);
     }
+    
 });
 </script>

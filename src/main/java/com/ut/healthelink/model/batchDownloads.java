@@ -211,6 +211,10 @@ public class batchDownloads {
        return dateCreated;
     }
     
+    public void setdateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+    
     public void settotalTransactions(int totalTransactions) {
         this.totalTransactions = totalTransactions;
     } 

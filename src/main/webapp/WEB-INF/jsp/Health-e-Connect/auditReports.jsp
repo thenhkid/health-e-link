@@ -69,7 +69,7 @@
                                         <td class="center-text">
                                             <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                         </td>
-                                        <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
+                                        <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy h:mm:ss a" /></td>
                                         <td class="actions-col center-text" style="width:50px;">
 					<c:if test="${batch.statusId != 4}">
                                             <a href="javascript:void(0);" rel="${batch.id}" class="btn btn-link viewLink">

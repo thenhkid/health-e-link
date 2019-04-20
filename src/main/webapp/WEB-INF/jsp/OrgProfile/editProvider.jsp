@@ -49,6 +49,7 @@
             <h2 class="form-title">Edit Provider Profile</h2>
             
             <form:form id="providerForm"  commandName="providerdetails" modelAttribute="providerdetails" role="form" class="form" method="post">
+                <form:hidden path="id" id="id" />
                 <form:hidden path="orgId" id="orgId" />
                 <form:hidden path="dateCreated" />
                 <div class="panel-group form-accordion" id="accordion">
@@ -58,6 +59,19 @@
                             <div class="panel-body">
                                 
                                 <div class="form-section row">
+                                    <div class="col-md-6 cb">
+                                        <div class="form-group">
+                                            <label for="status">Status *</label>
+                                            <div>
+                                                <label class="radio-inline">
+                                                    <form:radiobutton id="status" path="status" value="true" /> Active
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <form:radiobutton id="status" path="status" value="false" /> Inactive
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>  
                                     <div class="col-md-6 cb">
                                         <spring:bind path="firstName">
                                             <div class="form-group ${status.error ? 'has-error' : '' }">
@@ -133,7 +147,7 @@
                                     
                                 </div>
                                 
-                                <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save"/>
+                                <input type="button" id="save" class="btn btn-primary submitMessage" value="Save"/>
                             </div>
                         </div>
                         

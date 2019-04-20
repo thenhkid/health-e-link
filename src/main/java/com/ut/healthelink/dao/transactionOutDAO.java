@@ -8,14 +8,23 @@ package com.ut.healthelink.dao;
 
 import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.batchClearAfterDelivery;
+import com.ut.healthelink.model.batchUploads;
+import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationSchedules;
+import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.targetOutputRunLogs;
 import com.ut.healthelink.model.transactionIn;
 import com.ut.healthelink.model.transactionOutNotes;
 import com.ut.healthelink.model.transactionOutRecords;
+import com.ut.healthelink.model.transactionRecords;
 import com.ut.healthelink.model.transactionTarget;
+import com.ut.healthelink.model.custom.ConfigOutboundForInsert;
+
 import java.util.Date;
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 /**
@@ -124,8 +133,52 @@ public interface transactionOutDAO {
     
     List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
     
-    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId);
+    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId, Integer userOrgId);
     
     void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
+    
+    List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception;
+    
+    List<transactionTarget> getSentTransactions(Date fromDate, Date toDate) throws Exception;
+    
+    List<transactionTarget> getTTByStatusId(int batchId, List <Integer> statusIds) throws Exception;
+    
+    List<Integer> getTargetConfigsForBatch (int batchId, List <Integer> statusIds) throws Exception;
+    
+    Integer writeOutputToTextFile(configurationTransport transportDetails, Integer batchDLId, String filePathAndName, String configFields);
+   
+    void updateTTBatchIdByUploadBatch(Integer batchUploadId, Integer batchDownloadId) throws Exception;
+    
+    void  massInsertSummaryEntry(batchDownloads batchDowloadDetails, configuration configDetails, batchUploads batchUploadDetails) throws Exception;
+    
+    void setUpTransactionTranslatedOut(batchDownloads batchDowloadDetails, configuration configDetails, Integer statusId);
+    
+    List <ConfigOutboundForInsert> setConfigOutboundForInsert(int configId, int batchDownloadId) throws Exception;
+    
+    void massUpdateTTO (ConfigOutboundForInsert configOutboundForInsertList, Integer statusId ) throws Exception;
+    
+    String getConfigFieldsForOutput (Integer configId) throws Exception;
+    
+    void insertFailedRequiredFields(configurationFormFields cff, Integer batchDownloadId, Integer transactionTargetId) throws Exception;
+    
+    void genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchDownloadId, String regEx, Integer transactionTargetId) throws Exception;
+    
+    void moveTranslatedRecordsByBatch(int batchDownloadId) throws Exception;
+    
+    List<transactionRecords> getFieldColAndValues(Integer batchDownloadId, configurationFormFields cff) throws Exception;
+    
+    List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff, Integer transactionId) throws Exception;
+
+    void updateFieldValue (transactionRecords tr, String newValue) throws Exception;
+    
+    void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchDownloadId) throws Exception;
+    
+    void updateErrorStatusForTT (Integer batchDownloadId, Integer newStatusId, Integer transactionTargetId) throws Exception;
+   
+    void clearTransactionTranslatedOutByBatchId(Integer batchDownloadId) throws Exception;
+    
+    void insertDroppedValues (configurationFormFields cff, List <String> reportHeaderCols, Integer batchUploadId, Integer entityIdFCol) throws Exception;
+
+
     
 }

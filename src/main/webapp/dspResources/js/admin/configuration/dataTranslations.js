@@ -140,8 +140,7 @@ require(['./main'], function () {
         });
 
         //The function to submit the new crosswalk
-        $(document).on('click', '#submitCrosswalkButton', function(event) {
-
+        $(document).on('click', '#submitCrosswalkButton', function (event) {
             $('#crosswalkNameDiv').removeClass("has-error");
             $('#crosswalkNameMsg').removeClass("has-error");
             $('#crosswalkNameMsg').html('');
@@ -165,21 +164,24 @@ require(['./main'], function () {
 
             //Need to make sure the crosswalk name doesn't already exist.
             var orgId = $('#orgId').val();
+	    
+	    if(actionValue === "create") {
 
-            $.ajax({
-                url: '../library/checkCrosswalkName.do',
-                type: "POST",
-                async: false,
-                data: {'name': $('#name').val(), 'orgId': orgId},
-                success: function(data) {
-                    if (data == 1) {
-                        $('#crosswalkNameDiv').addClass("has-error");
-                        $('#crosswalkNameMsg').addClass("has-error");
-                        $('#crosswalkNameMsg').html('The name entered is already associated with another crosswalk in the system!');
-                        errorFound = 1;
-                    }
-                }
-            });
+		$.ajax({
+		    url: '../library/checkCrosswalkName.do',
+		    type: "POST",
+		    async: false,
+		    data: {'name': $('#name').val(), 'orgId': orgId},
+		    success: function (data) {
+			if (data == 1) {
+			    $('#crosswalkNameDiv').addClass("has-error");
+			    $('#crosswalkNameMsg').addClass("has-error");
+			    $('#crosswalkNameMsg').html('The name entered is already associated with another crosswalk in the system!');
+			    errorFound = 1;
+			}
+		    }
+		});
+	    }
 
             //Make sure a delimiter is selected
             if ($('#delimiter').val() == '') {
@@ -314,6 +316,24 @@ require(['./main'], function () {
                 }
             });
 
+        });
+        
+        //Function that will handle setting a default value for a field
+        //selected crosswalk.
+        $(document).on('change', '.setDefaultValue', function() {
+            var id = $(this).attr('rel');
+            var value = $(this).val();
+            
+             //Need to update the saved process order
+            $.ajax({
+                url: 'updateDefaultValue?fieldId=' + id + '&selValue=' + value,
+                type: "POST",
+                success: function(data) {
+                    $('#translationMsgDiv').show();
+                    populateExistingTranslations(1);
+                }
+            });
+            
         });
         
     });

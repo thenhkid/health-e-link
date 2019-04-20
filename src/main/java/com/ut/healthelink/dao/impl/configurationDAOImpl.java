@@ -22,10 +22,12 @@ import com.ut.healthelink.model.HL7Elements;
 import com.ut.healthelink.model.HL7Segments;
 import com.ut.healthelink.model.Macros;
 import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationCCDElements;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationConnectionSenders;
 import com.ut.healthelink.model.configurationDataTranslations;
+import com.ut.healthelink.model.configurationExcelDetails;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.configurationTransport;
@@ -452,9 +454,10 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<configurationConnection> getConnectionsByConfiguration(int configId) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection where sourceConfigId = :configId");
+    public List<configurationConnection> getConnectionsByConfiguration(int configId, int userId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection where sourceConfigId = :configId and id in (select connectionId from configurationConnectionSenders where userId = :userId)");
         query.setParameter("configId", configId);
+        query.setParameter("userId", userId);
 
         List<configurationConnection> connections = query.list();
         return connections;
@@ -626,11 +629,15 @@ public class configurationDAOImpl implements configurationDAO {
     public configurationSchedules getScheduleDetails(int configId) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where configId = :configId");
         query.setParameter("configId", configId);
+        
+        configurationSchedules scheduleDetails;
 
-        if (query.uniqueResult() == null) {
-            return null;
+        if (query.list().size() > 1) {
+            scheduleDetails = (configurationSchedules) query.list().get(0);
+            
+            return scheduleDetails;
         } else {
-            configurationSchedules scheduleDetails = (configurationSchedules) query.uniqueResult();
+            scheduleDetails = (configurationSchedules) query.uniqueResult();
 
             return scheduleDetails;
         }
@@ -775,7 +782,7 @@ public class configurationDAOImpl implements configurationDAO {
         Query query = sessionFactory
                 .getCurrentSession()
                 .createSQLQuery(
-                        "select configurationDataTranslations.*, fieldNo from configurationDataTranslations, configurationFormFields"
+                        "select configurationDataTranslations.*, fieldNo, fieldType from configurationDataTranslations, configurationFormFields"
                         + " where configurationDataTranslations.fieldId = configurationFormFields.id "
                         + " and configurationDataTranslations.configId = :configId and categoryId = :categoryId order by processorder asc;")
                 .setResultTransformer(
@@ -1050,4 +1057,79 @@ public class configurationDAOImpl implements configurationDAO {
         deleteSegment.setParameter("segmentId", segmentId);
         deleteSegment.executeUpdate();
     }
+    
+    /**
+     * The 'getCCDElements' function will return the CCD elements for the passed in configuration.
+     *
+     * @Table configurationCCDElements
+     *
+     * @param	configId This will hold the configuration id to find
+     *
+     * @return	This function will return a configurationCCDElements object
+     */
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationCCDElements> getCCDElements(Integer configId) throws Exception {
+        
+        Query query = sessionFactory
+             .getCurrentSession()
+             .createSQLQuery(
+                     "select configurationCCDElements.*, configurationFormFields.fieldLabel as fieldLabel from configurationCCDElements LEFT OUTER JOIN configurationFormFields on \n" +
+"configurationFormFields.configId = configurationCCDElements.configId and configurationFormFields.fieldNo = configurationCCDElements.fieldValue"
+                     + " where configurationCCDElements.configId = :configId ")
+             .setResultTransformer(
+                     Transformers.aliasToBean(configurationCCDElements.class))
+             .setParameter("configId", configId);
+
+        List<configurationCCDElements> elements = query.list();
+        
+        return elements;
+        
+    }
+    
+    /**
+     * The 'getCCDElement' function will return the configurationCCDElement object for the passed in
+     * elementId
+     * 
+     * @param elementId The id of the selected element.
+     * 
+     * @return This function will return a single configurationCCDElement
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public configurationCCDElements getCCDElement(Integer elementId) throws Exception {
+        return (configurationCCDElements) sessionFactory.
+                getCurrentSession().
+                get(configurationCCDElements.class, elementId);
+    }
+    
+    /**
+     * The 'saveCCDElement' function will save the new CCD element.
+     * 
+     * @param ccdElement    This will hold the new ccdElement object
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public void saveCCDElement(configurationCCDElements ccdElement) throws Exception {
+        sessionFactory.getCurrentSession().saveOrUpdate(ccdElement);
+    }
+
+	@Override
+	@Transactional
+	public configurationExcelDetails getExcelDetails (Integer configId, Integer orgId) throws Exception {
+		 Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationExcelDetails.class);
+	     criteria.add(Restrictions.eq("configId", configId));
+	     criteria.add(Restrictions.eq("orgId", orgId));
+	     
+	     if (criteria.list().size() > 0) {
+	    	 return (configurationExcelDetails) criteria.list().get(0);
+	     } else  {
+	    	 return null;
+	     }
+	     
+	}
+    
 }

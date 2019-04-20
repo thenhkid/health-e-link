@@ -100,6 +100,42 @@
                                     </div>
                                 </spring:bind>  
                             </c:if>
+                            <c:if test="${configurationDetails.transportMethod == 'ERG'}">
+                                <spring:bind path="attachmentLimit">
+                                    <div class="form-group">
+                                        <label class="control-label" for="attachmentLimit">Attachment Limit</label>
+                                        <br />
+                                        <ul>
+                                            <li>Set to 0 if attachments are not permitted for this message type</li>
+                                            <li>Leave blank if there is not attachment limit</li>
+                                        </ul>
+                                        <form:input path="attachmentLimit" id="attachmentLimit" class="form-control sm-input" type="text" maxLength="4" />
+                                        <form:errors path="attachmentLimit" cssClass="control-label" element="label" />
+                                    </div>
+                                </spring:bind>  
+                                <spring:bind path="attachmentRequired">
+                                    <div class="form-group">
+                                        <label class="control-label" for="attachmentRequired">Is at least one attachment required?</label>
+                                        <div>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="attachmentRequired" path="attachmentRequired" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Yes 
+                                            </label>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="attachmentRequired" path="attachmentRequired" value="0" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> No
+                                            </label>
+                                        </div>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="attachmentRequired" />
+                                        </c:if>    
+                                    </div>
+                                </spring:bind>  
+                                <spring:bind path="attachmentNote">
+                                    <div class="form-group">
+                                        <label class="control-label" for="attachmentNote">Attachment Heading</label>
+                                        <form:input path="attachmentNote" id="attachmentNote" class="form-control" type="text" maxLength="255" />
+                                    </div>
+                                </spring:bind>  
+                            </c:if>
                             <div id="upload-downloadDiv" class="methodDiv" style="display:none">
                                 <spring:bind path="clearRecords">
                                     <div class="form-group">
@@ -178,6 +214,17 @@
                                         </c:if>
                                     </div>
                                 </spring:bind>
+                                <spring:bind path="lineTerminator">
+                                    <div id="fileExtDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                        <label class="control-label" for="lineTerminator">Line Terminator *</label>
+                                        <form:input path="lineTerminator" id="lineTerminator" class="form-control" type="text" maxLength="40" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" />
+                                        <form:errors path="lineTerminator" cssClass="control-label" element="label" />
+                                        <span id="lineTerminatorMsg" class="control-label"></span>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="lineTerminator" />
+                                        </c:if>
+                                    </div>
+                                </spring:bind>
                                 <spring:bind path="encodingId">
                                     <div id="encodingDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="encodingId">Encoding *</label>
@@ -195,6 +242,44 @@
                                 </spring:bind>
                                 <%-- Target File Download options only --%>
                                 <c:if test="${configurationDetails.type == 2}">
+                                    <div id="hl7PDFSampleDiv" style="display:${transportDetails.fileType == 4 ? 'block' : 'none'}">
+                                         <c:if test="${id > 0}">
+                                            <c:if test="${not empty transportDetails.HL7PDFSampleTemplate}">
+                                                <div class="form-group">
+                                                    <label class="control-label" for="HL7PDFSampleTemplate">Current HL7 PDF Template File</label>
+                                                    <input type="text" disabled id="HL7PDFSampleTemplate" class="form-control" value="${transportDetails.HL7PDFSampleTemplate}" />
+                                                    <form:hidden id="HL7PDFSampleTemplate" path="HL7PDFSampleTemplate" />
+                                                </div>
+                                            </c:if>
+                                         </c:if>     
+                                        <spring:bind path="hl7PDFTemplatefile">
+                                            <div id="HL7PDFTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                                <label class="control-label" for="hl7PDFTemplatefile">Sample HL7 PDF Template (txt file)</label>
+                                                <form:input path="hl7PDFTemplatefile" id="hl7PDFTemplatefile" class="form-control" type="file" />
+                                                <form:errors path="hl7PDFTemplatefile" cssClass="control-label" element="label" />
+                                                <span id="HL7PDFTemplateMsg" class="control-label"></span>
+                                            </div>
+                                        </spring:bind> 
+                                    </div>
+                                    <div id="ccdSampleDiv" style="display:${transportDetails.fileType == 9 ? 'block' : 'none'}">
+                                         <c:if test="${id > 0}">
+                                            <c:if test="${not empty transportDetails.ccdSampleTemplate}">
+                                                <div class="form-group">
+                                                    <label class="control-label" for="ccdSampleTemplate">Current CCD Template File</label>
+                                                    <input type="text" disabled id="ccdSampleTemplate" class="form-control" value="${transportDetails.ccdSampleTemplate}" />
+                                                    <form:hidden id="ccdSampleTemplate" path="ccdSampleTemplate" />
+                                                </div>
+                                            </c:if>
+                                         </c:if>     
+                                        <spring:bind path="ccdTemplatefile">
+                                            <div id="ccdTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                                <label class="control-label" for="ccdTemplatefile">Sample CCD Template (XML file)</label>
+                                                <form:input path="ccdTemplatefile" id="ccdTemplatefile" class="form-control" type="file" />
+                                                <form:errors path="ccdTemplatefile" cssClass="control-label" element="label" />
+                                                <span id="ccdTemplateMsg" class="control-label"></span>
+                                            </div>
+                                        </spring:bind> 
+                                    </div>
                                     <spring:bind path="targetFileName">
                                         <div class="form-group ${status.error ? 'has-error' : '' }">
                                             <label class="control-label" for="targetFileName">File Name * <input id="useSource" type="checkbox"> Use Source File Name</label>
@@ -262,6 +347,24 @@
                                             </c:if>      
                                         </div>
                                     </spring:bind>
+                                     <spring:bind path="massTranslation">
+                                    <div class="form-group">
+                                            <label class="control-label" for="massTranslation">Mass Translation *</label>
+                                            <div>
+                                                <label class="radio-inline">
+                                                    <form:radiobutton id="massTranslation" path="massTranslation" value="true" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Yes
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <form:radiobutton id="massTranslation" path="massTranslation" value="false" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> No
+                                                </label>
+                                            </div>
+                                            <c:if test="${transportDetails.copiedTransportId > 0}">
+                                                <form:hidden path="massTranslation" />
+                                            </c:if>      
+                                        </div>
+                                    </spring:bind>
+                                    
+                                    
                                 </c:if>
                             </div>
                             <div id="additionalFTPDiv" class="methodDiv" style="display:none">
@@ -352,7 +455,94 @@
                                     </c:forEach>
                                 </div>
                             </div>
-                           
+                            
+                           <div id="wsDiv" class="methodDiv" style="display:none">
+                                <div id="wsDanger" class="alert alert-danger" style="display:none;">
+                                	<c:if test="${configurationDetails.type == 1}">
+                                		Inbound domain is a required field.
+                                	</c:if>
+                                	<c:if test="${configurationDetails.type == 2}">
+                                		Outbound email and outbound mimeType are required fields.
+                                	</c:if>
+                                    </div> 
+                                <div id="configurationDetailsTypeDiv" style="display:none;">
+                               	 <input name="configurationDetailsType" id="configurationDetailsType" class="form-control" type="hidden" value="${configurationDetails.type}"  />
+                                </div>
+                                <div class="row">
+                                    <c:if test="${configurationDetails.type == 1}">
+                                        <c:set var="webServiceFields" value="${transportDetails.webServiceFields[0]}"/>
+                                        <div class="form-group col-md-6">
+                                            <div class="form-group">
+                                                <label for="status">Web Service Inbound Details</label>
+                                                <input name="webServiceFields[0].method" class="form-control" type="hidden" value="1"  />
+                                                <input name="webServiceFields[0].id" id="id1" class="form-control" type="hidden" value="${webServiceFields.id}"  />
+                                            </div>
+                                            <c:if test="${webServiceFields.method == 1}">
+                                        	<div id="wsDomain1Div" class="form-group">
+                                                <label class="control-label" for="domain1">Sender Domain<c:if test="${fn:length(transportDetails.webServiceFields[0].senderDomainList) != 0}">(s)</c:if>*</label>
+                                                <c:if test="${fn:length(transportDetails.webServiceFields[0].senderDomainList) != 0}">
+	                                                <a href="#domainModal" data-toggle="modal" rel="${webServiceFields.transportId}" id="addEditDomain" 
+	                                                class="addEditDomain" title="Edit domains">
+	                                                	Add/Edit Domains
+	                                               	</a>
+                                                </c:if>
+                                                <c:set var="domains" value=""/>
+                                                <c:forEach 
+                                                items="${transportDetails.webServiceFields[0].senderDomainList}" 
+                                                var="domain" begin="0" end="0">
+                                                <c:set var="domainList" value="${domain.domain}"/>
+                                                </c:forEach>
+                                                <c:forEach 
+                                                items="${transportDetails.webServiceFields[0].senderDomainList}" 
+                                                var="domain" begin="1" end="3">
+                                                	<c:set var="domainList" value="${domainList}, ${domain.domain}"/>
+                                                </c:forEach>
+                                                <input name="domain1" id="domain1" <c:if test="${fn:length(transportDetails.webServiceFields[0].senderDomainList) != 0}">readOnly</c:if> 
+                                                class="form-control" type="text" maxLength="255" value="${domainList}"/>
+                                                <span id="wsDomain1Msg" class="control-label"></span>
+                                            </div> 
+                                            <div id="ws1TagNameDiv" class="form-group">
+                                                <label class="control-label" for="tagName1">Tag Name</label>
+                                                <input name="webServiceFields[0].tagName" id="tagName1" class="form-control" type="text" maxLength="255" value="${webServiceFields.tagName}"  />
+                                                <span id="wsTagName1Msg" class="control-label"></span>
+                                            </div>
+                                            <div id="ws1TagPositonDiv" class="form-group">
+                                                <label class="control-label" for="tagPosition${webServiceFields.method}">Expected Tag Position</label>
+                                                <input name="webServiceFields[0].tagPosition" id="tagPosition1" class="form-control" type="text" maxLength="4" value="${webServiceFields.tagPosition}"  />
+                                                <span id="wsTagPosition1Msg" class="control-label"></span>
+                                            </div>
+                                            <div id="ws1textInAttachment}Div" class="form-group">
+                                                <label class="control-label" for="textInAttachement${webServiceFields.method}">Expected Text in Attachement</label>
+                                                <input name="webServiceFields[0].textInAttachment" id="textInAttachment1" class="form-control" type="text" maxLength="100" value='<c:out value="${webServiceFields.textInAttachment}" escapeXml="false"/>'/>
+                                                <span id="wsTextInAttachment1Msg" class="control-label"></span>
+                                            </div>
+                                            </c:if>                                              
+                                        </div>
+                                        </c:if>
+                                        <c:if test="${configurationDetails.type == 2}">
+                                        <c:set var="webServiceFields" value="${transportDetails.webServiceFields[0]}"/>
+                                        <div class="form-group col-md-6">
+                                            <div class="form-group">
+                                                <label for="status">Web Service Outbound Details</label>
+                                                <input name="webServiceFields[1].method" class="form-control" type="hidden" value="2"  />
+                                                <input name="webServiceFields[1].id" id="id2" class="form-control" type="hidden" value="${webServiceFields.id}"  />
+                                            </div>
+                                            <div id="wsEmail2Div" class="form-group">
+                                                <label class="control-label" for="email2">Email *</label>
+                                                <input name="webServiceFields[1].email" id="email2" class="form-control" type="text" maxLength="255" value="${webServiceFields.email}"  />
+                                                <span id="wsEmail2Msg" class="control-label"></span>
+                                            </div> 
+                                             <div id="wsMimeType2Div" class="form-group">
+                                                <label class="control-label" for="mimeType2">Mime Type *</label>
+                                                <input name="webServiceFields[1].mimeType" id="mimeType2" class="form-control" type="text" maxLength="255" value="${webServiceFields.mimeType}"  />
+                                                <span id="wsMimeType2Msg" class="control-label"></span>
+                                            </div>                           
+                                        </div>
+                                        </c:if>
+                                    
+                                </div>
+                            </div>                            
+                            
                         </div>
                     </div>
                 </section>
@@ -400,4 +590,4 @@
     </div>
 </div>
 
-
+<div class="modal fade" id="domainModal" role="dialog" tabindex="-1" aria-labeledby="Add / Edit Domains" aria-hidden="true" aria-describedby="Add / Edit Domains"></div>

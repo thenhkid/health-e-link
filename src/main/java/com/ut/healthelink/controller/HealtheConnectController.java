@@ -264,7 +264,10 @@ public class HealtheConnectController {
         List<configurationTransport> transportTypes = configurationtransportmanager.getDistinctConfigTransportForOrg(userInfo.getOrgId(), 1);
 
         if (transportTypes.size() == 1) {
-            allowmultipleMessageTypes = true;
+        	//we check to see if any of these are mass translation, if true then we don't allow
+        	if (!configurationtransportmanager.hasConfigsWithMasstranslations(userInfo.getOrgId(), 1)) {
+        		allowmultipleMessageTypes = true;
+        	}  
         }
 
         mav.addObject("configurations", configMessageTypes);
@@ -449,8 +452,12 @@ public class HealtheConnectController {
             if (0 == errorCodes.size()) {
                 /* Get the details of the batch */
                 batchUploads batch = transactionInManager.getBatchDetails(batchId);
-                batch.setstatusId(2);
-
+                //we check config Id, mass translation files are status of 42
+                if (!multipleMessageTypes && transportDetails.isMassTranslation()) {
+                	batch.setstatusId(42);
+                } else {
+                	batch.setstatusId(2);
+                }
                 transactionInManager.submitBatchUploadChanges(batch);
 
                 /* Redirect to the list of uploaded batches */
@@ -1061,7 +1068,7 @@ public class HealtheConnectController {
                     transaction.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     /* get the message type name */
-                    transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+                    transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getDspName());
 
                     records = transactionInManager.getTransactionRecords(transactionId);
                     transaction.settransactionRecordId(records.getId());

@@ -28,6 +28,9 @@ public class messageType {
 
     @Transient
     private List<messageTypeDataTranslations> dataTranslations = null;
+    
+    @Transient
+    private boolean useProgram = false;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,6 +48,11 @@ public class messageType {
     @NoHtml
     @Column(name = "NAME", nullable = false)
     private String name;
+    
+    @NotEmpty
+    @NoHtml
+    @Column(name = "DISPLAYNAME", nullable = false)
+    private String dspName;
     
     @NoHtml
     @Column(name = "TEMPLATEFILE", nullable = true)
@@ -114,4 +122,21 @@ public class messageType {
         this.dataTranslations = dataTranslations;
     }
 
+    public String getDspName() {
+        return dspName;
+    }
+
+    public void setDspName(String dspName) {
+        this.dspName = dspName;
+    }
+
+    public boolean isUseProgram() {
+        return useProgram;
+    }
+
+    public void setUseProgram(boolean useProgram) {
+        this.useProgram = useProgram;
+    }
+    
+    
 }

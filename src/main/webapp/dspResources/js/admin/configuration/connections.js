@@ -52,13 +52,14 @@ require(['./main'], function () {
         //Go get the existing message types for the selected organization'
         $(document).on('change', '.selsrcOrganization', function() {
             var selOrg = $(this).val();
+            var connectionId = $('#connectionId').val();
 
             if (selOrg === '') {
                 $('#srcorgDiv').addClass("has-error");
             }
             else {
                 populateConfigurations(selOrg, 'srcConfig');
-                populateUsers(selOrg, 'srcUsers');
+                populateUsers(selOrg, 'srcUsersTable', connectionId);
             }
         });
 
@@ -66,13 +67,14 @@ require(['./main'], function () {
         //Go get the existing message types for the selected organization
         $(document).on('change', '.seltgtOrganization', function() {
             var selOrg = $(this).val();
+            var connectionId = $('#connectionId').val();
 
             if (selOrg === '') {
                 $('#tgtorgDiv').addClass("has-error");
             }
             else {
                 populateConfigurations(selOrg, 'tgtConfig');
-                populateUsers(selOrg, 'tgtUsers');
+                populateUsers(selOrg, 'tgtUsersTable', connectionId);
             }
         });
 
@@ -117,7 +119,75 @@ require(['./main'], function () {
 
         });
         
+        $(document).on('change', '#selectAllSrcUsers', function() {
+            if($(this).is(":checked")) {
+                $('.srcUsers').each(function() {
+                    $(this).prop('checked', true);
+                });
+            }
+            else {
+                $('.srcUsers').each(function() {
+                    $(this).prop('checked', false);
+                });
+                $('.srcUsersSendEmail').each(function() {
+                    $(this).prop('checked', false);
+                });
+            }
+        });
         
+        $(document).on('change', '#sendAllSrcUsers', function() {
+            if($(this).is(":checked")) {
+                $('.srcUsers').each(function() {
+                    $(this).prop('checked', true);
+                });
+                $('.srcUsersSendEmail').each(function() {
+                    $(this).prop('checked', true);
+                });
+            }
+            else {
+                $('.srcUsers').each(function() {
+                    $(this).prop('checked', false);
+                });
+                $('.srcUsersSendEmail').each(function() {
+                    $(this).prop('checked', false);
+                });
+            }
+        });
+        
+        $(document).on('change', '#selectAllTgtUsers', function() {
+            if($(this).is(":checked")) {
+                $('.tgtUsers').each(function() {
+                    $(this).prop('checked', true);
+                });
+            }
+            else {
+                $('.tgtUsers').each(function() {
+                    $(this).prop('checked', false);
+                });
+                $('.tgtUsersSendEmail').each(function() {
+                    $(this).prop('checked', false);
+                });
+            }
+        });
+        
+        $(document).on('change', '#sendAllTgtUsers', function() {
+            if($(this).is(":checked")) {
+                $('.tgtUsers').each(function() {
+                    $(this).prop('checked', true);
+                });
+                $('.tgtUsersSendEmail').each(function() {
+                    $(this).prop('checked', true);
+                });
+            }
+            else {
+                $('.tgtUsers').each(function() {
+                    $(this).prop('checked', false);
+                });
+                $('.tgtUsersSendEmail').each(function() {
+                    $(this).prop('checked', false);
+                });
+            }
+        });
     });
 });
 
@@ -147,17 +217,27 @@ function populateConfigurations(orgId, selectBoxId) {
     });
 }
 
-function populateUsers(orgId, selectBoxId) {
+function populateUsers(orgId, selectBoxId, connectionId) {
 
     var users = $('#'+selectBoxId).attr('rel');
-
+    
+    var url = "";
+    
+    if(selectBoxId === "srcUsersTable") {
+        url = "getAvailableSendingUsers.do";
+    }
+    else {
+        url = "getAvailableReceivingUsers.do";
+    }
+    
+    // 'getAvailableUsers.do'
     $.ajax({
-        url: 'getAvailableUsers.do',
+        url: url,
         type: "GET",
-        data: {'orgId': orgId},
+        data: {'orgId': orgId, 'connectionId': connectionId},
         success: function(data) {
             //get value of preselected col
-            var html = '<option value="">- Select - </option>';
+            /*var html = '<option value="">- Select - </option>';
             var len = data.length;
 
             if(len > 1) {
@@ -168,24 +248,25 @@ function populateUsers(orgId, selectBoxId) {
             }
 
             for (var i = 0; i < len; i++) {
-                if(users != '' && users.indexOf(data[i][0]) != -1) {
-                    if(data[i][3] == 1) {
-                        html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] +' (Manager) </option>';
+                
+                if(users != '' && users.indexOf(data[i].id) != -1) {
+                    if(data[i].userType == 1) {
+                        html += '<option value="' + data[i].id+ '" selected>' + data[i].firstName + ' ' + data[i].lastName +' (Manager) - ' + data[i].orgName + ' </option>';
                     }
                     else {
-                       html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] +' (Staff Member) </option>'; 
+                       html += '<option value="' + data[i].id + '" selected>' + data[i].firstName + ' ' + data[i].lastName +' (Staff Member) - ' + data[i].orgName + ' </option>'; 
                     }
                 }
                 else {
-                    if(data[i][3] == 1) {
-                        html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] +' (Manager) </option>';
+                    if(data[i].userType == 1) {
+                        html += '<option value="' + data[i].id + '">' + data[i].firstName + ' ' + data[i].lastName +' (Manager) - ' + data[i].orgName + ' </option>';
                     }
                     else {
-                        html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] +' (Staff Member) </option>'; 
+                        html += '<option value="' + data[i].id + '">' + data[i].firstName + ' ' + data[i].lastName +' (Staff Member) - ' + data[i].orgName + ' </option>'; 
                     }
                 }
-            }
-            $('#'+selectBoxId).html(html);
+            }*/
+            $('#'+selectBoxId).html(data);
         }
     });
 }

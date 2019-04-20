@@ -181,7 +181,14 @@ public class newsArticleController {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/news/articleDetails");
-        mav.addObject("article", article.get(0));
+        
+        if(article != null && article.size() > 0) {
+            mav.addObject("article", article.get(0));
+        }
+        else {
+            mav.addObject("article", "");
+        }
+        
         mav.addObject("pageTitle", "News");
         return mav;
         

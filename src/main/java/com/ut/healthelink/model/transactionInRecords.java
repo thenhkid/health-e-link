@@ -27,6 +27,9 @@ public class transactionInRecords {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
+    
+    @Column(name = "batchId", nullable = false)
+    private int batchId;
 
     @Column(name = "TRANSACTIONINID", nullable = false)
     private int transactionInId;
@@ -6068,6 +6071,14 @@ public class transactionInRecords {
     public void setF500(String f500) {
         this.f500 = f500;
     }
+
+	public int getBatchId() {
+		return batchId;
+	}
+
+	public void setBatchId(int batchId) {
+		this.batchId = batchId;
+	}
     
     
 }

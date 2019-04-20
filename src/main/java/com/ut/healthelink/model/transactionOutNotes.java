@@ -47,6 +47,9 @@ public class transactionOutNotes {
     @Column(name = "DATESUBMITTED", nullable = false)
     private Date dateSubmitted = new Date();
     
+    @Column(name = "MESSAGESTATUS", nullable = true)
+    private String messageStatus;
+    
     public int getId() {
         return id;
     }
@@ -93,6 +96,14 @@ public class transactionOutNotes {
     
     public void setuserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getMessageStatus() {
+        return messageStatus;
+    }
+
+    public void setMessageStatus(String messageStatus) {
+        this.messageStatus = messageStatus;
     }
     
 }

@@ -5,6 +5,7 @@
  */
 package com.ut.healthelink.service;
 
+import com.ut.healthelink.model.activityReportList;
 import com.ut.healthelink.model.MoveFilesLog;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.CrosswalkData;
@@ -12,7 +13,10 @@ import com.ut.healthelink.model.Macros;
 import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.TransactionInError;
 import com.ut.healthelink.model.User;
+import com.ut.healthelink.model.WSMessagesIn;
+import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchMultipleTargets;
+import com.ut.healthelink.model.batchRetry;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configurationConnection;
@@ -34,9 +38,12 @@ import com.ut.healthelink.model.custom.IdAndFieldValue;
 import com.ut.healthelink.model.custom.TransErrorDetail;
 import com.ut.healthelink.model.custom.TransErrorDetailDisplay;
 import com.ut.healthelink.model.messagePatients;
+import com.ut.healthelink.model.referralActivityExports;
 import com.ut.healthelink.model.systemSummary;
 
 import java.io.File;
+import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +79,9 @@ public interface transactionInManager {
     List<batchUploads> getpendingBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
 
     List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception;
-
+    
+    List<transactionIn> getBatchTransactions(int batchId, int userId, List<Integer> messageTypeList, List<Integer> OrgList) throws Exception;
+    
     List<batchUploads> getsentBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
 
     batchUploads getBatchDetails(int batchId) throws Exception;
@@ -118,6 +127,8 @@ public interface transactionInManager {
     List<Integer> getTransWithMultiValues(ConfigForInsert config);
 
     Integer clearMessageTables(int batchId);
+    
+    Integer clearMessageTablesByTransactionInId(int transactionInId);
 
     List<Integer> getBlankTransIds(ConfigForInsert config);
 
@@ -141,16 +152,16 @@ public interface transactionInManager {
 
     boolean setDoNotProcess(Integer batchUploadId);
 
-    Integer clearTransactionInRecords(Integer batchUploadId);
+    Integer clearTransactionInRecords(Integer batchUploadId, Integer transactionInId);
 
     boolean insertTransactions(Integer batchUploadId);
 
     Integer clearTransactionIn(Integer batchUploadId);
 
-    Integer clearTransactionTranslatedIn(Integer batchUploadId);
+    Integer clearTransactionTranslatedIn(Integer batchUploadId, Integer transactionInId);
 
     Integer clearTransactionTables(Integer batchUploadId, boolean leaveFinalStatusIds);
-
+    
     Integer clearTransactionTarget(Integer batchUploadId);
 
     void flagAndEmailAdmin(Integer batchUploadId);
@@ -207,7 +218,7 @@ public interface transactionInManager {
 
     void flagCWErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
 
-    void flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
+    Integer flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
 
     List<configurationTransport> getHandlingDetailsByBatch(int batchId);
 
@@ -227,7 +238,7 @@ public interface transactionInManager {
 
     Integer copyTransactionInStatusToTarget(Integer batchId, Integer transactionId);
 
-    Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow);
+    Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow, String lineTerminator);
 
     Integer createLoadTable(String loadTableName);
 
@@ -253,9 +264,9 @@ public interface transactionInManager {
 
     Integer clearBatchUploadSummary(Integer batchId);
 
-    void loadBatches();
+    void loadBatches() throws Exception;
 
-    boolean loadBatch(Integer batchId);
+    boolean loadBatch(Integer batchId) throws Exception;
 
     List<batchUploads> getBatchesByStatusIds(List<Integer> statusIds);
 
@@ -284,7 +295,9 @@ public interface transactionInManager {
     Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId);
 
     Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId);
-
+    
+    Integer clearTransactionOutErrorsByUploadBatchId(Integer batchId);
+    
     Integer rejectInvalidTargetOrg(Integer batchId, configurationConnection confConn);
 
     Integer insertBatchUploadSumByOrg(batchUploads batchUpload, configurationConnection confConn);
@@ -379,7 +392,7 @@ public interface transactionInManager {
 
     Map<String, String> chkUploadBatchFile(configurationTransport transportDetails, File uploadedFile) throws Exception;
 
-    Integer moveRhapsodyFiles();
+    Integer moveRRFiles();
 
     List<configurationRhapsodyFields> getRhapsodyInfoForJob(Integer method);
 
@@ -407,7 +420,7 @@ public interface transactionInManager {
     
     void sendEmailToAdmin(String message, String subject) throws Exception;
     
-    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId);
+    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId, Integer userOrgId);
     
     boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception;
     
@@ -421,6 +434,120 @@ public interface transactionInManager {
     
     boolean recheckLongDate(String longDateVal, String convertedDate);
     
-    List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId);
+    String getTransactionInIdsFromBatch(Integer batchUploadId);
     
+    Integer processWebServiceMessages();
+    
+    Integer processWebServiceMessage(WSMessagesIn wsMessage);
+
+    List<WSMessagesIn> getWSMessagesByStatusId(List<Integer> statusIds);
+    
+    WSMessagesIn getWSMessagesById(Integer wsMessageId);
+    
+    Integer updateWSMessage(WSMessagesIn wsMessage);
+    
+    List <Integer> getErrorCodes (List <Integer> codesToIgnore);
+
+    Integer rejectInvalidSourceSubOrg(batchUploads batch, configurationConnection confConn, boolean nofinalStatus);
+    
+    Integer updateSSOrgIdTransactionIn(batchUploads batchUpload, configurationConnection batchTargets);
+    
+    Integer updateSSOrgIdUploadSummary(batchUploads batchUpload);
+ 
+    Integer updateSSOrgIdTransactionTarget(batchUploads batchUpload);
+    
+    List<Integer> getBatchesForReport(Date fromDate, Date toDate) throws Exception;
+    
+    BigInteger getReferralCount(List<Integer> batchIds) throws Exception;
+    
+    BigInteger getFeedbackReportCount(List<Integer> batchIds) throws Exception;
+    
+    BigInteger getRejectedCount(Date fromDate, Date toDate) throws Exception;
+    
+    List<activityReportList> getFeedbackReportList(List<Integer> batchIds) throws Exception;
+    
+    List<activityReportList> getReferralList(List<Integer> batchIds) throws Exception;
+    
+    List<Integer> getActivityStatusTotals(List<Integer> batchIds) throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExports() throws Exception;
+    
+    void createNewReferralActivityExport(referralActivityExports newExport) throws Exception;
+    
+    List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
+    
+    void clearMultipleTargets(Integer batchId) throws Exception;
+    
+    void sendRejectNotification(batchUploads batch, Integer rejectCount) throws Exception;
+    
+    List <Transaction> getTransactionsByStatusId (Integer batchId, List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    List <Transaction> setTransactionInInfoByStatusId (Integer batchId, List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    Transaction setTransactionTargetInfoByStatusId (Transaction transaction) throws Exception;
+    
+    List<batchUploads> getMassTranslateBatchForOutput (Integer howMany) throws Exception;
+    
+    void loadMassBatches() throws Exception;
+    
+    void processMassBatches() throws Exception;
+    
+    void saveBatchClearAfterDelivery (batchClearAfterDelivery bmt) throws Exception;
+    
+    void updateBatchClearAfterDelivery (batchClearAfterDelivery bmt) throws Exception;
+    
+    void clearAfterDeliveryBatches () throws Exception;
+    
+    void clearAfterDeliveryBatch (batchClearAfterDelivery bmt) throws Exception;
+    
+    List <batchClearAfterDelivery> getBatchClearAfterDelivery (List<Integer> statusIds) throws Exception;
+    
+    batchClearAfterDelivery getClearAfterDeliverById (Integer bmtId) throws Exception;
+
+    List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
+    
+    void translateCWForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
+
+    void processReferralActivityExportJob() throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExportsByStatus(List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    public void updateReferralActivityExport(referralActivityExports activityExport) throws Exception;
+    
+    void sendExportEmail(User userDetails) throws Exception;
+    
+    public void saveReferralActivityExport(referralActivityExports activityExport) throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExportsWithUserNames(List<Integer> statusIds) throws Exception;
+    
+    referralActivityExports getReferralActivityExportById(Integer exportId) throws Exception;
+    
+     public List<transactionRecords> setOutboundFormFields(List<configurationFormFields> formfields, transactionInRecords records, int configId, boolean readOnly, int orgId, int clientId) throws NoSuchMethodException, ParseException;
+ 
+     void populateAuditReport(Integer batchUploadId, configurationMessageSpecs cms) throws Exception;
+     
+     List <Integer> getErrorFieldNos(Integer batchUploadId) throws Exception;
+     
+     void populateFieldError(Integer batchUploadId, Integer fieldNo, configurationMessageSpecs cms) throws Exception;
+     
+     void cleanAuditErrorTable(Integer batchUploadId) throws Exception;
+     
+     Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId,  configurationDataTranslations cdt, boolean foroutboundProcessing,  Integer transactionId);
+     
+     void deleteMoveFileLogsByStatus(Integer statusId)  throws Exception;
+     
+     void deleteLoadTableRows (Integer howMany, String ascOrDesc, String laodTableName) throws Exception;
+     
+     Integer clearTransactionTranslatedListIn(Integer batchUploadId);
+     
+     Integer clearTransactionAttachments(Integer batchId);
+     
+     batchRetry getBatchRetryByUploadId (Integer batchUploadId, Integer statusId) throws Exception;
+     
+     void saveBatchRetry (batchRetry br) throws Exception;
+     
+     void clearBatchRetry (Integer batchUploadId) throws Exception;
+     
+     Integer clearTransactionInDroppedValuesByBatchId(Integer batchUploadId);
+
 }

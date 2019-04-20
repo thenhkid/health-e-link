@@ -9,6 +9,12 @@ import com.ut.healthelink.service.emailMessageManager;
 import com.ut.healthelink.service.newsArticleManager;
 import com.ut.healthelink.service.newsletterManager;
 import com.ut.healthelink.service.userManager;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,6 +24,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,6 +57,25 @@ public class mainController {
     
     @Autowired
     private newsletterManager newslettermanager;
+    
+    
+    @RequestMapping(value = "/files/{file_name}", method = RequestMethod.GET)
+    public void getFile(@PathVariable("file_name") String fileName, HttpServletResponse response) throws FileNotFoundException {
+	try {
+	
+	    File file = ResourceUtils.getFile("classpath:files/"+fileName+".docx");
+	
+	    // get your file as InputStream
+	    InputStream is = new FileInputStream(file);
+	    // copy it to response's OutputStream
+	    org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+	    response.flushBuffer();
+	 } 
+	catch (IOException ex) {
+	   throw new RuntimeException("IOError writing file to output stream");
+	}
+    }
+   
     
     /**
      * The '/login' request will serve up the login page.
@@ -108,8 +135,8 @@ public class mainController {
      * @return	the home page view
      * @throws Exception
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
+    @RequestMapping(value = "/", method = {RequestMethod.GET, RequestMethod.POST})
+    public ModelAndView welcome() throws Exception {
         
        /* Get a list of active news articles */
        List<newsArticle> newsArticles = newsarticlemanager.listAllActiveNewsArticles();
@@ -120,6 +147,20 @@ public class mainController {
        return mav;
        
     }
+    
+    /**
+     * The '/' head request 
+     * @param request
+     * @param response
+     * @return	the login page
+     * @throws Exception
+     */
+    @RequestMapping(value = "/", method = {RequestMethod.HEAD})
+    public ModelAndView headRequest() throws Exception { 
+            ModelAndView mav = new ModelAndView(new RedirectView("/home"));
+            return mav;   
+    }
+    
 
     /**
      * The '/about' GET request will display the about page.
@@ -134,14 +175,14 @@ public class mainController {
     }
     
     /**
-     * The '/about.how-we-work' GET request will display the how we work page.
+     * The '/about/Network-Capabilities' GET request will display the Network Capabilities  page.
      */
-    @RequestMapping(value = "/about/how-we-work", method = RequestMethod.GET)
-    public ModelAndView howweworkPage() throws Exception {
+    @RequestMapping(value = "/about/network-capabilities", method = RequestMethod.GET)
+    public ModelAndView networkcapabilitiesPage() throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/howwework");
-        mav.addObject("pageTitle", "How We Work");
+        mav.setViewName("/networkcapabilities");
+        mav.addObject("pageTitle", "Network Capabilities");
         return mav;
     }
     
@@ -181,8 +222,8 @@ public class mainController {
        
        mailMessage messageDetails = new mailMessage();
         
-       messageDetails.settoEmailAddress("info@health-e-link.net");
-       messageDetails.setfromEmailAddress("info@health-e-link.net");
+       messageDetails.settoEmailAddress("information@health-e-link.net");
+       messageDetails.setfromEmailAddress("support@health-e-link.net");
        messageDetails.setmessageSubject("Health-e-Link Contact Form Submission");
        
        
@@ -249,8 +290,8 @@ public class mainController {
        
        mailMessage messageDetails = new mailMessage();
         
-       messageDetails.settoEmailAddress("info@health-e-link.net");
-       messageDetails.setfromEmailAddress("info@health-e-link.net");
+       messageDetails.settoEmailAddress("information@health-e-link.net");
+       messageDetails.setfromEmailAddress("support@health-e-link.net");
        messageDetails.setmessageSubject("Health-e-Link Partner Request Form Submission");
        
        
@@ -361,18 +402,18 @@ public class mainController {
         mailMessage messageDetails = new mailMessage();
 
         messageDetails.settoEmailAddress(userDetails.getEmail());
-        messageDetails.setmessageSubject("Universal Translator Reset Password");
+        messageDetails.setmessageSubject("Health-e-Link Reset Password");
         
         String resetURL = request.getRequestURL().toString().replace("sendPassword.do", "resetPassword?b=");
         
         StringBuilder sb = new StringBuilder();
 
         sb.append("Dear " + userDetails.getFirstName() + ",<br />");
-        sb.append("You have recently asked to reset your Universal Translator password.<br /><br />");
+        sb.append("You have recently asked to reset your Health-e-Link password.<br /><br />");
         sb.append("<a href='" + resetURL + randomCode + "'>Click here to reset your password.</a>");
 
         messageDetails.setmessageBody(sb.toString());
-        messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+        messageDetails.setfromEmailAddress("support@health-e-link.net");
 
         emailMessageManager.sendEmail(messageDetails);
 
@@ -416,6 +457,7 @@ public class mainController {
         } else {
             userDetails.setresetCode(null);
             userDetails.setPassword(newPassword);
+            userDetails = usermanager.encryptPW(userDetails);
 
             //Return the sections for the clicked user
             List<userAccess> userSections = usermanager.getuserSections(userDetails.getId());
@@ -444,20 +486,14 @@ public class mainController {
      */
     public String generateRandomCode() {
 
-        StringBuilder code = new StringBuilder();
-
-        /* Generate a random 6 digit number for a confirmation code */
-        for (int i = 1; i <= 7; i++) {
-            Random rand = new Random();
-            int r = rand.nextInt(8) + 1;
-            code.append(r);
-        }
-
+    	Random random = new Random();
+        String randomCode = new BigInteger(130, random).toString(32);
+       
         /* Check to make sure there is not reset code already generated */
-        User usedCode = usermanager.getUserByResetCode(code.toString());
+        User usedCode = usermanager.getUserByResetCode(randomCode);
 
         if (usedCode == null) {
-            return code.toString();
+            return randomCode;
         } else {
 
             return generateRandomCode();

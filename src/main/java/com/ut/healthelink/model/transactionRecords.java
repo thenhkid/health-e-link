@@ -14,6 +14,7 @@ import java.util.List;
 public class transactionRecords {
 
     private String fieldValue = null;
+    private String fieldHelp = null;
     private String saveToTable = null;
     private String saveToTableCol = null;
     private int fieldNo;
@@ -22,9 +23,11 @@ public class transactionRecords {
     private String fieldLabel = null;
     private int transactionId;
     private boolean readOnly = false;
+    private Integer fieldType = 1;
     
     private String errorDesc = null;
     private String errorData = null;
+    private boolean useField = true;
 
     public int getTransactionId() {
         return transactionId;
@@ -132,4 +135,29 @@ public class transactionRecords {
         this.errorData = errorData;
     }
 
+    public Integer getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(Integer fieldType) {
+        this.fieldType = fieldType;
+    }
+
+    public String getFieldHelp() {
+        return fieldHelp;
+    }
+
+    public void setFieldHelp(String fieldHelp) {
+        this.fieldHelp = fieldHelp;
+    }
+
+    public boolean isUseField() {
+        return useField;
+    }
+
+    public void setUseField(boolean useField) {
+        this.useField = useField;
+    }
+    
+    
 }

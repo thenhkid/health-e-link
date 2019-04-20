@@ -34,6 +34,7 @@ import com.ut.healthelink.model.messageTypeDataTranslations;
 import com.ut.healthelink.model.messageTypeFormFields;
 import com.ut.healthelink.model.validationType;
 import com.ut.healthelink.reference.fileSystem;
+
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -51,7 +52,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
     @Override
     @Transactional
-    public Integer createMessageType(messageType messageType) {
+    public Integer createMessageType(messageType messageType) throws Exception {
         Integer lastId = null;
 
         MultipartFile file = messageType.getFile();
@@ -59,7 +60,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
         InputStream inputStream = null;
         OutputStream outputStream = null;
-
+        
         try {
             inputStream = file.getInputStream();
             File newFile = null;
@@ -94,6 +95,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
         } catch (IOException e) {
             e.printStackTrace();
+            throw new Exception(e);
         }
 
         //Submit the new message type to the database
@@ -231,6 +233,13 @@ public class messageTypeManagerImpl implements messageTypeManager {
     public String getValidationById(int id) {
         return messageTypeDAO.getValidationById(id);
     }
+    
+    @SuppressWarnings("rawtypes")
+    @Override
+    @Transactional
+    public List getFieldTypes() {
+        return messageTypeDAO.getFieldTypes();
+    }
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -278,7 +287,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
     @Override
     @Transactional
-    public Integer createCrosswalk(Crosswalks crosswalkDetails) {
+    public Integer createCrosswalk(Crosswalks crosswalkDetails) throws Exception {
         Integer lastId = null;
         String cleanURL = null;
 
@@ -302,11 +311,11 @@ public class messageTypeManagerImpl implements messageTypeManager {
         newFile = new File(dir.getDir() + fileName);
 
         try {
-            inputStream = file.getInputStream();
-
             if (!newFile.exists()) {
                 newFile.createNewFile();
             }
+            
+            inputStream = file.getInputStream();
             outputStream = new FileOutputStream(newFile);
             int read = 0;
             byte[] bytes = new byte[1024];
@@ -321,6 +330,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
         } catch (IOException e) {
             e.printStackTrace();
+            throw new Exception (e);           
         }
 
         //Need to get the actual delimiter character
@@ -380,7 +390,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
      * @param delim	delim: the delimiter used in the file
      *
      */
-    public void loadCrosswalkContents(int id, String fileName, String delim, String cleanURL) {
+    public void loadCrosswalkContents(int id, String fileName, String delim, String cleanURL) throws Exception {
 
         //Set the directory that holds the crosswalk files
         fileSystem dir = new fileSystem();
@@ -397,18 +407,23 @@ public class messageTypeManagerImpl implements messageTypeManager {
             file = new FileInputStream(new File(dir.getDir() + fileName));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            throw new Exception(e);
         }
 
         BufferedReader br = new BufferedReader(new InputStreamReader(file));
 
         try {
+	    String sqlStmt = "";
             String line = null;
             try {
                 line = br.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception(e);
             }
-
+	    
+	    messageTypeDAO.executeSQLStatement("delete from rel_crosswalkData where crosswalkId = "+id);
+	   
             while (line != null) {
 
                 //Need to parse each line via passed in delimiter
@@ -420,31 +435,30 @@ public class messageTypeManagerImpl implements messageTypeManager {
                 String sourceValue = lineValue[0];
                 String targetValue = lineValue[1];
                 String descVal = lineValue[2];
-
-                //Need to insert all the fields into the crosswalk data Fields table
-                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO rel_crosswalkData (crosswalkId, sourceValue, targetValue, descValue)"
-                        + "VALUES (:crosswalkid, :sourceValue, :targetValue, :descVal)")
-                        .setParameter("crosswalkid", id)
-                        .setParameter("sourceValue", sourceValue)
-                        .setParameter("targetValue", targetValue)
-                        .setParameter("descVal", descVal);
-
-                query.executeUpdate();
+		
+		sqlStmt += "INSERT INTO rel_crosswalkData (crosswalkId, sourceValue, targetValue, descValue) VALUES ("+id+",'"+sourceValue+"','"+targetValue+"','"+descVal+"');";
 
                 try {
                     line = br.readLine();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    throw new Exception(e);
                 }
             }
+	    
+	    if(!"".equals(sqlStmt)) {
+		messageTypeDAO.executeSQLStatement(sqlStmt);
+	    }
 
         } finally {
             try {
                 br.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception(e);
             }
         }
+
     }
 
     /**
@@ -454,6 +468,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
      * @param fileName	fileName: file name of the uploaded excel file.
      *
      */
+    
     public void loadExcelContents(int id, String fileName) {
 
         try {
@@ -602,4 +617,76 @@ public class messageTypeManagerImpl implements messageTypeManager {
         return messageTypeDAO.getAssociatedMessageTypes(orgId);
     }
 
+    @Override
+    public Integer uploadNewFileForCrosswalk(Crosswalks crosswalkDetails) throws Exception {
+        Integer lastId = null;
+        String cleanURL = null;
+	
+	MultipartFile file = crosswalkDetails.getFile();
+        String fileName = file.getOriginalFilename();
+
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        fileSystem dir = new fileSystem();
+
+        if (crosswalkDetails.getOrgId() > 0) {
+            Organization orgDetails = organizationDAO.getOrganizationById(crosswalkDetails.getOrgId());
+            cleanURL = orgDetails.getcleanURL();
+            dir.setDir(cleanURL, "crosswalks");
+        } else {
+            //Set the directory to save the uploaded message type template to
+            dir.setMessageTypeCrosswalksDir("libraryFiles");
+        }
+
+        File newFile = null;
+        newFile = new File(dir.getDir() + fileName);
+
+        try {
+            inputStream = file.getInputStream();
+
+            if (!newFile.exists()) {
+                newFile.createNewFile();
+            }
+            outputStream = new FileOutputStream(newFile);
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            while ((read = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, read);
+            }
+            outputStream.close();
+
+            //Set the filename to the original file name
+            crosswalkDetails.setfileName(fileName);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //Need to get the actual delimiter character
+        String delimChar = (String) messageTypeDAO.getDelimiterChar(crosswalkDetails.getFileDelimiter());
+
+        //Check to make sure the file contains the selected delimiter
+        //Set the directory that holds the crosswalk files
+        int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
+
+        if (delimCount > 0) {
+            //Submit the new message type to the database
+            messageTypeDAO.updateCrosswalk(crosswalkDetails);
+
+            //Call the function that will load the content of the crosswalk text file
+            //into the rel_crosswalkData table
+            loadCrosswalkContents(crosswalkDetails.getId(), fileName, delimChar, cleanURL);
+
+            return crosswalkDetails.getId();
+        } else {
+            //Need to delete the file
+            newFile.delete();
+
+            //Need to return an error
+            return 0;
+        }
+    }
+
+    
 }

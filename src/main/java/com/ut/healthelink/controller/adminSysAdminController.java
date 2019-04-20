@@ -1,20 +1,29 @@
 package com.ut.healthelink.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.reference.TestCategoryList;
 import com.ut.healthelink.reference.USStateList;
 import com.ut.healthelink.reference.ProcessCategoryList;
 import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.sysAdminManager;
+import com.ut.healthelink.service.userManager;
 import com.ut.healthelink.model.Macros;
+import com.ut.healthelink.model.MoveFilesLog;
+import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.custom.LogoInfo;
 import com.ut.healthelink.model.custom.LookUpTable;
 import com.ut.healthelink.model.custom.TableData;
@@ -29,6 +38,7 @@ import com.ut.healthelink.model.lutables.lu_Procedures;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.lutables.lu_Tests;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -47,6 +57,10 @@ public class adminSysAdminController {
 
     @Autowired
     private sysAdminManager sysAdminManager;
+    
+    @Autowired
+    private userManager usermanager;
+
 
     @Autowired
     private configurationManager configurationmanager;
@@ -76,12 +90,15 @@ public class adminSysAdminController {
         int totalLookUpTables = sysAdminManager.findTotalLookUpTable();
         Long totalMacroRows = sysAdminManager.findTotalMacroRows();
         Long totalHL7Entries = sysAdminManager.findtotalHL7Entries();
-        Long totalNewsArticles = sysAdminManager.findtotalNewsArticles();
+        Long totalUsers = sysAdminManager.findTotalUsers();
+        Integer filePaths = sysAdminManager.getMoveFilesLog(1).size();
+        
         mav.addObject("totalLookUpTables", totalLookUpTables);
         mav.addObject("totalMacroRows", totalMacroRows);
         mav.addObject("totalHL7Entries", totalHL7Entries);
-        mav.addObject("totalNewsArticles", totalNewsArticles);
-
+        mav.addObject("totalUsers", totalUsers);
+        mav.addObject("filePaths", filePaths);
+        
         return mav;
     }
 
@@ -1466,4 +1483,168 @@ public class adminSysAdminController {
         redirectAttr.addFlashAttribute("savedStatus", "updated");
         return mav;
     }
+    
+    /** modify admin profile **/
+    @RequestMapping(value = "/adminInfo", method = RequestMethod.GET)
+    public @ResponseBody
+    ModelAndView displayAdminInfo(HttpServletRequest request, Authentication authentication) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/adminInfo/profile");
+        User userDetails = usermanager.getUserByUserName(authentication.getName());
+        
+        mav.addObject("btnValue", "Update");
+        mav.addObject("userdetails", userDetails);
+        return mav;
+    }
+    
+    @RequestMapping(value = "/adminInfo", method = RequestMethod.POST)
+    public @ResponseBody
+    ModelAndView updateAdminInfo(HttpServletRequest request, @ModelAttribute(value = "userdetails") User userdetails, 
+    		Authentication authentication, BindingResult result) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        User user = usermanager.getUserByUserName(authentication.getName());
+        
+        mav.setViewName("/administrator/sysadmin/adminInfo/profile");
+        
+        
+        /** we verify existing password **/
+        
+        boolean okToChange = false;
+      
+        try  {
+        	okToChange = usermanager.authenticate(request.getParameter("existingPassword"), user.getEncryptedPw(), user.getRandomSalt());
+        } catch(Exception ex) {
+        	okToChange = false;
+        }
+        
+        if (okToChange) {
+        	/** we update user **/
+            user.setFirstName(userdetails.getFirstName());
+            user.setLastName(userdetails.getLastName());
+            user.setEmail(userdetails.getEmail());
+            if (!request.getParameter("newPassword").trim().equalsIgnoreCase("")) {
+          		user.setRandomSalt(usermanager.generateSalt());
+           		user.setEncryptedPw(usermanager.getEncryptedPassword(request.getParameter("newPassword"), user.getRandomSalt()));
+            }
+            try {
+            	usermanager.updateUserOnly(user);
+            } catch (Exception ex) {
+            	ex.printStackTrace();
+            	okToChange = false;
+            }
+
+        }
+        
+        if (!okToChange) {
+        	mav.addObject("failed", "Please check your existing password.  Profile is not updated.");
+        	mav.addObject("btnValue", "Update");
+        }  else {
+	        mav.addObject("userdetails", user);
+	        mav.addObject("success", "Profile is updated");
+	        mav.addObject("btnValue", "Update");
+        }
+        
+        
+        return mav;
+    }  
+    
+ 
+    /** login as portion  **/
+    @RequestMapping(value = "/loginAs", method = RequestMethod.GET)
+    public ModelAndView loginAs() throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/loginAs");
+        
+        //get all active users
+        List <User> usersList = usermanager.getUsersByStatuRolesAndOrg(true, Arrays.asList(1), Arrays.asList(1), false);
+        mav.addObject("usersList", usersList);
+
+        return mav;
+    }
+    
+    @RequestMapping(value = "/loginAs", method = RequestMethod.POST)
+    public @ResponseBody
+    ModelAndView checkAdminPW(HttpServletRequest request,  Authentication authentication) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        User user = usermanager.getUserByUserName(authentication.getName());
+        
+        mav.setViewName("/administrator/sysadmin/loginAs");
+        
+        boolean okToLoginAs = false;
+        
+        /** we verify existing password **/
+        if (user.getRoleId() == 1 || user.getRoleId() == 4) {
+	        try  {
+	        	okToLoginAs = usermanager.authenticate(request.getParameter("password"), user.getEncryptedPw(), user.getRandomSalt());
+	        } catch(Exception ex) {
+	        	okToLoginAs = false;
+	        }
+        }
+        
+        
+        if (!okToLoginAs) {
+        	mav.addObject("msg", "Your credentials are invalid.");
+        }  else {
+	        mav.addObject("msg", "pwmatched");
+	    }
+        
+        
+        return mav;
+    }  
+    
+    @RequestMapping(value = "/getLog", method = {RequestMethod.GET})
+    public void getLog(HttpSession session, HttpServletResponse response, Authentication authentication) throws Exception {
+    	
+    	User userInfo = usermanager.getUserByUserName(authentication.getName());
+    	//log user activity
+ 	   UserActivity ua = new UserActivity();
+ 	   ua.setUserId(userInfo.getId());
+ 	   ua.setAccessMethod("GET");
+ 	   ua.setPageAccess("/getLog");
+ 	   ua.setActivity("Download Tomcat Log");
+ 	   usermanager.insertUserLog(ua);
+ 	   
+    	File logFileDir = new File(System.getProperty("catalina.home"), "logs");
+        File logFile = new File(logFileDir, "catalina.out");
+        // get your file as InputStream
+	   InputStream is = new FileInputStream(logFile);
+	   String mimeType = "application/octet-stream";
+	            		  response.setContentType(mimeType);
+	            		  response.setHeader("Content-Transfer-Encoding", "binary");
+	                      response.setHeader("Content-Disposition", "attachment;filename=catalina.out");
+	                      org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+	                      response.flushBuffer();
+	            	      is.close();
+	   
+} 
+    
+    @RequestMapping(value = "/moveFilePaths", method = RequestMethod.GET)
+    public ModelAndView moveFilePaths(HttpServletRequest request, HttpServletResponse response, 
+    		HttpSession session, RedirectAttributes redirectAttr) throws Exception {
+
+    	ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/moveFilePaths");
+        //we get list of programs
+        List<MoveFilesLog> pathList = sysAdminManager.getMoveFilesLog(1);
+        mav.addObject("pathList", pathList);
+        
+        return mav;
+    }
+    
+    @RequestMapping(value = "/moveFilePaths", method = RequestMethod.POST)
+    @ResponseBody
+    public String associateEntity(@RequestParam(value = "pathId", required = true) Integer pathId) throws Exception {
+        
+    	MoveFilesLog moveFilesLog = new MoveFilesLog();
+    	moveFilesLog.setId(pathId);
+    	sysAdminManager.deleteMoveFilesLog(moveFilesLog);
+        
+        return "deleted";
+    }    	
+    
+    
 }

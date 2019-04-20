@@ -14,6 +14,7 @@ public class fieldSelectOptions {
     
     private String optionValue;
     private String optionDesc = null;
+    private String defaultValue;
     
     public String getoptionValue() {
         return optionValue;
@@ -30,4 +31,13 @@ public class fieldSelectOptions {
     public void setoptionDesc(String optionDesc) {
         this.optionDesc = optionDesc;
     }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+    
 }

@@ -49,6 +49,9 @@ public class configurationMessageSpecs {
     @Column(name = "TARGETORGCOL", nullable = false)
     private int targetOrgCol = 0;
     
+    @Column(name = "sourceSubOrgCol", nullable = false)
+    private int sourceSubOrgCol = 0;
+    
     @Column(name = "CONTAINSHEADERROW", nullable = false)
     private boolean containsHeaderRow = false;
     
@@ -159,7 +162,13 @@ public class configurationMessageSpecs {
     public void setFile(CommonsMultipartFile file) {
         this.file = file;
     }
-    
-    
-    
+
+	public int getSourceSubOrgCol() {
+		return sourceSubOrgCol;
+	}
+
+	public void setSourceSubOrgCol(int sourceSubOrgCol) {
+		this.sourceSubOrgCol = sourceSubOrgCol;
+	}
+
 }

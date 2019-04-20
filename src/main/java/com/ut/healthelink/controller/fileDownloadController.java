@@ -110,7 +110,7 @@ public class fileDownloadController {
             outputStream.close();
             
         } catch (FileNotFoundException e) {
-        	errorMessage = e.getMessage();
+        	errorMessage = errorMessage + "<br/>" + e.getMessage();
         	e.printStackTrace();
             
         } catch (IOException e) {
@@ -121,7 +121,7 @@ public class fileDownloadController {
                 try {
                     in.close();
                 } catch (IOException e) {
-                	errorMessage = e.getMessage();
+                	errorMessage = errorMessage + "<br/>" +  e.getMessage();
                     e.printStackTrace();
                 }
             }

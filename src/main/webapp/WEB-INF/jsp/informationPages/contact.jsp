@@ -17,13 +17,13 @@
                     <div class="module sidebar-module">
                         <dl class="vcard info-list">
                             <dt>Contact Us By Phone</dt>
-                            <dd class="tel">(508) 721-1977</dd>
+                            <dd class="tel">(774) 272-0313</dd>
 
                             <dt>Contact Us By Fax</dt>
                             <dd class="tel">(508) 721-1978</dd>
 
                             <dt>Contact Us By Email</dt>
-                            <dd class="email"><a href="" title="">info@health-e-link.net</a></dd>
+                            <dd class="email"><a href="mailto:information@health-e-link.net" title="">information@health-e-link.net</a></dd>
 
                             <%--<dt>Connect</dt>
                             <dd class="margin-small top">
@@ -44,7 +44,11 @@
                     </div>
                 </c:if>
 
-                <h2>Contact Form</h2>
+                <p>
+                    Health-e-link's staff would be happy to contact you and discuss how our technology solutions and support services may help you create expanded service delivery and patient care models, improve your 
+                    ability manage your network of collaborating healthcare professionals, and track program and population-based health data. Please complete the form below, provide any information you feel is relevant 
+                    and we'll be in touch soon!
+                </p>
 
                 <form:form id="contactForm" method="post" role="form">
                     <div class="form-container">
@@ -106,32 +110,34 @@
                             <span id="errorMsg_email" class="control-label"></span> 
                             <span class="control-label"><a href="#privacyModal" data-toggle="modal" class="btn btn-link userEdit">Privacy Policy</a></span>
                         </div>
-                        <div class="form-group">
-                            <label for="comments">I am Interestd In:</label>
+                        <div id="fieldDiv_interestedIn" class="form-group">
+                        	<label for="comments">I am Interested In: *</label>
+                        	<span id="errorMsg_interestedIn" class="control-label"></span> 
                             <div class="checkbox">
                                 <label>
-                                    <input name='interestedIn' type="checkbox" value="Health-e-Net">
-                                    Health-e-Net
+                                    <input name='interestedIn' type="checkbox" value="Care Connect">
+                                    Care Connect
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input name='interestedIn' type="checkbox" value="Health-e-Data">
-                                    Health-e-Data
+                                    <input name='interestedIn' type="checkbox" value="Universal HIE">
+                                    Universal HIE
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input name='interestedIn' type="checkbox" value="Health-e-Web">
-                                    Health-e-Web
+                                    <input name='interestedIn' type="checkbox" value="Clinical Data Warehouse">
+                                    Clinical Data Warehouse
                                 </label>
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input name='interestedIn' type="checkbox" value="DOC-u-Link">
-                                    DOC-u-Link
+                                    <input name='interestedIn' type="checkbox" value="Support Services">
+                                    Support Services
                                 </label>
                             </div>
+                            
                         </div>
                         <div class="form-group">
                             <label for="comments">Comments</label>

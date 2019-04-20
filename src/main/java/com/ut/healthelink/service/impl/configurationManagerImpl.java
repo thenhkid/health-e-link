@@ -1,5 +1,6 @@
 package com.ut.healthelink.service.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,12 @@ import com.ut.healthelink.model.HL7Segments;
 import com.ut.healthelink.model.Macros;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationCCDElements;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationConnectionSenders;
 import com.ut.healthelink.model.configurationDataTranslations;
+import com.ut.healthelink.model.configurationExcelDetails;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.reference.fileSystem;
@@ -31,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
+
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -190,8 +194,8 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     @Transactional
-    public List<configurationConnection> getConnectionsByConfiguration(int configId) {
-        return configurationDAO.getConnectionsByConfiguration(configId);
+    public List<configurationConnection> getConnectionsByConfiguration(int configId, int userId) {
+        return configurationDAO.getConnectionsByConfiguration(configId, userId);
     }
 
     @Override
@@ -280,7 +284,7 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     @Transactional
-    public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int fileType) {
+    public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int fileType) throws Exception {
 
         boolean processFile = false;
         String fileName = null;
@@ -340,6 +344,7 @@ public class configurationManagerImpl implements configurationManager {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception (e);
             }
         }
 
@@ -350,6 +355,7 @@ public class configurationManagerImpl implements configurationManager {
                 loadExcelContents(messageSpecs.getconfigId(), transportDetailId, fileName, dir);
             } catch (Exception e1) {
                 e1.printStackTrace();
+                throw new Exception (e1);
             }
 
         }
@@ -365,7 +371,7 @@ public class configurationManagerImpl implements configurationManager {
      *
      */
     public void loadExcelContents(int id, int transportDetailId, String fileName, fileSystem dir) throws Exception {
-
+    	String errorMessage = "";
         try {
             //Set the initial value of the buckets (1);
             Integer bucketVal = new Integer(1);
@@ -388,6 +394,7 @@ public class configurationManagerImpl implements configurationManager {
 
             } catch (Exception e1) {
                 e1.printStackTrace();
+                errorMessage = errorMessage + "<br/>" + e1.getMessage();
             }
 
             //Get first/desired sheet from the workbook
@@ -461,10 +468,18 @@ public class configurationManagerImpl implements configurationManager {
                 pkg.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                errorMessage = errorMessage + "<br/>" + e.getMessage();
             }
         } catch (Exception e) {
             e.printStackTrace();
+            errorMessage = errorMessage + "<br/>" + e.getMessage();
         }
+        
+        /** throw error message here because want to make sure file stream is closed **/
+        if (!errorMessage.equalsIgnoreCase("")) {
+        	throw new Exception(errorMessage);
+        }
+        
     }
 
     @Override
@@ -565,4 +580,57 @@ public class configurationManagerImpl implements configurationManager {
      public void removeHL7Segment(Integer segmentId) {
          configurationDAO.removeHL7Segment(segmentId);
      }
+     
+     @Override
+     public List<configurationCCDElements> getCCDElements(Integer configId) throws Exception {
+         return configurationDAO.getCCDElements(configId);
+     }
+     
+     @Override
+     public void saveCCDElement(configurationCCDElements ccdElement) throws Exception {
+         configurationDAO.saveCCDElement(ccdElement);
+     }
+     
+     @Override
+     public configurationCCDElements getCCDElement(Integer elementId) throws Exception {
+         return configurationDAO.getCCDElement(elementId);
+     }
+
+	@Override
+	public configurationExcelDetails getExcelDetails(Integer configId, Integer orgId)
+			throws Exception {
+		return configurationDAO.getExcelDetails(configId, orgId);
+	}
+
+	@Override
+	public List <String> getConfigHeaderCols(configurationMessageSpecs cms)
+			throws Exception {
+		String selectCols = "";
+		String insertCols = "";
+		
+		if (cms.getrptField1() != 0) {
+			selectCols += ("F" + cms.getrptField1() + ",");
+			insertCols += "reportField1Data, ";
+		}
+		if (cms.getrptField1() != 0) {
+			selectCols += ("F" + cms.getrptField2() + ",");
+			insertCols += "reportField2Data, ";
+		}
+		if (cms.getrptField1() != 0) {
+			selectCols += ("F" + cms.getrptField3() + ",");
+			insertCols += "reportField3Data, ";
+		}
+		if (cms.getrptField1() != 0) {
+			selectCols += ("F" + cms.getrptField4());
+			insertCols += "reportField4Data";
+		}
+		if (insertCols.endsWith(",")) {
+			insertCols += insertCols.substring(0, insertCols.length() - 1);
+			selectCols += selectCols.substring(0, selectCols.length() - 1);
+		}
+		
+		List<String> headerCols = Arrays.asList(selectCols, insertCols);
+		
+		return headerCols;
+	}
 }

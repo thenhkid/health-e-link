@@ -10,11 +10,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Entity
 @Table(name = "CONFIGURATIONTRANSPORTDETAILS")
 public class configurationTransport {
-    
+
     @Transient
     private List<configurationFormFields> fields = null;
 
@@ -25,6 +26,9 @@ public class configurationTransport {
     private List<configurationRhapsodyFields> rhapsodyFields = null;
 
     @Transient
+    private List<configurationWebServiceFields> webServiceFields = null;
+
+    @Transient
     private String delimChar = null;
 
     @Transient
@@ -32,6 +36,9 @@ public class configurationTransport {
 
     @Transient
     private List<Integer> messageTypes = null;
+    
+    @Transient
+    private CommonsMultipartFile ccdTemplatefile = null, hl7PDFTemplatefile = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -80,13 +87,34 @@ public class configurationTransport {
 
     @Column(name = "COPIEDTRANSPORTID", nullable = false)
     private int copiedTransportId = 0;
-
+    
+    @Column(name = "massTranslation", nullable = false)
+    private boolean massTranslation = false;
+    
+    @Column(name = "lineTerminator", nullable = true)
+    private String lineTerminator = "\\n";
+    
     @NoHtml
     @Column(name = "FILEEXT", nullable = false)
     private String fileExt = null;
 
     @Column(name = "encodingId", nullable = false)
     private int encodingId = 1;
+
+    @Column(name = "ccdSampleTemplate", nullable = true)
+    private String ccdSampleTemplate = null;
+    
+    @Column(name = "attachmentLimit", nullable = true)
+    private String attachmentLimit = "";
+    
+    @Column(name = "attachmentRequired", nullable = false)
+    private Boolean attachmentRequired = false;
+    
+    @Column(name = "attachmentNote", nullable = true)
+    private String attachmentNote = "";
+    
+    @Column(name = "HL7PDFSampleTemplate", nullable = true)
+    private String HL7PDFSampleTemplate = null;
 
     public int getId() {
         return id;
@@ -271,5 +299,86 @@ public class configurationTransport {
     public void setRhapsodyFields(List<configurationRhapsodyFields> rhapsodyFields) {
         this.rhapsodyFields = rhapsodyFields;
     }
+
+    public List<configurationWebServiceFields> getWebServiceFields() {
+        return webServiceFields;
+    }
+
+    public void setWebServiceFields(
+            List<configurationWebServiceFields> webServiceFields) {
+        this.webServiceFields = webServiceFields;
+    }
+    
+    public String getCcdSampleTemplate() {
+        return ccdSampleTemplate;
+    }
+
+    public void setCcdSampleTemplate(String ccdSampleTemplate) {
+        this.ccdSampleTemplate = ccdSampleTemplate;
+    }
+
+    public CommonsMultipartFile getCcdTemplatefile() {
+        return ccdTemplatefile;
+    }
+
+    public void setCcdTemplatefile(CommonsMultipartFile ccdTemplatefile) {
+        this.ccdTemplatefile = ccdTemplatefile;
+    }
+
+    public String getAttachmentLimit() {
+        return attachmentLimit;
+    }
+
+    public void setAttachmentLimit(String attachmentLimit) {
+        this.attachmentLimit = attachmentLimit;
+    }
+
+    public Boolean getAttachmentRequired() {
+        return attachmentRequired;
+    }
+
+    public void setAttachmentRequired(Boolean attachmentRequired) {
+        this.attachmentRequired = attachmentRequired;
+    }
+
+    public String getAttachmentNote() {
+        return attachmentNote;
+    }
+
+    public void setAttachmentNote(String attachmentNote) {
+        this.attachmentNote = attachmentNote;
+    }
+
+    public String getHL7PDFSampleTemplate() {
+        return HL7PDFSampleTemplate;
+    }
+
+    public void setHL7PDFSampleTemplate(String HL7PDFSampleTemplate) {
+        this.HL7PDFSampleTemplate = HL7PDFSampleTemplate;
+    }
+
+    public CommonsMultipartFile getHl7PDFTemplatefile() {
+        return hl7PDFTemplatefile;
+    }
+
+    public void setHl7PDFTemplatefile(CommonsMultipartFile hl7PDFTemplatefile) {
+        this.hl7PDFTemplatefile = hl7PDFTemplatefile;
+    }
+
+	public boolean isMassTranslation() {
+		return massTranslation;
+	}
+
+	public void setMassTranslation(boolean massTranslation) {
+		this.massTranslation = massTranslation;
+	}
+
+	public String getLineTerminator() {
+		return lineTerminator;
+	}
+
+	public void setLineTerminator(String lineTerminator) {
+		this.lineTerminator = lineTerminator;
+	}
 
 }

@@ -9,12 +9,20 @@ package com.ut.healthelink.service;
 import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.batchClearAfterDelivery;
+import com.ut.healthelink.model.batchUploads;
+import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationFormFields;
+import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.pendingDeliveryTargets;
 import com.ut.healthelink.model.systemSummary;
 import com.ut.healthelink.model.transactionIn;
 import com.ut.healthelink.model.transactionOutNotes;
+import com.ut.healthelink.model.transactionRecords;
 import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.model.transactionOutRecords;
+import com.ut.healthelink.model.custom.ConfigOutboundForInsert;
+
 import java.util.Date;
 import java.util.List;
 
@@ -122,8 +130,61 @@ public interface transactionOutManager {
     
     void selectOutputRecordsForProcess(Integer transactionTargetId) throws Exception;
     
-    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId);
+    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId, Integer userOrgId);
     
     void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
     
+    List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception;
+    
+    void processMassOutputBatches() throws Exception;
+    
+    Integer processMassOutputBatch(Integer uploadBatchId) throws Exception;
+    
+    List<transactionTarget> getTTByStatusId(int batchId, List <Integer> statusIds) throws Exception;
+    
+    List<Integer> getTargetConfigsForBatch (int batchId, List <Integer> statusIds) throws Exception;
+    
+    Integer writeOutputToTextFile(configurationTransport transportDetails, Integer batchUploadId, String filePathAndName, String fieldNos) throws Exception;
+    
+    String generateDLBatchName(configurationTransport transportDetails, configuration configDetails, batchUploads batchUploadDetails, Date date) throws Exception;
+
+    void updateTTBatchIdByUploadBatch(Integer batchDLId, Integer batchDownloadId) throws Exception;
+    
+    void  massInsertSummaryEntry(batchDownloads batchDowloadDetails, configuration configDetails, batchUploads batchUploadDetails) throws Exception;
+    
+    void setUpTransactionTranslatedOut(batchDownloads batchDowloadDetails, configuration configDetails, Integer statusId) throws Exception;
+    
+    List <ConfigOutboundForInsert> setConfigOutboundForInsert(int configId, int batchDownloadId) throws Exception;
+    
+    void massUpdateTTO (ConfigOutboundForInsert configOutboundForInsertList, Integer statusId ) throws Exception;
+    
+    String getConfigFieldsForOutput (Integer configId ) throws Exception;
+    
+    void insertFailedRequiredFields(configurationFormFields cff, Integer batchDownloadId, Integer transactionTargetId) throws Exception;
+    
+    void runValidations(Integer batchDownloadId, Integer configId, Integer transactionTargetId) throws Exception;
+    
+    void genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchDownloadId, String regEx, Integer transactionTargetId) throws Exception;
+    
+    void urlValidation(configurationFormFields cff, Integer validationTypeId, Integer batchDownloadId, Integer transactionId) throws Exception;
+    
+    void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchDownloadId, Integer transactionId) throws Exception;
+    
+    void moveTranslatedRecordsByBatch(int batchDownloadId) throws Exception;
+    
+    List<transactionRecords> getFieldColAndValues(Integer batchDownloadId, configurationFormFields cff) throws Exception;
+    
+    List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff, Integer transactionId) throws Exception;
+    
+    void updateFieldValue (transactionRecords tr, String newValue) throws Exception;
+    
+    void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchDownloadId) throws Exception;
+    
+    void updateErrorStatusForTT (Integer batchDownloadId, Integer newStatusId, Integer transactionTargetId) throws Exception;
+    
+    void clearTransactionTranslatedOutByBatchId(Integer batchDownloadId) throws Exception;
+    
+    void insertDroppedValuesForConfigPair (Integer inConfigId, Integer outConfigId, Integer batchUploadId) throws Exception;
+    
+    void insertDroppedValues (configurationFormFields cff, List <String> reportHeaderCols, Integer batchUploadId, Integer entityIdFCol) throws Exception;
 }

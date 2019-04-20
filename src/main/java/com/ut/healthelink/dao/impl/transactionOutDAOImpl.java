@@ -8,12 +8,16 @@ package com.ut.healthelink.dao.impl;
 import com.ut.healthelink.dao.transactionOutDAO;
 import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.batchClearAfterDelivery;
+import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.configurationTransport;
+import com.ut.healthelink.model.transactionRecords;
+import com.ut.healthelink.model.custom.ConfigOutboundForInsert;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.messagePatients;
 import com.ut.healthelink.model.targetOutputRunLogs;
@@ -22,15 +26,20 @@ import com.ut.healthelink.model.transactionOutNotes;
 import com.ut.healthelink.model.transactionOutRecords;
 import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.service.sysAdminManager;
+import com.ut.healthelink.service.transactionInManager;
 import com.ut.healthelink.service.userManager;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -51,6 +60,12 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
     @Autowired
     private userManager usermanager;
+    
+    @Autowired
+    private transactionInManager transactionInManager;
+    
+  //list of final status - these records we skip
+    private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16, 18, 20);
 
     /**
      * The 'submitBatchDownload' function will submit the new batch.
@@ -91,6 +106,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 + "select id from batchDownloadSummary where batchId = :batchId "
                 + "and transactionTargetId = :transactionTargetId "
                 + "and sourceOrgId = :sourceOrgId "
+                + "and sourceSubOrgId = :sourceSubOrgId "
                 + "and targetOrgId = :targetOrgId "
                 + "and messageTypeId = :messageTypeId "
                 + "and targetConfigId = :targetConfigId"
@@ -99,6 +115,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         query.setParameter("batchId", summary.getbatchId());
         query.setParameter("transactionTargetId", summary.gettransactionTargetId());
         query.setParameter("sourceOrgId", summary.getsourceOrgId());
+        query.setParameter("sourceSubOrgId", summary.getSourceSubOrgId());
         query.setParameter("targetOrgId", summary.gettargetOrgId());
         query.setParameter("messageTypeId", summary.getmessageTypeId());
         query.setParameter("targetConfigId", summary.gettargetConfigId());
@@ -121,7 +138,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Transactional
     public int findMergeableBatch(int orgId) {
 
-        Query query = sessionFactory.getCurrentSession().createQuery("select id FROM batchDownloads where orgId = :orgId and mergeable = 1 and statusId = 28");
+        Query query = sessionFactory.getCurrentSession().createQuery("select id FROM batchDownloads where orgId = :orgId and mergeable = 1 and (statusId = 23 OR statusId = 28)");
         query.setParameter("orgId", orgId);
 
         Integer batchId = (Integer) query.uniqueResult();
@@ -238,7 +255,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         /* Get a list of available batches */
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
-        batchSummaries.add(Restrictions.eq("targetOrgId", orgId));
+        batchSummaries.add(Restrictions.or(
+                Restrictions.eq("targetOrgId", orgId),
+                Restrictions.eq("targetSubOrgId", orgId)
+        ));
         batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
         batchSummaries.add(Restrictions.in("sourceOrgId", sourceOrgList));
         List<batchDownloadSummary> batchDownloadSummaryList = batchSummaries.list();
@@ -308,16 +328,15 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
     }
 
-    
     @Override
     @Transactional
     public boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception {
 
         boolean matched = true;
-        
+
         String[] terms = searchTerm.split("\\|", -1);
         String[] systemStatus = terms[0].split("\\-", -1);
-        
+
         String statusCode = systemStatus[0];
         String statusCategory = systemStatus[1];
 
@@ -344,10 +363,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         if (!batchDetails.getdateCreated().before(toDate)) {
             matched = false;
         }
-        
+
         lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
-        
-        if(!"".equals(statusCategory) && "batch".equals(statusCategory) && !statusCode.equals(processStatus.getEndUserDisplayCode())) {
+
+        if (!"".equals(statusCategory) && "batch".equals(statusCategory) && !statusCode.equals(processStatus.getEndUserDisplayCode())) {
             matched = false;
         }
 
@@ -365,12 +384,12 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             transactionIn.add(Restrictions.eq("id", transaction.gettransactionInId()));
 
             transactionIn transactionInDetails = (transactionIn) transactionIn.uniqueResult();
-            
+
             lu_ProcessStatus transprocessStatus = sysAdminManager.getProcessStatusById(transactionInDetails.getstatusId());
-                
-                if(!"".equals(statusCategory) && "transaction".equals(statusCategory) && !statusCode.equals(transprocessStatus.getEndUserDisplayCode())) {
-                    matched = false;
-                }
+
+            if (!"".equals(statusCategory) && "transaction".equals(statusCategory) && !statusCode.equals(transprocessStatus.getEndUserDisplayCode())) {
+                matched = false;
+            }
 
             if (!"0".equals(status) && !status.equals(String.valueOf(transactionInDetails.getmessageStatus()))) {
                 matched = false;
@@ -819,24 +838,38 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     }
 
     /**
-     * The 'getpendingOutPutTransactions' function will return a list of transactions that are in the 'Pending Output' status (id = 19) that are ready to start the output process
+     * The 'getpendingOutPutTransactions' function will return a list of transactions that are 
+     * in the 'Pending Output' status (id = 19) and the upload
+     * batch is not for massTranslation 
+     * that are ready to start the output process
      *
      * @param transactionTargetId This will hold a specific transaction Id to process will default to 0 which will find all transactions.
      *
      * @table transactionTarget;
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     @Transactional
     public List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) throws Exception {
 
-        Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
-        transactionQuery.add(Restrictions.eq("statusId", 19));
+    	String sql = "select id from transactiontarget where statusid = 19 and "
+    			+ " batchuploadid not in (select distinct batchid from transactionin "
+    			+ " where configid not in (select configid from configurationtransportdetails where"
+    			+ " masstranslation = false and status = 1)) ";
+    			if (transactionTargetId > 0) {
+    				sql = sql + " and id = :transactionTargetId";
+    	        }
+    			sql = sql + " order by statustime, id limit 1";
 
-        if (transactionTargetId > 0) {
-            transactionQuery.add(Restrictions.eq("id", transactionTargetId));
-        }
+    	Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .addScalar("id", StandardBasicTypes.INTEGER)
+                .setResultTransformer(
+                        Transformers.aliasToBean(transactionTarget.class));
+                if (transactionTargetId > 0) {
+                	query.setParameter("transactionTargetId", transactionTargetId);
+    	        }
 
-        List<transactionTarget> transactions = transactionQuery.list();
+        List<transactionTarget> transactions = query.list();
 
         return transactions;
     }
@@ -885,14 +918,20 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
                     if (idot > 0) {
                         idot += 1;
-                        rowNum = Integer.parseInt(formField.getFieldDesc().substring(idot)) - 1;
+                        rowNum = 0;
+                        try {
+                        	rowNum = Integer.parseInt(formField.getFieldDesc().substring(idot)) - 1;
+                        } catch (Exception ex) {
+                        	transactionInManager.insertProcessingError(28, null, 0, null, null, null, null, false, true, ("Expection number idot form desc, formField " + formField.getFieldDesc() + " " + ex.getLocalizedMessage()), transactionTargetId);
+                        	ex.printStackTrace();
+                        	return false;
+                        }
                     } else {
                         rowNum = 0;
                     }
 
                     dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
                             + " WHERE transactionInId = :transactionInId LIMIT " + rowNum + ",1"; //LIMIT 0,1
-
                     Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
                             .setParameter("transactionInId", transactionInId);
 
@@ -902,7 +941,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                     if (getData.uniqueResult() == null) {
                         sql += null + ",";
                     } else {
-                        sql += "'" + getData.uniqueResult() + "',";
+                        sql += "'" + getData.uniqueResult().toString().replace("'", "''") + "',";
                     }
                 }
             }
@@ -910,7 +949,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             //remove last comma
             sql = sql.substring(0, sql.length() - 1);
             sql += ") ";
-
+            
             Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setParameter("transactionTargetId", transactionTargetId)
                     .setParameter("configId", configId);
@@ -919,6 +958,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 return true;
             } catch (Exception ex) {
                 ex.printStackTrace();
+                transactionInManager.insertProcessingError(29, null, 0, null, null, null, null, false, true, ("Expection at insertData - sql " +  sql + " " + ex.getLocalizedMessage()), transactionTargetId);
                 return false;
             }
 
@@ -1056,7 +1096,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-            System.err.println("updateTransactionStatus failed." + ex);
+            System.err.println("updateTransactionTargetBatchDLId failed." + ex);
         }
 
     }
@@ -1423,7 +1463,11 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
         batchSummaries.add(Restrictions.eq("transactionTargetId", transactionTargetId));
 
-        return (batchDownloadSummary) batchSummaries.uniqueResult();
+        if (batchSummaries.list().size() > 1) {
+            return (batchDownloadSummary) batchSummaries.list().get(0);
+        } else {
+            return (batchDownloadSummary) batchSummaries.uniqueResult();
+        }
 
     }
 
@@ -1603,16 +1647,20 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId) {
+    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId, Integer userOrgId) {
 
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
         batchSummaries.add(Restrictions.eq("targetConfigId", configId));
         batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
+        batchSummaries.add(Restrictions.or(
+                Restrictions.eq("targetOrgId", userOrgId),
+                Restrictions.eq("targetSubOrgId", userOrgId)
+        ));
 
         return batchSummaries.list();
 
     }
-    
+
     /**
      * The 'updateTransactionTargetStatusOutBound' function will update the transactionTarget entries when the created batch has been sent.
      *
@@ -1624,33 +1672,32 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     public void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception {
-    	try {
-	        String sql = "update transactionTarget "
-	                + " set statusId = :toStatusId, "
-	                + "statusTime = CURRENT_TIMESTAMP";
-	
-	        if (transactionId > 0) {
-	            sql += " where id = :transactionId ";
-	        } else {
-	            sql += " where batchDLId = :batchDLId ";
-	        }
-	
-	        if (fromStatusId != 0) {
-	            sql = sql + " and statusId = :fromStatusId";
-	        }
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("toStatusId", toStatusId);
-	        if (transactionId > 0) {
-	            updateData.setParameter("transactionId", transactionId);
-	        } else {
-	            updateData.setParameter("batchDLId", batchDLId);
-	        }
-	
-	        if (fromStatusId != 0) {
-	            updateData.setParameter("fromStatusId", fromStatusId);
-	        }
+        try {
+            String sql = "update transactionTarget "
+                    + " set statusId = :toStatusId, "
+                    + "statusTime = CURRENT_TIMESTAMP";
 
-        
+            if (transactionId > 0) {
+                sql += " where id = :transactionId ";
+            } else {
+                sql += " where batchDLId = :batchDLId ";
+            }
+
+            if (fromStatusId != 0) {
+                sql = sql + " and statusId = :fromStatusId";
+            }
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("toStatusId", toStatusId);
+            if (transactionId > 0) {
+                updateData.setParameter("transactionId", transactionId);
+            } else {
+                updateData.setParameter("batchDLId", batchDLId);
+            }
+
+            if (fromStatusId != 0) {
+                updateData.setParameter("fromStatusId", fromStatusId);
+            }
+
             updateData.executeUpdate();
         } catch (Exception ex) {
             System.err.println("updateTransactionTargetStatusOutBound " + ex.getCause());
@@ -1658,4 +1705,485 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
     }
 
+    @Override
+    @Transactional
+    public List<String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception {
+        String SQL = "select senderEmail from batchUploads where id in "
+                + " (select batchuploadId from transactiontarget where id in "
+                + " (select transactionTargetId from transactionIN where id in "
+                + " (select transactionInId from transactiontarget where batchDLId = :batchDLIds)))";
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(SQL).setParameterList("batchDLIds", batchDLIds);
+
+        List<String> emails = query.list();
+
+        return emails;
+
+    }
+
+    /**
+     * The 'getSentTransactions' method will return all pending target transactions based on the org and message type passed in.
+     *
+     *
+     * @return This function will return a list of transactionTargets
+     */
+    @Override
+    @Transactional
+    public List<transactionTarget> getSentTransactions(Date fromDate, Date toDate) throws Exception {
+        
+        /* Get a list of available batches */
+       /* Criteria transactionIn = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+        transactionIn.add(Restrictions.eq("transactionTargetId", 0));
+        List<transactionIn> transactionInList = transactionIn.list();
+
+        List<Integer> transactionInIds = new ArrayList<Integer>();
+
+        if (transactionInList.isEmpty()) {
+            transactionInIds.add(0);
+        } else {
+
+            for (transactionIn transaction : transactionInList) {
+                transactionInIds.add(transaction.getId());
+            }
+        }*/
+        
+        
+        
+        Criteria transactions = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactions.add(
+                Restrictions.or(
+                        Restrictions.eq("statusId", 20),
+                        Restrictions.eq("statusId", 18)
+                )
+        );
+        transactions.add(Restrictions.ge("batchDLId", 0));
+        //transactions.add(Restrictions.in("transactionInId", transactionInIds));
+
+        transactions.add(Restrictions.ge("dateCreated", fromDate));
+        transactions.add(Restrictions.lt("dateCreated", toDate));
+       
+
+        return transactions.list();
+    }
+
+	@Override
+	@Transactional
+	public List<transactionTarget> getTTByStatusId(int batchId,
+			List<Integer> statusIds) throws Exception {
+		Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactionQuery.add(Restrictions.in("statusId", statusIds));
+        
+        if (batchId > 0) {
+            transactionQuery.add(Restrictions.eq("batchUploadId", batchId));
+        }
+
+        List<transactionTarget> transactions = transactionQuery.list();
+
+        return transactions;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<Integer> getTargetConfigsForBatch(int batchId,
+			List<Integer> statusIds) throws Exception {
+		String sql = "select distinct configId from transactiontarget "
+                + " where batchUploadId = :batchUploadId and statusId in (:statusIds)";
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("batchUploadId", batchId);
+        query.setParameterList("statusIds", statusIds);
+        
+        List<Integer> configIds = query.list();
+        return configIds;
+	}
+
+	@Override
+	@Transactional
+	public Integer writeOutputToTextFile(configurationTransport transportDetails, Integer batchDownloadId, String filePathAndName, String fieldNos) {
+		//we use configuration info 
+		//build this sql
+		String sql = "SELECT " + fieldNos 
+				+ " FROM transactionTranslatedOut where batchId = :batchDownloadId "
+				+ " and statusId = 18 and configId = :configId"
+				+ " INTO OUTFILE  '" + filePathAndName + "'"
+						+ " FIELDS TERMINATED BY '" + transportDetails.getDelimChar() 
+						+ "' LINES TERMINATED BY '"+transportDetails.getLineTerminator()+"';";
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("batchDownloadId", batchDownloadId);
+        query.setParameter("configId", transportDetails.getconfigId());
+        try {
+        	query.list();
+        } catch (Exception ex) {
+        	System.out.println(ex.getMessage());
+        }
+        return 0;
+	}
+
+	@Override
+	@Transactional
+	public void updateTTBatchIdByUploadBatch(Integer batchUploadId,
+			Integer batchDownloadId) throws Exception {
+		
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("UPDATE transactionTarget set batchDLId = :batchDownloadId "
+				+ " where batchUploadId = :batchUploadId and statusId = 19;");
+		query.setParameter("batchUploadId", batchUploadId);
+		query.setParameter("batchDownloadId", batchDownloadId);
+		query.executeUpdate();	
+	}
+
+	@Override
+	@Transactional
+	public void massInsertSummaryEntry(batchDownloads batchDowloadDetails, 
+			configuration configDetails, batchUploads batchUploadDetails) throws Exception {
+		
+		String sql = "insert into batchdownloadsummary (batchId, transactionTargetId,"
+				+ " sourceOrgId, targetOrgId,  targetConfigId, messageTypeId, targetSubOrgId,"
+				+ "sourceSubOrgId) "
+				+ "select  " + batchDowloadDetails.getId() + ", id, "
+				+ batchUploadDetails.getOrgId() + ", "+ batchDowloadDetails.getOrgId() + "," + configDetails.getId() + ","
+				+ configDetails.getMessageTypeId() + ", "
+				+ "targetSubOrgId, sourceSubOrgId from transactionTarget where batchDLId = :batchDLId"
+				+ " and statusId = 19;"
+				;
+
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("batchDLId", batchDowloadDetails.getId());
+        query.executeUpdate();
+	}
+
+	@Override
+	@Transactional
+	public void setUpTransactionTranslatedOut(
+			batchDownloads batchDowloadDetails, configuration configDetails, Integer statusId) {
+		String sql = "insert into transactionTranslatedOut (transactionTargetId, configId, batchId, statusId)"
+				+ "select  id, configId, batchDLId, statusId from transactionTarget where batchDLId = :batchDLId"
+				+ " and statusId = :statusId";
+
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("batchDLId", batchDowloadDetails.getId());
+        query.setParameter("statusId", statusId);
+        
+        query.executeUpdate();
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<ConfigOutboundForInsert> setConfigOutboundForInsert(
+			int configId, int batchDownloadId) throws Exception {
+		String sql = ("call setSqlForOutboundConfig(:configId, :batchDownloadId);");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .addScalar("batchDownloadId", StandardBasicTypes.INTEGER)
+                .addScalar("fieldNos", StandardBasicTypes.STRING)
+                .addScalar("saveToCols", StandardBasicTypes.STRING)
+                .addScalar("saveToTableName", StandardBasicTypes.STRING)
+                .addScalar("selectFields", StandardBasicTypes.STRING)
+                .addScalar("updateFields", StandardBasicTypes.STRING)
+                .addScalar("configId", StandardBasicTypes.INTEGER)
+                
+                
+                .setResultTransformer(
+                        Transformers.aliasToBean(ConfigOutboundForInsert.class))
+                .setParameter("configId", configId)
+                .setParameter("batchDownloadId", batchDownloadId);
+
+        List<ConfigOutboundForInsert> configOutboundForInsertList = query.list();
+
+        return configOutboundForInsertList;
+	}
+
+	@Override
+	@Transactional
+	public void massUpdateTTO(ConfigOutboundForInsert outboundConfig, Integer statusId) throws Exception {
+		String sql = "UPDATE transactionTranslatedOut tto "
+				+ " JOIN (select tt.id as transactiontargetid, " 
+				+ outboundConfig.getSaveToTableName() + ".transactioninid, "
+				+ outboundConfig.getSelectFields()
+				+ " from " + outboundConfig.getSaveToTableName() 
+				+ ", transactiontarget tt where tt.transactionInId = "
+				+ outboundConfig.getSaveToTableName() + ".transactionInId"
+				+ " and batchDLId = :batchId and statusId = :statusId group by " 
+				+ outboundConfig.getSaveToTableName() +".transactionInId) selectTbl "
+				+ " ON tto.transactiontargetid = selectTbl.transactiontargetid "
+				+ " SET "
+				+ outboundConfig.getUpdateFields() 
+				+ " WHERE tto.transactiontargetid = selectTbl.transactiontargetid;";
+		
+		//System.out.println(sql);
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("batchId", outboundConfig.getBatchDownloadId());
+        query.setParameter("statusId", statusId);
+       
+        query.executeUpdate();
+    }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public String getConfigFieldsForOutput(Integer configId) throws Exception {
+		Query query1 = sessionFactory.getCurrentSession().createSQLQuery("SET SESSION group_concat_max_len = 5000;");
+        query1.executeUpdate(); 
+		
+		String sql = ""
+				+ "select group_concat('REPLACE(REPLACE(ifnull(F', fieldNo, ',\"\") , ''\\n'', ''''), ''\\r'', '''')') as fieldNos "
+				+ " from configurationFormFields where configId = :configId order by fieldNo";
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("configId", configId);
+        List <String> fieldNos = query.list();
+        if (query.list().size() ==1) {
+        	return fieldNos.get(0);
+        } else  {
+        	return null;
+        }
+    }
+
+	@Override
+	@Transactional
+	public void insertFailedRequiredFields(configurationFormFields cff,
+			Integer batchDownloadId, Integer transactionTargetId) throws Exception{
+		Integer id = batchDownloadId;
+        String sql = "insert into transactionOuterrors (batchDownloadId, configId, transactionTargetId,"
+        		+ " fieldNo, errorid)"
+                + "select " + batchDownloadId + ", " + cff.getconfigId() + ", transactionTargetId, " 
+        		+ cff.getFieldNo() + ", 1 from transactionTranslatedOut where configId = :configId "
+                + " and (F" + cff.getFieldNo()
+                + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0"
+                + " or length(REPLACE(REPLACE(F" + cff.getFieldNo() + ", '\n', ''), '\r', '')) = 0)"
+                + "and  ";
+        if (transactionTargetId == 0) {
+            sql = sql + " batchId = :id and "
+            		+ " configId = :configId and statusId not in (:transRELId);";
+        } else {
+            sql = sql + " = :id";
+            id = transactionTargetId;
+        }
+
+        Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("id", id);
+        insertData.setParameter("configId", cff.getconfigId());
+        if (transactionTargetId == 0) {
+            insertData.setParameterList("transRELId", transRELId);
+        }
+        
+        insertData.executeUpdate();
+	}
+
+	@Override
+	@Transactional
+	public void genericValidation(configurationFormFields cff,
+			Integer validationTypeId, Integer batchDownloadId, String regEx,
+			Integer transactionTargetId) throws Exception {
+		
+		String sql = "call insertValidationErrorsOutbound(:vtType, :fieldNo, :batchUploadId, :configId, :transactionId)";
+
+        Query insertError = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        insertError.setParameter("vtType", cff.getValidationType());
+        insertError.setParameter("fieldNo", cff.getFieldNo());
+        insertError.setParameter("batchUploadId", batchDownloadId);
+        insertError.setParameter("configId", cff.getconfigId());
+        insertError.setParameter("transactionId", transactionTargetId);
+        
+        insertError.executeUpdate();
+		
+	}
+
+	@Override
+    @Transactional
+    public void moveTranslatedRecordsByBatch(int batchDownloadId) throws Exception {
+
+        /* Always clear this table out for the passed in transactionTargetId */
+        Query clearRecords = sessionFactory.getCurrentSession().createSQLQuery("DELETE from transactionOutRecords where transactionTargetId in (select id from transactionTarget where batchDLId = :batchDownloadId)");
+        clearRecords.setParameter("batchDownloadId", batchDownloadId);
+        clearRecords.executeUpdate();
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO transactionOutRecords ("
+                + "transactionTargetId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31,"
+                + "f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64,"
+                + "f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98,"
+                + "f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129,"
+                + "f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159,"
+                + "f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189,"
+                + "f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219,"
+                + "f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249,"
+                + "f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500) "
+                + "SELECT transactionTargetId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31,"
+                + "f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64,"
+                + "f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98,"
+                + "f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129,"
+                + "f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159,"
+                + "f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189,"
+                + "f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219,"
+                + "f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249,"
+                + "f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500 "
+                + "FROM transactionTranslatedOut where transactionTargetId in (select id from transactionTarget where batchDLId = :batchDownloadId)");
+        query.setParameter("batchDownloadId", batchDownloadId);
+        query.executeUpdate();
+    }
+	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<transactionRecords> getFieldColAndValues(Integer batchDownloadId,
+            configurationFormFields cff) throws Exception{
+        String sql = ("select transactionTargetId as transactionId, F" + cff.getFieldNo()
+                + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedOut "
+                + " where configId = :configId "
+                + " and F" + cff.getFieldNo() + " is not null "
+                + " and transactionTargetId in (select id from transactionTarget where"
+                + " batchDLId = :batchDLId"
+                + " and configId = :configId and statusId not in ( :transRELId ) order by transactionTargetId); ");
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .addScalar("transactionId", StandardBasicTypes.INTEGER)
+                .addScalar("fieldValue", StandardBasicTypes.STRING)
+                .addScalar("fieldNo", StandardBasicTypes.INTEGER)
+                .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
+                .setParameter("configId", cff.getconfigId())
+                .setParameter("batchDLId", batchDownloadId)
+                .setParameterList("transRELId", transRELId);
+
+        List<transactionRecords> trs = query.list();
+
+        return trs;
+    }
+	
+    
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff, Integer transactionId) throws Exception {
+         String sql = ("select transactionTargetId as transactionId, F" + cff.getFieldNo()
+                    + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedOut "
+                    + " where configId = :configId "
+                    + " and F" + cff.getFieldNo() + " is not null "
+                    + " and transactionTargetId = :id");
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .addScalar("transactionId", StandardBasicTypes.INTEGER)
+                    .addScalar("fieldValue", StandardBasicTypes.STRING)
+                    .addScalar("fieldNo", StandardBasicTypes.INTEGER)
+                    .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
+                    .setParameter("configId", cff.getconfigId())
+                    .setParameter("id", transactionId);
+
+            List<transactionRecords> trs = query.list();
+
+            return trs;
+    }
+    
+    @Override
+    @Transactional
+    public void updateFieldValue(transactionRecords tr, String newValue) throws Exception {
+        String sql = "update transactiontranslatedOut set F" + tr.getfieldNo() + " = :newValue where"
+                + " transactionTargetId = :ttiId";
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        updateData.setParameter("ttiId", tr.getTransactionId());
+        updateData.setParameter("newValue", newValue);
+        updateData.executeUpdate();
+    }
+    
+    
+    @Override
+    @Transactional
+    public void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchDownloadId) throws Exception{
+        String sql = "insert into transactionOuterrors "
+                + "(batchDownloadId, configId, transactionTargetId, fieldNo, errorid, validationTypeId)"
+                + " values (:batchDownloadId, :configId, :ttiId, :fieldNo, 2, :validationId);";
+        Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchDownloadId", batchDownloadId)
+                .setParameter("fieldNo", cff.getFieldNo())
+                .setParameter("configId", cff.getconfigId())
+                .setParameter("ttiId", tr.getTransactionId())
+                .setParameter("validationId", cff.getValidationType());
+        insertData.executeUpdate();
+       
+    }
+
+	@Override
+	@Transactional
+	public void updateErrorStatusForTT(Integer batchDownloadId,
+			Integer newStatusId, Integer transactionTargetId) throws Exception {
+		
+		String sql = "UPDATE  transactionTarget JOIN (select distinct transactionTargetId matchid  "
+				+ " from transactionOutErrors where batchDownloadId = :batchDownloadId";
+				if (transactionTargetId > 0) {
+					sql = sql + " and transactionTargetId = :transactionTargetId";
+				}
+				sql = sql  + ") tbl_concat "
+				+ " ON transactionTarget.id = tbl_concat.matchid "
+				+ " SET transactionTarget.statusId = :newStatusId "
+				+ " WHERE transactionTarget.batchDLId = :batchDownloadId "
+				+ " and transactionTarget.statusId not in (:transRELId)";
+				if (transactionTargetId > 0) {
+					sql = sql + " and id = :transactionTargetId";
+				}
+		//System.out.println(sql);
+		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchDownloadId", batchDownloadId)
+                .setParameter("newStatusId", newStatusId)
+                .setParameterList("transRELId", transRELId);
+        
+        if (transactionTargetId > 0) {
+        	updateData.setParameter("transactionTargetId", transactionTargetId);
+		}
+        
+        updateData.executeUpdate();
+        
+	}
+
+	@Override
+    @Transactional
+    public void clearTransactionTranslatedOutByBatchId(Integer batchDownloadId) {
+        String sql = "delete from transactionTranslatedOut where batchId = :batchDownloadId";
+
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchDownloadId", batchDownloadId);
+
+        try {
+            deleteData.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("clearTransactionTranslatedOutByBatchId " + ex.getCause());
+        }
+
+    }
+
+	@Override
+	@Transactional
+	public void insertDroppedValues(configurationFormFields cff,
+			List<String> reportHeaderCols, Integer batchUploadId, Integer entityIdFCol)
+			throws Exception {
+		String sql = "insert into transactionindroppedvalues  "
+				+ " (transactionInId, batchUploadId, configId, ";
+		if (entityIdFCol > 0) {
+			sql += " entity3Id, ";
+		}
+		sql += " fieldNo, fieldName, fieldValue, "
+				+ " "+ reportHeaderCols.get(1)+") "
+				+ " select tir.transactionInId,  "+batchUploadId+", " 
+				+ cff.getconfigId()+", ";
+		
+		if (entityIdFCol > 0) {
+			sql += " entity3Col,";
+		}
+		sql += cff.getFieldNo()+", '" + cff.getFieldLabel() +"'," 
+		+ " tir.f"+cff.getFieldNo()+", "+ reportHeaderCols.get(0)+" "
+				+ " from (select f"+cff.getFieldNo() +",";
+				
+		sql += " transactionInId , "+reportHeaderCols.get(0)+" "
+				+ " from transactioninrecords where batchid =  :batchUploadId and length(f"+cff.getFieldNo()+") > 0 and f"+cff.getFieldNo()+" is not null) tir join "
+				+ " (select f"+cff.getFieldNo()+"," ;
+				if (entityIdFCol > 0) {
+					sql += " F"+entityIdFCol+" entity3Col,";
+				}
+				sql +=	 " transactionInId from transactiontranslatedin "
+				+ " where batchid = :batchUploadId and (length(f11) = 0 or  f"+cff.getFieldNo()+" is null) and statusId = 40) tti "
+				+ " on tti.transactionInId = tir.transactionInId;";
+				
+		Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
+        
+        insertData.executeUpdate();
+		
+	}
+    
 }

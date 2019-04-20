@@ -21,6 +21,11 @@ require(['./main'], function () {
             var confirmed = confirm("Are you sure you want to process this transaction?");
 
              if (confirmed) {
+                 
+                $('body').overlay({
+                    glyphicon : 'floppy-disk',
+                    message : 'Processing...'
+                });
              
                 $.ajax({
                   url: '../processTransaction',
@@ -41,6 +46,11 @@ require(['./main'], function () {
              var confirmed = confirm("Are you sure you do not want to process this transaction?");
 
              if (confirmed) {
+                 
+                $('body').overlay({
+                    glyphicon : 'floppy-disk',
+                    message : 'Canceling...'
+                });
              
                 $.ajax({
                   url: '../donotprocessTransaction',

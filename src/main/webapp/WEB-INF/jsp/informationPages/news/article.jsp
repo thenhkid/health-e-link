@@ -21,7 +21,7 @@
                                     <div id="active-page-nav">
                                         <ul class="nav" >
                                             <li ${param['page'] == 'about' ? 'class="active"' : ''}><a href="<c:url value='/about'/>" title="About Health-e-Link">About Health-e-Link</a></li>
-                                            <li ${param['page'] == 'howwework' ? 'class="active"' : ''}><a href="<c:url value='/about/how-we-work'/>" title="How We Work">How We Work</a></li>
+                                            <li ${param['page'] == 'networkcapabilities' ? 'class="active"' : ''}><a href="<c:url value='/about/Network-capabilities'/>" title="Network Capabilities">Network Capabilities</a></li>
                                         </ul>
                                     </div>
                                 </li>
@@ -31,13 +31,13 @@
                     <div class="module sidebar-module">
                         <dl class="vcard info-list">
                             <dt>Contact Us By Phone</dt>
-                            <dd class="tel">(508) 721-1977</dd>
+                            <dd class="tel">(774) 272-0313</dd>
 
                             <dt>Contact Us By Fax</dt>
                             <dd class="tel">(508) 721-1978</dd>
 
                             <dt>Contact Us By Email</dt>
-                            <dd class="email"><a href="" title="">info@health-e-link.net</a></dd>
+                            <dd class="email"><a href="mailto:information@health-e-link.net" title="">information@health-e-link.net</a></dd>
 
                             <%--<dt>Connect</dt>
                             <dd class="margin-small top">
@@ -51,20 +51,26 @@
             </aside>
 
             <div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
-                <h3>${article.title}</h3>
-                <p>
-                    ${article.longDesc}
-                </p>
+                <c:choose>
+                    <c:when test="${article != ''}">
+                        <h3>${article.title}</h3>
+                        <p>
+                            ${article.longDesc}
+                        </p>
+                    </c:when>
+                    <c:otherwise>
+                        <p>Article was not found</p>
+                    </c:otherwise>
+                </c:choose>
             </div>
-
         </div>
     </div>
 </div>
 
 <div class="module content-call-out">
     <div class="container center-text">
-        <p>For more information on how BOWlink Technologies can create a cost-effective healthcare information data exchange solution for your organization,
-            <br/>please contact us at <strong>(508) 721-1977</strong> or email <strong><a href="mailto:info@health-e-link.net">info@health-e-link.net</a></strong>
+        <p>
+            For more information or a demonstration of Health-e-link's interoperability and data management solutions,<br/> please contact us at <strong>(774) 272-0313</strong> or email <a href="mailto:information@health-e-link.net">information@health-e-link.net</a>
         </p>
     </div>
 </div>

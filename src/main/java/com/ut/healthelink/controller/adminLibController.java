@@ -229,6 +229,11 @@ public class adminLibController {
         @SuppressWarnings("rawtypes")
         List validationTypes = messagetypemanager.getValidationTypes();
         mav.addObject("validationTypes", validationTypes);
+        
+        //Get the list of available field types
+        @SuppressWarnings("rawtypes")
+        List fieldTypes = messagetypemanager.getFieldTypes();
+        mav.addObject("fieldTypes", fieldTypes);
 
         return mav;
 
@@ -290,6 +295,7 @@ public class adminLibController {
         formField.setSaveToTableCol("");
         formField.setBucketNo(bucketNo);
         formField.setBucketDspPos(newBucketDspPos);
+        formField.setFieldType(1);
         
         mav.addObject("messageTypeFormFields", formField);
         
@@ -303,6 +309,11 @@ public class adminLibController {
         @SuppressWarnings("rawtypes")
         List validationTypes = messagetypemanager.getValidationTypes();
         mav.addObject("validationTypes", validationTypes);
+        
+        //Get the list of available field types
+        @SuppressWarnings("rawtypes")
+        List fieldTypes = messagetypemanager.getFieldTypes();
+        mav.addObject("fieldTypes", fieldTypes);
         
         return mav;
     }
@@ -480,6 +491,15 @@ public class adminLibController {
      * @Objects	(1) An object that will hold all the details of the clicked crosswalk
      *
      */
+    /**
+     * The '/newCrosswalk' GET request will be used to return a blank crosswalk form.
+     *
+     *
+     * @return	The crosswalk details page
+     *
+     * @Objects	(1) An object that will hold all the details of the clicked crosswalk
+     *
+     */
     @RequestMapping(value = "/newCrosswalk", method = RequestMethod.GET)
     public @ResponseBody
     ModelAndView newCrosswalk(@RequestParam(value = "orgId", required = false) Integer orgId) throws Exception {
@@ -494,6 +514,7 @@ public class adminLibController {
         Crosswalks crosswalkDetails = new Crosswalks();
         mav.addObject("crosswalkDetails", crosswalkDetails);
         mav.addObject("btnValue", "Create");
+	mav.addObject("actionValue", "Create");
         mav.addObject("orgId", orgId);
 
         //Get the list of available file delimiters
@@ -577,6 +598,11 @@ public class adminLibController {
         @SuppressWarnings("rawtypes")
         List delimiters = messagetypemanager.getDelimiters();
         mav.addObject("delimiters", delimiters);
+	
+	mav.addObject("btnValue", "Upload New File");
+        mav.addObject("actionValue", "UploadNewFile");
+	
+	mav.addObject("orgId", crosswalkDetails.getOrgId());
 
         return mav;
     }
@@ -664,6 +690,43 @@ public class adminLibController {
         }
 
         return 1;
+    }
+    
+    /**
+     * The '/UploadNewFile' function will be used to upload a new file for an existing crosswalk.
+     *
+     * @param crosswalkDetails
+     * @param result
+     * @param redirectAttr
+     * @return 
+     * @throws java.lang.Exception 
+     * @Return The function will either return the crosswalk form on error or redirect to the data translation page.
+     */
+    @RequestMapping(value = "/uploadnewfileCrosswalk", method = RequestMethod.POST)
+    public @ResponseBody 
+        ModelAndView uploadnewfileCrosswalk(
+            @ModelAttribute(value = "crosswalkDetails") Crosswalks crosswalkDetails, 
+            BindingResult result, RedirectAttributes redirectAttr, @RequestParam int orgId
+    ) throws Exception {
+
+        
+        int lastId = messagetypemanager.uploadNewFileForCrosswalk(crosswalkDetails);
+
+        if (lastId == 0) {
+            redirectAttr.addFlashAttribute("savedStatus", "error");
+        } else {
+            redirectAttr.addFlashAttribute("savedStatus", "updated");
+        }
+
+        //if orgId > 0 then need to send back to the configurations page
+        //otherwise send back to the message type libarary translation page.
+        if (orgId > 0) {
+            ModelAndView mav = new ModelAndView(new RedirectView("../configurations/translations"));
+            return mav;
+        } else {
+            ModelAndView mav = new ModelAndView(new RedirectView("translations"));
+            return mav;
+        }
     }
 
 }

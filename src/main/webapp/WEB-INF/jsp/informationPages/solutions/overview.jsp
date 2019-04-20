@@ -29,13 +29,13 @@
                     <div class="module sidebar-module">
                         <dl class="vcard info-list">
                             <dt>Contact Us By Phone</dt>
-                            <dd class="tel">(508) 721-1977</dd>
+                            <dd class="tel">(774) 272-0313</dd>
 
                             <dt>Contact Us By Fax</dt>
                             <dd class="tel">(508) 721-1978</dd>
 
                             <dt>Contact Us By Email</dt>
-                            <dd class="email"><a href="" title="">info@health-e-link.net</a></dd>
+                            <dd class="email"><a href="mailto:information@health-e-link.net" title="">information@health-e-link.net</a></dd>
 
                             <%--<dt>Connect</dt>
                             <dd class="margin-small top">
@@ -82,7 +82,7 @@
                     <li>Enhance your <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">data exchange</a> capabilities using Health-e-Link modular components for <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">healthcare registry systems</a>, <a href="<c:url value='/product-suite/doc-u-link'/>" title="DOC-u-Link">document management</a> and <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">secure email messaging</a>.</li>
                 </ul>
                 <blockquote>
-                    <p>For more information, contact Health-e-Link at <strong>(508) 721-1977</strong>.</p>
+                    <p>For more information, contact Health-e-Link at <strong>(774) 272-0313</strong>.</p>
                 </blockquote>
                 
                 <a href="" id="Federal"></a>
@@ -99,7 +99,7 @@
                     <li>Enhance your <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">data exchange</a> capabilities using Health-e-Link modular components for <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">healthcare registry systems</a>, <a href="<c:url value='/product-suite/doc-u-link'/>" title="DOC-u-Link">document management</a> and <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">secure email messaging</a>.</li>
                 </ul>
                 <blockquote>
-                    <p>For more information, contact Health-e-Link at <strong>(508) 721-1977</strong>.</p>
+                    <p>For more information, contact Health-e-Link at <strong>(774) 272-0313</strong>.</p>
                 </blockquote>
                 
                 <a href="" id="Community"></a>
@@ -116,7 +116,7 @@
                     <li>Enhance your <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">data exchange</a> capabilities using Health-e-Link modular components for <a href="<c:url value='/product-suite/doc-u-link'/>" title="DOC-u-Link">document management</a> and <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">secure email messaging</a>.</li>
                 </ul>
                 <blockquote>
-                    <p>For more information, contact Health-e-Link at <strong>(508) 721-1977</strong>.</p>
+                    <p>For more information, contact Health-e-Link at <strong>(774) 272-0313</strong>.</p>
                 </blockquote>
                 
                 <a href="" id="HIT"></a>
@@ -134,7 +134,7 @@
                     <li>Enhance your <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">data exchange</a> capabilities using Health-e-Link modular components for <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">healthcare registry systems</a>, <a href="<c:url value='/product-suite/doc-u-link'/>" title="DOC-u-Link">document management</a> and <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">secure email messaging</a>.</li>
                 </ul>
                 <blockquote>
-                    <p>Interested in partnering with Health-e-Link? Complete the vendor application to receive more information and a demonstration of the power and flexibility of Health-e-Link suite of data integration solutions. For more information, contact Health-e-Link at <strong>(508) 721-1977</strong>.</p>
+                    <p>Interested in partnering with Health-e-Link? Complete the vendor application to receive more information and a demonstration of the power and flexibility of Health-e-Link suite of data integration solutions. For more information, contact Health-e-Link at <strong>(774) 272-0313</strong>.</p>
                 </blockquote>
                 
                 <a href="" id="Hospitals"></a>
@@ -152,7 +152,7 @@
                     <li>Enhance your <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">data exchange</a> capabilities using Health-e-Link modular components for <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">healthcare registry systems</a>, <a href="<c:url value='/product-suite/doc-u-link'/>" title="DOC-u-Link">document management</a> and <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">secure email messaging</a>.</li>
                 </ul>
                 <blockquote>
-                    <p>For more information, contact Health-e-Link at <strong>(508) 721-1977</strong>.</p>
+                    <p>For more information, contact Health-e-Link at <strong>(774) 272-0313</strong>.</p>
                 </blockquote>
                 
                 <a href="" id="Payers"></a>
@@ -169,7 +169,7 @@
                     <li>Enhance your <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">data exchange</a> capabilities using Health-e-Link modular components for <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">healthcare registry systems</a>, <a href="<c:url value='/product-suite/doc-u-link'/>" title="DOC-u-Link">document management</a> and <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">secure email messaging</a>.</li>
                 </ul>
                 <blockquote>
-                    <p>For more information, contact Health-e-Link at <strong>(508) 721-1977</strong>.</p>
+                    <p>For more information, contact Health-e-Link at <strong>(774) 272-0313</strong>.</p>
                 </blockquote>
                 
                 <a href="" id="Private"></a>
@@ -188,7 +188,7 @@
                     <li>Enhance your <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">data exchange</a> capabilities using Health-e-Link modular components for <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">healthcare registry systems</a>, <a href="<c:url value='/product-suite/doc-u-link'/>" title="DOC-u-Link">document management</a> and <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">secure email messaging</a>.</li>
                 </ul>
                 <blockquote>
-                    <p>For more information, contact Health-e-Link at <strong>(508) 721-1977</strong>.</p>
+                    <p>For more information, contact Health-e-Link at <strong>(774) 272-0313</strong>.</p>
                 </blockquote>
             </div>
         </div>
@@ -197,8 +197,8 @@
 
 <div class="module content-call-out">
     <div class="container center-text">
-        <p>For more information on how BOWlink Technologies can create a cost-effective healthcare information data exchange solution for your organization,
-            <br/>please contact us at <strong>(508) 721-1977</strong> or email <strong><a href="mailto:info@health-e-link.net">info@health-e-link.net</a></strong>
+        <p>
+            For more information or a demonstration of Health-e-link's interoperability and data management solutions,<br/> please contact us at <strong>(774) 272-0313</strong> or email <a href="mailto:information@health-e-link.net">information@health-e-link.net</a>
         </p>
     </div>
 </div>

@@ -8,6 +8,7 @@ package com.ut.healthelink.service.impl;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import com.ut.healthelink.service.convertTextToPDF;
 import com.ut.healthelink.dao.messageTypeDAO;
 import com.ut.healthelink.dao.transactionOutDAO;
 import com.ut.healthelink.model.HL7Details;
@@ -20,25 +21,33 @@ import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationCCDElements;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationDataTranslations;
 import com.ut.healthelink.model.configurationFTPFields;
 import com.ut.healthelink.model.configurationFormFields;
+import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.configurationTransport;
+import com.ut.healthelink.model.configurationWebServiceFields;
+import com.ut.healthelink.model.transactionRecords;
+import com.ut.healthelink.model.wsMessagesOut;
 import com.ut.healthelink.service.emailMessageManager;
 import com.ut.healthelink.model.mailMessage;
 import com.ut.healthelink.model.pendingDeliveryTargets;
 import com.ut.healthelink.model.systemSummary;
 import com.ut.healthelink.model.targetOutputRunLogs;
+import com.ut.healthelink.model.transactionAttachment;
 import com.ut.healthelink.model.transactionIn;
 import com.ut.healthelink.model.transactionOutNotes;
 import com.ut.healthelink.model.transactionOutRecords;
 import com.ut.healthelink.model.transactionTarget;
+import com.ut.healthelink.model.custom.ConfigOutboundForInsert;
 import com.ut.healthelink.reference.fileSystem;
 import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.configurationTransportManager;
@@ -47,6 +56,8 @@ import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.transactionInManager;
 import com.ut.healthelink.service.transactionOutManager;
 import com.ut.healthelink.service.userManager;
+import com.ut.healthelink.service.utilManager;
+import com.ut.healthelink.webServices.WSManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,21 +68,37 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Resource;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
+import org.docx4j.Docx4J;
+import org.docx4j.convert.out.FOSettings;
+import org.docx4j.model.fields.FieldUpdater;
+import org.docx4j.model.fields.merge.DataFieldName;
+import org.docx4j.model.fields.merge.MailMerger.OutputField;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
@@ -83,7 +110,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class transactionOutManagerImpl implements transactionOutManager {
-
+    
+    @Resource(name = "myProps")
+    private Properties myProps;
+    
     @Autowired
     private transactionOutDAO transactionOutDAO;
 
@@ -114,9 +144,30 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Autowired
     private userManager usermanager;
     
+    @Autowired
+    private WSManager wsManager;
+    
+    @Autowired
+    private utilManager utilmanager;
+    
+    @Autowired
+    private convertTextToPDF txtToPDF;
+    
     private int processingSysErrorId = 5;
+    
+    private String directoryPath = System.getProperty("directory.rootDir");
+    
+    private String archivePath = (directoryPath + "archivesOut/");
+    
+    private String massOutPutPath = (directoryPath + "massoutputfiles/");
 
-    private String archivePath = "/bowlink/archivesOut/";
+    private String massOutPutPathMysqlPath =  System.getProperty("directory.massOutputPath");
+   
+    
+    //list of final status - these records we skip
+    private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16, 18, 20);
+    
+    private List<Integer> rejectIds = Arrays.asList(13, 14);
     
     @Override
     @Transactional
@@ -313,12 +364,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 } catch (Exception e) {
                     //throw new Exception("Error occurred trying to process output transaction. transactionId: "+transaction.getId(),e);
                     processed = false;
+                    //email admin
+                    transactionInManager.sendEmailToAdmin(("Please check transactionOutErrors - SELECT * from transactionOutErrors where transactionTargetId = " + transaction.getId()), "Process Output Error");
                 }
 
                 if (!processed) {
                     //we update and log
                 	updateTransactionTargetStatusOutBound(0, transaction.getId(), 0, 33);
                     transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, errorMessage, transaction.getId());
+                    //email admin
+                    transactionInManager.sendEmailToAdmin(("Please check transactionOutErrors - SELECT * from transactionOutErrors where transactionTargetId = " + transaction.getId()), "Process Output Error");
+               
                 }
 
                 Integer processingErrors;
@@ -409,10 +465,23 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 if (transportDetails.gettransportMethodId() == 1) {
                                     transactionOutDAO.updateBatchStatus(batchId, 23);
                                     transactionInManager.updateBatchStatus(transaction.getbatchUploadId(), 23, "");
+                                    //check inbound for clearing options
+                                    if (configurationTransportManager.getTransportDetails(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getclearRecords()) {
+                                    	//we insert into clearAfterDelivery
+                                    	batchClearAfterDelivery cad = new batchClearAfterDelivery();
+            		                    cad.setBatchDLId(batchId);
+            		                    cad.setBatchUploadId(transaction.getbatchUploadId());
+            		                    cad.setTransactionInId(transaction.gettransactionInId());
+            		                    cad.setTransactionTargetId(transaction.getId());
+            		                    transactionInManager.saveBatchClearAfterDelivery(cad);
+                                    }
+                                    
                                 } /* If FTP Call the FTP Method */ else if (transportDetails.gettransportMethodId() == 3) {
                                     FTPTargetFile(batchId, transportDetails);
                                 } /* Rhapsody Method */ else if (transportDetails.gettransportMethodId() == 5) {
                                 	RhapsodyTargetFile(batchId, transportDetails);
+                                }/* If soap message  */ else if (transportDetails.gettransportMethodId() == 6) {
+                                	SendWSMessage(batchId, transportDetails);
                                 }
                                 /** end of processing, before email **/
                                 /** insert log**/ 
@@ -441,83 +510,155 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                         batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
 
                                         /* Get the from user */
-                                        Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
-                                        List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(), 1);
+                                        configuration fromConfig = configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId());
+                                        String msgType = "";
+                                        if(fromConfig.getsourceType() == 1) {
+                                            msgType = "Referral";
+                                        }
+                                        else {
+                                            msgType = "Feedback Report";
+                                        }
+                                        
+                                        Integer fromOrgId = 0;
+                                        if(transaction.getSourceSubOrgId() > 0) {
+                                            fromOrgId = transaction.getSourceSubOrgId();
+                                        }
+                                        else {
+                                            fromOrgId = configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId();
+                                        }
+                                        /* get the sending organization details */
+                                        Organization fromOrg = organizationManager.getOrganizationById(fromOrgId);
+                                        
+                                        // Get a list of all user who should receive an email regarding the sent referral/FB report
+                                        List<User> orgFromContacts = userManager.getUserConnectionListSending(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId());
+                                       
+                                        Integer toOrgId = 0;
+                                        if(transaction.getTargetSubOrgId()> 0) {
+                                            toOrgId = transaction.getTargetSubOrgId();
+                                        }
+                                        else {
+                                            toOrgId = configurationManager.getConfigurationById(transaction.getconfigId()).getorgId();
+                                        }
+                                        
+                                        /* get the receiving organization details */
+                                        Organization toOrg = organizationManager.getOrganizationById(toOrgId);
+                                        
+                                        /* Send an email to all users in the connection setting who is set to receive an
+                                        email when the referral/FB report was sent out */
+                                        if (orgFromContacts != null && orgFromContacts.size() > 0) {
+                                            String fromName = "";
+                                            String fromEmail = "";
+                                            mailMessage msg = new mailMessage();
+                                            ArrayList<String> fromCCAddressArray = new ArrayList<String>();
+                                            msg.setfromEmailAddress("support@health-e-link.net");
+ 
+                                                
+                                            for(int i = 0; i < orgFromContacts.size(); i++) {
+                                                if("".equals(fromEmail)) {
+                                                    fromName = orgFromContacts.get(i).getFirstName() + " " + orgFromContacts.get(i).getLastName();
+                                                    fromEmail = orgFromContacts.get(i).getEmail();
+                                                }
+                                                else {
+                                                    fromCCAddressArray.add(orgFromContacts.get(i).getEmail());
+                                                }
+                                            }
+                                            
+                                            if(!"".equals(fromEmail)) {
+                                                //fromEmail = "support@health-e-link.net";
+                                                msg.settoEmailAddress(fromEmail);
 
-                                        /* get the to user details */
-                                        List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 1);
-                                        List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 2);
+                                                if (fromCCAddressArray.size() > 0) {
+                                                    String[] fromCCAddressList = new String[fromCCAddressArray.size()];
+                                                    fromCCAddressList = fromCCAddressArray.toArray(fromCCAddressList);
+                                                    msg.setccEmailAddress(fromCCAddressList);
+                                                }
 
-                                        if (fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0)) {
-                                            String toName = null;
+                                                msg.setmessageSubject("Your "+ msgType +" has been successfully delivered ("+myProps.getProperty("server.identity")+")");
+
+                                                /* Build the body of the email */
+                                                StringBuilder sb = new StringBuilder();
+                                                sb.append("The ").append(msgType).append(" sent to ").append(toOrg.getOrgName()).append(" has been successfully delivered."); 
+                                                msg.setmessageBody(sb.toString());
+
+                                                /* Send the email */
+                                                try {
+                                                    emailMessageManager.sendEmail(msg);
+                                                } catch (Exception ex) {
+                                                    System.err.println("mail exception");
+                                                    //ex.printStackTrace();
+                                                }
+                                            }
+                                        }
+                                        
+                                        // Get a list of all user who should receive an email regarding the recieived referral/FB report
+                                        List<User> orgToContacts = userManager.getUserConnectionListReceiving(transaction.getconfigId());
+                                       
+                                        /* Send an email to all users in the connection setting who is set to receive an
+                                        email when the referral/FB report was recievied */
+                                        if (orgToContacts != null && orgToContacts.size() > 0) {
+                                            String toName = "";
+                                            String toEmail = "";
                                             mailMessage msg = new mailMessage();
                                             ArrayList<String> ccAddressArray = new ArrayList<String>();
-                                            msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
-
-                                            if (toPrimaryContact.size() > 0) {
-                                                toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
-                                                msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
-
-                                                if (toPrimaryContact.size() > 1) {
-                                                    for (int i = 1; i < toPrimaryContact.size(); i++) {
-                                                        ccAddressArray.add(toPrimaryContact.get(i).getEmail());
-                                                    }
+                                            msg.setfromEmailAddress("support@health-e-link.net");
+ 
+                                            for(int i = 0; i < orgToContacts.size(); i++) {
+                                                if("".equals(toEmail)) {
+                                                    toName = orgToContacts.get(i).getFirstName() + " " + orgToContacts.get(i).getLastName();
+                                                    toEmail = orgToContacts.get(i).getEmail();
                                                 }
-
-                                                if (toSecondaryContact.size() > 0) {
-                                                    for (int i = 0; i < toSecondaryContact.size(); i++) {
-                                                        ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                                    }
-                                                }
-                                            } else {
-                                                toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
-                                                msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
-
-                                                if (toSecondaryContact.size() > 1) {
-                                                    for (int i = 1; i < toSecondaryContact.size(); i++) {
-                                                        ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                                    }
+                                                else {
+                                                    ccAddressArray.add(orgToContacts.get(i).getEmail());
                                                 }
                                             }
+                                            
+                                            if(!"".equals(toEmail)) {
+                                                //toEmail = "support@health-e-link.net";
+                                                msg.settoEmailAddress(toEmail);
+                                                
+                                                if (ccAddressArray.size() > 0) {
+                                                    String[] ccAddressList = new String[ccAddressArray.size()];
+                                                    ccAddressList = ccAddressArray.toArray(ccAddressList);
+                                                    msg.setccEmailAddress(ccAddressList);
+                                                }
 
-                                            if (ccAddressArray.size() > 0) {
-                                                String[] ccAddressList = new String[ccAddressArray.size()];
-                                                ccAddressList = ccAddressArray.toArray(ccAddressList);
-                                                msg.setccEmailAddress(ccAddressList);
-                                            }
+                                                msg.setmessageSubject("You have received a new message from the eReferral System ("+myProps.getProperty("server.identity")+")");
 
-                                            msg.setmessageSubject("You have received a new message from the Universal Translator");
+                                                /* Build the body of the email */
+                                                StringBuilder sb = new StringBuilder();
+                                                sb.append("You have received a new message from ").append(fromOrg.getOrgName()); 
+                                                sb.append("<br /><br />");
+                                                sb.append("BatchId: ").append(batchDLInfo.getutBatchName());
+                                                if (batchDLInfo.getoutputFIleName() != null && !"".equals(batchDLInfo.getoutputFIleName())) {
+                                                    sb.append("<br />");
+                                                    sb.append("File Name: ").append(batchDLInfo.getoutputFIleName());
+                                                }
+                                                
+                                                msg.setmessageBody(sb.toString());
 
-                                            /* Build the body of the email */
-                                            StringBuilder sb = new StringBuilder();
-                                            sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
-                                            sb.append(System.getProperty("line.separator"));
-                                            sb.append(System.getProperty("line.separator"));
-                                            sb.append("BatchId: " + batchDLInfo.getutBatchName());
-                                            if (batchDLInfo.getoutputFIleName() != null && !"".equals(batchDLInfo.getoutputFIleName())) {
-                                                sb.append(System.getProperty("line.separator"));
-                                                sb.append("File Name: " + batchDLInfo.getoutputFIleName());
-                                            }
-                                            sb.append(System.getProperty("line.separator"));
-                                            sb.append("From Organization: " + fromOrg.getOrgName());
-
-                                            msg.setmessageBody(sb.toString());
-
-                                            /* Send the email */
-                                            try {
-                                                emailMessageManager.sendEmail(msg);
-                                            } catch (Exception ex) {
-                                                System.err.println("mail exception");
-                                                //ex.printStackTrace();
+                                                /* Send the email */
+                                                try {
+                                                    emailMessageManager.sendEmail(msg);
+                                                } catch (Exception ex) {
+                                                    System.err.println("mail exception");
+                                                    //ex.printStackTrace();
+                                                }
                                             }
                                         }
                                     } catch (Exception e) {
-                                        throw new Exception("Error occurred trying to send the alert email for batchId: " + batchId, e);
+                                    	//should send email to admin 
+                                    	
+                                    	throw new Exception("Error occurred trying to send the alert email for batchId: " + batchId, e);
                                     }
 
                                 }
-                            } catch (Exception e) {
-                                throw new Exception("Error occurred trying to auto process the output file.", e);
+                            } catch (Exception ex) {
+                            	try{
+                            		transactionInManager.sendEmailToAdmin((ex.toString() + "<br/>" + Arrays.toString(ex.getStackTrace())), "process output error");
+                            	} catch (Exception e) {
+                            		throw new Exception("Error occurred trying to send email error for auto process the output file ", e);
+                            	}
+                                throw new Exception("Error occurred trying to auto process the output file.", ex);
                             }
 
                         }
@@ -571,86 +712,85 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     List<targetOutputRunLogs> logs = transactionOutDAO.getLatestRunLog(schedule.getconfigId());
 
                     /* DAILY SCHEDULE */
-                    if (schedule.gettype() == 2) {
-
-                        /* if Daily check for scheduled or continuous */
-                        if (schedule.getprocessingType() == 1) {
-                            double diffInHours;
-                            int hourOfDay;
-
-                            /* SCHEDULED */
-                            try {
-                                hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
-
-                                if (logs.size() > 0) {
-                                    targetOutputRunLogs log = logs.get(0);
-                                    long diff = currDate.getTime() - log.getlastRunTime().getTime();
-                                    diffInHours = diff / ((double) 1000 * 60 * 60);
-                                } else {
-                                    diffInHours = 0;
+                    switch (schedule.gettype()) {
+                    /* WEEKLY SCHEDULE */
+                        case 2:
+                            /* if Daily check for scheduled or continuous */
+                            if (schedule.getprocessingType() == 1) {
+                                double diffInHours;
+                                int hourOfDay;
+                                
+                                /* SCHEDULED */
+                                try {
+                                    hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+                                    
+                                    if (logs.size() > 0) {
+                                        targetOutputRunLogs log = logs.get(0);
+                                        long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                        diffInHours = diff / ((double) 1000 * 60 * 60);
+                                    } else {
+                                        diffInHours = 0;
+                                    }
+                                } catch (Exception e) {
+                                    throw new Exception("Error trying to calculate the time difference from run logs", e);
                                 }
-                            } catch (Exception e) {
-                                throw new Exception("Error trying to calculate the time difference from run logs", e);
-                            }
-
-                            if (hourOfDay >= schedule.getprocessingTime() && (diffInHours == 0 || diffInHours >= 24)) {
-                                runProcess = true;
-                            }
-                        } else {
-                            /* CONTINUOUS */
-
-                            double diffInHours;
-                            double diffInMinutes;
-
-                            try {
-                                if (logs.size() > 0) {
-                                    targetOutputRunLogs log = logs.get(0);
-                                    long diff = currDate.getTime() - log.getlastRunTime().getTime();
-                                    diffInHours = diff / ((double) 1000 * 60 * 60);
-                                    diffInMinutes = (diffInHours - (int) diffInHours) * 60;
-                                } else {
-                                    diffInMinutes = 0;
+                                
+                                if (hourOfDay >= schedule.getprocessingTime() && (diffInHours == 0 || diffInHours >= 24)) {
+                                    runProcess = true;
                                 }
-                            } catch (Exception e) {
-                                throw new Exception("Error trying to calculate the time difference from run logs", e);
-                            }
-
-                            if (diffInMinutes == 0 || diffInMinutes >= schedule.getnewfileCheck()) {
-                                runProcess = true;
-                            }
-
-                        }
-                    } /* WEEKLY SCHEDULE */ else if (schedule.gettype() == 3) {
-                        long diffInWeeks = 0;
-
-                        if (logs.size() > 0) {
-                            targetOutputRunLogs log = logs.get(0);
-                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
-
-                            diffInWeeks = diff / ((long) 7 * 24 * 60 * 60 * 1000);
-
-                            if (diffInWeeks == 0 || diffInWeeks >= 1) {
-                                runProcess = true;
-                            }
-
-                        }
-
-                    } /* MONTHLY SCHEDULE */ else if (schedule.gettype() == 4) {
-
-                        long diffInDays = 0;
-
-                        if (logs.size() > 0) {
-                            targetOutputRunLogs log = logs.get(0);
-                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
-
-                            diffInDays = diff / ((long) 365.24 * 24 * 60 * 60 * 1000 / 12);
-
-                            if (diffInDays == 0 || diffInDays >= 30) {
-                                runProcess = true;
-                            }
-
-                        }
-
+                            } else {
+                                /* CONTINUOUS */
+                                
+                                double diffInHours;
+                                double diffInMinutes;
+                                
+                                try {
+                                    if (logs.size() > 0) {
+                                        targetOutputRunLogs log = logs.get(0);
+                                        long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                        diffInHours = diff / ((double) 1000 * 60 * 60);
+                                        diffInMinutes = (diffInHours - (int) diffInHours) * 60;
+                                    } else {
+                                        diffInMinutes = 0;
+                                    }
+                                } catch (Exception e) {
+                                    throw new Exception("Error trying to calculate the time difference from run logs", e);
+                                }
+                                
+                                if (diffInMinutes == 0 || diffInMinutes >= schedule.getnewfileCheck()) {
+                                    runProcess = true;
+                                }
+                                
+                            }   break;
+                    /* MONTHLY SCHEDULE */
+                        case 3:
+                            long diffInWeeks = 0;
+                            if (logs.size() > 0) {
+                                targetOutputRunLogs log = logs.get(0);
+                                long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                
+                                diffInWeeks = diff / ((long) 7 * 24 * 60 * 60 * 1000);
+                                
+                                if (diffInWeeks == 0 || diffInWeeks >= 1) {
+                                    runProcess = true;
+                                }
+                                
+                            }   break;
+                        case 4:
+                            long diffInDays = 0;
+                            if (logs.size() > 0) {
+                                targetOutputRunLogs log = logs.get(0);
+                                long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                
+                                diffInDays = diff / ((long) 365.24 * 24 * 60 * 60 * 1000 / 12);
+                                
+                                if (diffInDays == 0 || diffInDays >= 30) {
+                                    runProcess = true;
+                                }
+                                
+                            }   break;
+                        default:
+                            break;
                     }
 
                     if (runProcess == true) {
@@ -685,7 +825,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
 
                         /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
-                         apply to scheduled and not continous settings. */
+                         apply to scheduled and not continuous settings. */
                         if (transportDetails.gettransportMethodId() == 1) {
                             transactionOutDAO.updateBatchStatus(batchId, 23);
 
@@ -702,8 +842,26 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             FTPTargetFile(batchId, transportDetails);
                         } /* If Rhapsody Method */ else if (transportDetails.gettransportMethodId() == 5) {
                         	RhapsodyTargetFile(batchId, transportDetails);
+                        }/* If soap message  */ else if (transportDetails.gettransportMethodId() == 6) {
+                        	/** soap messages are to be delivery instantaneously. This is for scheduled
+                        	 * output only, we error the batch and transactions **/
+                        	transactionOutDAO.updateBatchStatus(batchId, 30);
+                        	/**insert error**/
+                        	transactionInManager.insertProcessingError(20, null, batchId, null, null, null, null, false, true, "Web Service config should not be scheduled.");
+                        	updateTargetTransasctionStatus(batchId, 33);
+                        	//update transactionIn status
+                        	List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
+                            
+                            /** we reject is targets are more than one, web service should only be sending one message at a time **/
+                        	for (transactionTarget target : targets) {
+                        		/* Need to update the uploaded batch status */
+                                transactionInManager.updateBatchStatus(target.getbatchUploadId(), 30, "");
+                                /* Need to update the uploaded batch transaction status */
+                                transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 33);
+                            }
+                        	/** we probably should email admin to fix web configuration **/
                         }
-
+                        
                         /* Log the last run time */
                         try {
                             targetOutputRunLogs log = new targetOutputRunLogs();
@@ -716,54 +874,46 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                         try {
                             /* Get the list of primary and secondary contacts */
-                            List<User> toPrimaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(), 1);
-                            List<User> toSecondaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(), 2);
-
-                            if (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0) {
-                                String toName = null;
+                            // Get a list of all user who should receive an email regarding the recieived referral/FB report
+                            List<User> orgToContacts = userManager.getUserConnectionListReceiving(schedule.getconfigId());
+                                 
+                            if (orgToContacts.size() > 0) {
+                                String toName = "";
+                                String toEmail = "";
                                 mailMessage msg = new mailMessage();
                                 ArrayList<String> ccAddressArray = new ArrayList<String>();
-
-                                msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
-
-                                if (toPrimaryContact.size() > 0) {
-                                    toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
-                                    msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
-
-                                    if (toPrimaryContact.size() > 1) {
-                                        for (int i = 1; i < toPrimaryContact.size(); i++) {
-                                            ccAddressArray.add(toPrimaryContact.get(i).getEmail());
+                                msg.setfromEmailAddress("support@health-e-link.net");
+                                
+                                if (orgToContacts.size() > 0) {
+                                                
+                                    for(int i = 0; i < orgToContacts.size(); i++) {
+                                        if("".equals(toEmail)) {
+                                            toName = orgToContacts.get(i).getFirstName() + " " + orgToContacts.get(i).getLastName();
+                                            toEmail = orgToContacts.get(i).getEmail();
                                         }
-
-                                    }
-
-                                    if (toSecondaryContact.size() > 0) {
-                                        for (int i = 0; i < toSecondaryContact.size(); i++) {
-                                            ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                        }
-                                    }
-                                } else {
-                                    toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
-                                    msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
-
-                                    if (toSecondaryContact.size() > 1) {
-                                        for (int i = 1; i < toSecondaryContact.size(); i++) {
-                                            ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                        else {
+                                            ccAddressArray.add(orgToContacts.get(i).getEmail());
                                         }
                                     }
                                 }
 
+                                if("".equals(toEmail)) {
+                                    toEmail = "support@health-e-link.net";
+                                }
+
+                                msg.settoEmailAddress(toEmail);
+                                
                                 if (ccAddressArray.size() > 0) {
                                     String[] ccAddressList = new String[ccAddressArray.size()];
                                     ccAddressList = ccAddressArray.toArray(ccAddressList);
                                     msg.setccEmailAddress(ccAddressList);
                                 }
 
-                                msg.setmessageSubject("You have received a new message from the Universal Translator");
+                                msg.setmessageSubject("You have received a new message from the eReferral System");
 
                                 /* Build the body of the email */
                                 StringBuilder sb = new StringBuilder();
-                                sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
+                                sb.append("You have recieved a new message from the eReferral System. "); 
                                 sb.append(System.getProperty("line.separator"));
                                 sb.append(System.getProperty("line.separator"));
                                 sb.append("BatchId: " + batchDLInfo.getutBatchName());
@@ -836,7 +986,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 /* Generate the batch */
                 /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
                 try {
-                    batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
+                    batchId = generateBatch(uploadedBatchDetails.getdateSubmitted(), configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
 
                     /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
                     transactionInManager.updateBatchStatus(batchId, 25, "");
@@ -844,7 +994,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     throw new Exception("Error occurred trying to generate a batch. transactionId: " + transaction.getId(), e);
                 }
 
-            } /* File Download || FTP || EMed-Apps */ else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3 || transportDetails.gettransportMethodId() == 5) {
+            } /* File Download || FTP || EMed-Apps */ else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3 || transportDetails.gettransportMethodId() == 5 ||transportDetails.gettransportMethodId() == 6) {
 
                 boolean createNewFile = true;
 
@@ -856,7 +1006,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     /* Generate the batch */
                     /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
                     try {
-                        batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
+                        batchId = generateBatch(uploadedBatchDetails.getdateSubmitted(), configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
 
                         /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
                         transactionInManager.updateBatchStatus(batchId, 25, "");
@@ -876,7 +1026,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         /* Generate the batch */
                         /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
                         try {
-                            batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), true);
+                            batchId = generateBatch(uploadedBatchDetails.getdateSubmitted(), configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), true);
 
                             /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
                             transactionInManager.updateBatchStatus(batchId, 25, "");
@@ -899,6 +1049,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         summary.settargetOrgId(configDetails.getorgId());
                         summary.settransactionTargetId(transaction.getId());
                         summary.setsourceOrgId(uploadedBatchDetails.getOrgId());
+                        summary.setSourceSubOrgId(transaction.getSourceSubOrgId());
+                        summary.setTargetSubOrgId(transaction.getTargetSubOrgId());
+                        
 
                         try {
                             transactionOutDAO.submitSummaryEntry(summary);
@@ -933,7 +1086,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     	String fileExt = batchDetails.getoutputFIleName().substring(batchDetails.getoutputFIleName().lastIndexOf("."));
                 		
                     	fileSystem fileSystem = new fileSystem();
-                    	File archiveFile = new File ( fileSystem.setPath(archivePath) + batchDetails.getutBatchName() + fileExt);
+                    	File archiveFile = new File ( fileSystem.setPathFromRoot(archivePath) + batchDetails.getutBatchName() + fileExt);
                     	
                     	//we check to see if our file is encoded
                     	if (!encryptMessage)  {
@@ -975,7 +1128,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     /**
      * The 'generateBatch' function will create the new download batch for the target
      */
-    public int generateBatch(configuration configDetails, transactionTarget transaction, configurationTransport transportDetails, int sourceOrgId, String sourceFileName, boolean mergeable) throws Exception {
+    public int generateBatch(Date referralDate, configuration configDetails, transactionTarget transaction, configurationTransport transportDetails, int sourceOrgId, String sourceFileName, boolean mergeable) throws Exception {
 
         /* Create the batch name (OrgId+MessageTypeId+Date/Time) - need milliseconds as computer is fast and files have the same name*/
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
@@ -1036,6 +1189,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         batchDownload.settransportMethodId(transportDetails.gettransportMethodId());
         batchDownload.setoutputFIleName(batchName);
         batchDownload.setmergeable(mergeable);
+        batchDownload.setdateCreated(referralDate);
 
         /* Update the status of the target batch to TBP (Target Batch Created) (ID = 28) */
         batchDownload.setstatusId(28);
@@ -1053,6 +1207,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
         summary.settargetOrgId(configDetails.getorgId());
         summary.settransactionTargetId(transaction.getId());
         summary.setsourceOrgId(sourceOrgId);
+        summary.setSourceSubOrgId(transaction.getSourceSubOrgId());
+        summary.setTargetSubOrgId(transaction.getTargetSubOrgId());
 
         transactionOutDAO.submitSummaryEntry(summary);
 
@@ -1079,12 +1235,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
         dir.setDirByName(filelocation);
 
         boolean hl7 = false;
+        boolean CCD = false;
         String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
-
+        
         if ("hl7".equals(fileType)) {
             hl7 = true;
         }
-
+        else if("xml (CCD)".equals(fileType)) {
+            CCD = true;
+        }
+        
         int findExt = batchDetails.getoutputFIleName().lastIndexOf(".");
 
         if (findExt >= 0) {
@@ -1147,15 +1307,80 @@ public class transactionOutManagerImpl implements transactionOutManager {
             } catch (IOException ex) {
                 Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            /* If a CCD file is to be generated */
+            if(CCD == true) {
+                
+                Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
+                fileSystem ccdTemplateDir = new fileSystem();
+                ccdTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
+                
+                String ccdSampleTemplate = transportDetails.getCcdSampleTemplate();
+                
+                Path path = Paths.get(ccdTemplateDir.getDir() + ccdSampleTemplate);
+                String ccdSampleContent = new String(Files.readAllBytes(path));
+                
+                Path newFilePath = Paths.get(dir.getDir() + fileName);
+                Files.write(newFilePath, ccdSampleContent.getBytes());
+                
+                String contentToUpdate = new String(Files.readAllBytes(newFilePath));
+                
+                /* Get the configurationCCDElements */
+                List<configurationCCDElements> ccdElements = configurationManager.getCCDElements(transportDetails.getconfigId());
+                
+                if(!ccdElements.isEmpty()) {
+                    
+                    for(configurationCCDElements element : ccdElements) {
+                        
+                        if(!"".equals(element.getDefaultValue())) {
+                            if ("~currDate~".equals(element.getDefaultValue())) {
+                                SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                String date = date_format.format(batchDetails.getdateCreated());
+                                contentToUpdate = contentToUpdate.replace(element.getElement(), date);
+                            }
+                            else {
+                                contentToUpdate = contentToUpdate.replace(element.getElement(), element.getDefaultValue());
+                            }
+                           
+                        }
+                        else {
+                             String colName = new StringBuilder().append("f").append(element.getFieldValue()).toString();
+                             
+                              String fieldValue = BeanUtils.getProperty(records, colName);
 
+                              if (fieldValue == null) {
+                                   fieldValue = "";
+                              } else if ("null".equals(fieldValue)) {
+                                  fieldValue = "";
+                              } else if (fieldValue.isEmpty()) {
+                                  fieldValue = "";
+                              } else if (fieldValue.length() == 0) {
+                                  fieldValue = "";
+                              }
+                              
+                              contentToUpdate = contentToUpdate.replace(element.getElement(), fieldValue);
+                        }
+                        
+                    }
+                }
+                
+                /** need to see if we need to  encrypt file here  
+                 **/
+                if (!encrypt) {
+                	Files.write(newFilePath, contentToUpdate.getBytes());
+                } else {
+                	String strEncodedFile = utilmanager.encodeStringToBase64Binary(contentToUpdate);
+                	Files.write(newFilePath, strEncodedFile.getBytes());
+                } 
+            }
             /* If an hl7 file is to be generated */
-            if (hl7 == true) {
+            else if (hl7 == true) {
 
                 /* Get the hl7 details */
                 HL7Details hl7Details = configurationManager.getHL7Details(transportDetails.getconfigId());
 
                 if (hl7Details != null) {
-
+                    
                     /* Get the hl7 Segments */
                     List<HL7Segments> hl7Segments = configurationManager.getHL7Segments(hl7Details.getId());
 
@@ -1174,60 +1399,320 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                 int elementCounter = 1;
                                 for (HL7Elements element : hl7Elements) {
+                                    
+                                    if("pdfattachment".equals(element.getelementName().toLowerCase()) && transportDetails.getHL7PDFSampleTemplate()!= null && !"".equals(transportDetails.getHL7PDFSampleTemplate())) {
+                                       
+                                        Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
+                                        fileSystem hl7PDFTemplateDir = new fileSystem();
+                                        hl7PDFTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
 
-                                    if (!"".equals(element.getdefaultValue())) {
-                                        if ("~currDate~".equals(element.getdefaultValue())) {
-                                            SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
-                                            String date = date_format.format(batchDetails.getdateCreated());
-                                            hl7recordRow.append(date);
-                                        } else {
-                                            hl7recordRow.append(element.getdefaultValue());
+                                        String hl7PDFSampleTemplate = transportDetails.getHL7PDFSampleTemplate();
+                                        
+                                        File inputFile;
+                                        
+                                        if(hl7PDFSampleTemplate.contains(".docx")) {
+                                            String inputfilepath = hl7PDFTemplateDir.getDir() + hl7PDFSampleTemplate;
+                                        
+                                            String outputfilepath = dir.getDir() + "OUT_variableReplace.docx";
+
+                                            WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(new java.io.File(inputfilepath));
+
+                                            //MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
+
+                                            List<configurationCCDElements> hl7PDFElements = configurationManager.getCCDElements(transportDetails.getconfigId());
+
+                                            if(!hl7PDFElements.isEmpty()) {
+                                                
+                                                List<Map<DataFieldName, String>> data = new ArrayList<Map<DataFieldName, String>>();
+
+                                                Map<DataFieldName, String> map1 = new HashMap<DataFieldName, String>();
+                                                
+                                                for(configurationCCDElements CCDelement : hl7PDFElements) {
+                                                    
+                                                    String elementName = CCDelement.getElement().replace("<%", "").replace("%>", "");
+
+                                                    if(!"".equals(CCDelement.getDefaultValue())) {
+
+                                                        if ("~currDate~".equals(CCDelement.getDefaultValue())) {
+                                                            SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                                            String date = date_format.format(batchDetails.getdateCreated());
+                                                            
+                                                            map1.put(new DataFieldName(elementName), date);
+
+                                                        }
+                                                        else {
+                                                             map1.put(new DataFieldName(elementName), CCDelement.getDefaultValue());
+                                                        }
+                                                    }
+                                                    else {
+                                                        String colName = new StringBuilder().append("f").append(CCDelement.getFieldValue()).toString();
+
+                                                        String fieldValue = BeanUtils.getProperty(records, colName);
+
+                                                        if (fieldValue == null) {
+                                                             fieldValue = "";
+                                                        } else if ("null".equals(fieldValue)) {
+                                                            fieldValue = "";
+                                                        } else if (fieldValue.isEmpty()) {
+                                                            fieldValue = "";
+                                                        } else if (fieldValue.length() == 0) {
+                                                            fieldValue = "";
+                                                        }  
+
+                                                         map1.put(new DataFieldName(elementName), fieldValue);
+                                                    }
+                                                }
+                                                data.add(map1);
+                                                
+                                                org.docx4j.model.fields.merge.MailMerger.setMERGEFIELDInOutput(OutputField.REMOVED);
+                                                
+                                                int x=0;
+                                                for(Map<DataFieldName,String> docMapping : data) {
+                                                    org.docx4j.model.fields.merge.MailMerger.performMerge(wordMLPackage, docMapping, true);
+                                                    wordMLPackage.save(new java.io.File(outputfilepath) );
+                                                }
+                                                
+                                            }
+                                            
+                                            inputFile = new File(dir.getDir() + "OUT_variableReplace.docx");
+                                            
+                                            FieldUpdater updater = new FieldUpdater(wordMLPackage);
+                                            updater.update(true);
+                                            
+                                            FOSettings foSettings = Docx4J.createFOSettings();
+                                            foSettings.setWmlPackage(wordMLPackage);
+                                            
+                                            String outputfilepath2 = dir.getDir() + "hl7pdf.pdf";
+                                            OutputStream os = new java.io.FileOutputStream(outputfilepath2);
+                                            Docx4J.toFO(foSettings, os, Docx4J.FLAG_EXPORT_PREFER_XSL);
+                                            
+                                            if (wordMLPackage.getMainDocumentPart().getFontTablePart()!=null) {
+                                               wordMLPackage.getMainDocumentPart().getFontTablePart().deleteEmbeddedFontTempFiles();
+                                            }
+                                            
+                                            updater = null;
+                                            foSettings = null;
+                                            wordMLPackage = null;
+
+                                            fileSystem attachDir = new fileSystem();
+                                            File f = new File(dir.getDir() + "hl7pdf.pdf");
+                                            byte[] bytes = attachDir.loadFile(f);
+                                            byte[] encoded = Base64.encode(bytes);
+                                            String encodedString = new String(encoded);
+
+                                            hl7recordRow.append(encodedString);
+
+                                            /* Decode the encoded content back to a PDF */
+                                            /*byte[] decoded = Base64.decode(encodedString.getBytes());
+                                            File newfile = new File(dir.getDir() + "sample.pdf");
+                                            BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(newfile));
+                                            writer.write(decoded);
+                                            writer.flush();
+                                            writer.close();*/
+
+                                            /* Delete files */
+                                            inputFile.delete();
+                                            f.delete();
                                         }
+                                        else {
+                                            
+                                           Path path = Paths.get(hl7PDFTemplateDir.getDir() + hl7PDFSampleTemplate);
+                                           String hl7PDFSampleContent = new String(Files.readAllBytes(path));
 
-                                    } else {
 
-                                        /* Get the element components */
-                                        List<HL7ElementComponents> hl7Components = configurationManager.getHL7ElementComponents(element.getId());
+                                            Path newFilePath = Paths.get(dir.getDir() + "hl7pdf.txt");
+                                            Files.write(newFilePath, hl7PDFSampleContent.getBytes());
 
-                                        if (!hl7Components.isEmpty()) {
-                                            int counter = 1;
-                                            for (HL7ElementComponents component : hl7Components) {
+                                            String contentToUpdate = new String(Files.readAllBytes(newFilePath));
 
-                                                String colName = new StringBuilder().append("f").append(component.getfieldValue()).toString();
+                                            List<configurationCCDElements> hl7PDFElements = configurationManager.getCCDElements(transportDetails.getconfigId());
 
-                                                String fieldValue = BeanUtils.getProperty(records, colName);
+                                            if(!hl7PDFElements.isEmpty()) {
 
-                                                if (fieldValue == null) {
-                                                    fieldValue = "";
-                                                } else if ("null".equals(fieldValue)) {
-                                                    fieldValue = "";
-                                                } else if (fieldValue.isEmpty()) {
-                                                    fieldValue = "";
-                                                } else if (fieldValue.length() == 0) {
-                                                    fieldValue = "";
+                                                for(configurationCCDElements CCDelement : hl7PDFElements) {
+
+                                                    if(!"".equals(CCDelement.getDefaultValue())) {
+                                                        if ("~currDate~".equals(CCDelement.getDefaultValue())) {
+                                                            SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                                            String date = date_format.format(batchDetails.getdateCreated());
+                                                            contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), date);
+                                                        }
+                                                        else {
+                                                            contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), CCDelement.getDefaultValue());
+                                                        }
+
+                                                    }
+                                                    else {
+                                                         String colName = new StringBuilder().append("f").append(CCDelement.getFieldValue()).toString();
+
+                                                          String fieldValue = BeanUtils.getProperty(records, colName);
+
+                                                          if (fieldValue == null) {
+                                                               fieldValue = "";
+                                                          } else if ("null".equals(fieldValue)) {
+                                                              fieldValue = "";
+                                                          } else if (fieldValue.isEmpty()) {
+                                                              fieldValue = "";
+                                                          } else if (fieldValue.length() == 0) {
+                                                              fieldValue = "";
+                                                          }
+
+                                                          contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), fieldValue);
+                                                    }
+
                                                 }
+                                            }
 
-                                                if (!"".equals(component.getfieldDescriptor()) && component.getfieldDescriptor() != null) {
-                                                    hl7recordRow.append(component.getfieldDescriptor()).append(" ").append(fieldValue);
-                                                } else {
-                                                    hl7recordRow.append(fieldValue);
+                                            Files.write(newFilePath, contentToUpdate.getBytes()); 
+                                            
+                                            inputFile = new File(dir.getDir() + "hl7pdf.txt");
+                                            
+                                            if(txtToPDF.convertTextToPDF(inputFile, dir.getDir(), "hl7pdf.pdf")) {
+                                                fileSystem attachDir = new fileSystem();
+                                                File f = new File(dir.getDir() + "hl7pdf.pdf");
+                                                byte[] bytes = attachDir.loadFile(f);
+                                                byte[] encoded = Base64.encode(bytes);
+                                                String encodedString = new String(encoded);
+
+                                                hl7recordRow.append(encodedString);
+
+                                                /* Decode the encoded content back to a PDF */
+                                                /*byte[] decoded = Base64.decode(encodedString.getBytes());
+                                                File newfile = new File(dir.getDir() + "sample.pdf");
+                                                BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(newfile));
+                                                writer.write(decoded);
+                                                writer.flush();
+                                                writer.close();*/
+
+                                                /* Delete files */
+                                                inputFile.delete();
+                                                f.delete();
+                                            }
+                                        }
+                                        
+                                    }
+                                    
+                                    /* If the HL7 requires attachments then we need to look for the "attachments" keyword
+                                    in order to loop through and retrieve all attachments to the batch.
+                                    */
+                                    if("attachments".equals(element.getelementName().toLowerCase())) {
+                                        transactionTarget targetDetails = transactionOutDAO.getTransactionDetails(transactionTargetId);
+                                        List<transactionAttachment> attachments = transactionInManager.getAttachmentsByTransactionId(targetDetails.gettransactionInId());
+                                        
+                                        if(!attachments.isEmpty()) {
+                                            Integer attachmentCounter = 1;
+                                            for(transactionAttachment attachment : attachments) {
+                                                fileSystem attachDir = new fileSystem();
+                                                attachDir.setDirByName(attachment.getfileLocation() + "/");
+                                                File f = new File(attachDir.getDir() + attachment.getfileName());
+                                                byte[] bytes = attachDir.loadFile(f);
+                                                byte[] encoded = Base64.encode(bytes);
+                                                String encodedString = new String(encoded);
+                                                if(!"".equals(attachment.gettitle()) && attachment.gettitle() != null) {
+                                                    hl7recordRow.append(attachmentCounter).append(hl7Details.getfieldSeparator()).append(attachment.gettitle()).append(hl7Details.getfieldSeparator());
                                                 }
-
-                                                if (!"".equals(component.getFieldAppendText()) && component.getFieldAppendText() != null) {
-                                                    hl7recordRow.append(" ").append(component.getFieldAppendText());
+                                                else {
+                                                    hl7recordRow.append(attachmentCounter).append(hl7Details.getfieldSeparator()).append(attachment.getfileName()).append(hl7Details.getfieldSeparator());
                                                 }
-
-                                                if (counter < hl7Components.size()) {
-                                                    hl7recordRow.append(hl7Details.getcomponentSeparator());
-                                                    counter += 1;
+                                                
+                                                hl7recordRow.append(encodedString);
+                                                
+                                                if(attachmentCounter < attachments.size()) {
+                                                    hl7recordRow.append(System.getProperty("line.separator"));
+                                                    hl7recordRow.append(segment.getsegmentName()).append(hl7Details.getfieldSeparator());
+                                                    attachmentCounter += 1;
                                                 }
+                                            }
+                                            
+                                        }
+                                    }
+                                    else {
 
+                                        if (!"".equals(element.getdefaultValue()) && element.getdefaultValue() != null) {
+                                            if ("~currDate~".equals(element.getdefaultValue())) {
+                                                SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                                String date = date_format.format(batchDetails.getdateCreated());
+                                                hl7recordRow.append(date);
+                                            } else {
+                                                hl7recordRow.append(element.getdefaultValue());
                                             }
 
                                         } else {
-                                            hl7recordRow.append("");
-                                        }
 
+                                            /* Get the element components */
+                                            List<HL7ElementComponents> hl7Components = configurationManager.getHL7ElementComponents(element.getId());
+
+                                            if (!hl7Components.isEmpty()) {
+                                                int counter = 1;
+                                                for (HL7ElementComponents component : hl7Components) {
+                                                    
+                                                    String fieldValue = "";
+                                                    
+                                                    if(!"".equals(component.getDefaultValue()) && component.getDefaultValue() != null) {
+                                                        
+                                                        /* If the HL7 requires attachments then we need to look for the "attachments" keyword
+                                                        in order to loop through and retrieve all attachments to the batch.
+                                                        */
+                                                        if("attachments".equals(component.getDefaultValue().toLowerCase())) {
+                                                            transactionTarget targetDetails = transactionOutDAO.getTransactionDetails(transactionTargetId);
+                                                            List<transactionAttachment> attachments = transactionInManager.getAttachmentsByTransactionId(targetDetails.gettransactionInId());
+
+                                                            if(!attachments.isEmpty()) {
+                                                                Integer attachmentCounter = 1;
+                                                                for(transactionAttachment attachment : attachments) {
+                                                                    fileSystem attachDir = new fileSystem();
+                                                                    attachDir.setDirByName(attachment.getfileLocation() + "/");
+                                                                    File f = new File(attachDir.getDir() + attachment.getfileName());
+                                                                    byte[] bytes = attachDir.loadFile(f);
+                                                                    byte[] encoded = Base64.encode(bytes);
+                                                                    fieldValue = new String(encoded);
+                                                                }
+                                                            }
+                                                        }
+                                                        else {
+                                                            fieldValue = component.getDefaultValue();
+                                                        }
+                                                        
+                                                    }
+                                                    else {
+                                                        String colName = new StringBuilder().append("f").append(component.getfieldValue()).toString();
+
+                                                        fieldValue = BeanUtils.getProperty(records, colName);
+
+                                                        if (fieldValue == null) {
+                                                            fieldValue = "";
+                                                        } else if ("null".equals(fieldValue)) {
+                                                            fieldValue = "";
+                                                        } else if (fieldValue.isEmpty()) {
+                                                            fieldValue = "";
+                                                        } else if (fieldValue.length() == 0) {
+                                                            fieldValue = "";
+                                                        }
+                                                    }
+
+
+                                                    if (!"".equals(component.getfieldDescriptor()) && component.getfieldDescriptor() != null) {
+                                                        hl7recordRow.append(component.getfieldDescriptor()).append(" ").append(fieldValue);
+                                                    } else {
+                                                        hl7recordRow.append(fieldValue);
+                                                    }
+
+                                                    if (!"".equals(component.getFieldAppendText()) && component.getFieldAppendText() != null) {
+                                                        hl7recordRow.append(" ").append(component.getFieldAppendText());
+                                                    }
+
+                                                    if (counter < hl7Components.size()) {
+                                                        hl7recordRow.append(hl7Details.getcomponentSeparator());
+                                                        counter += 1;
+                                                    }
+
+                                                }
+
+                                            } else {
+                                                hl7recordRow.append("");
+                                            }
+
+                                        }
                                     }
 
                                     if (elementCounter < hl7Elements.size()) {
@@ -1372,6 +1857,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     /* Update the downloaded batch transaction status */
                     transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 37);
 
+                    //check inbound for clearing options
+                    if (configurationTransportManager.getTransportDetails(transactionInManager.getTransactionDetails(target.gettransactionInId()).getconfigId()).getclearRecords()) {
+                    	//we insert into clearAfterDelivery
+                    	batchClearAfterDelivery cad = new batchClearAfterDelivery();
+	                    cad.setBatchDLId(batchId);
+	                    cad.setBatchUploadId(target.getbatchUploadId());
+	                    cad.setTransactionInId(target.gettransactionInId());
+	                    cad.setTransactionTargetId(target.getId());
+	                    transactionInManager.saveBatchClearAfterDelivery(cad);
+                    }
+                    
                 }
 
             }
@@ -1828,6 +2324,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
         return transactionOutDAO.getBatchesBySentOrg(srcorgId, tgtOrgId, messageTypeId);
     }
 
+    /** modifying this to select one record at a time so we don't end up with a long list that the
+     * scheduler picks up over and over 
+     * We also should not pick up transactions from any batches that are defined for mass translation
+     */
+    
     @Override
     public void selectOutputRecordsForProcess(Integer transactionTargetId) throws Exception {
         try {
@@ -1878,6 +2379,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     /* Update the downloaded batch transaction status */
                     transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 37);
 
+                    //check inbound for clearing options
+                    if (configurationTransportManager.getTransportDetails(transactionInManager.getTransactionDetails(target.gettransactionInId()).getconfigId()).getclearRecords()) {
+                    	//we insert into clearAfterDelivery
+                    	batchClearAfterDelivery cad = new batchClearAfterDelivery();
+	                    cad.setBatchDLId(batchId);
+	                    cad.setBatchUploadId(target.getbatchUploadId());
+	                    cad.setTransactionInId(target.gettransactionInId());
+	                    cad.setTransactionTargetId(target.getId());
+	                    transactionInManager.saveBatchClearAfterDelivery(cad);
+                    }
                 }
 
             }
@@ -1896,7 +2407,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             dir.setDirByName(filelocation);
             
             File sourceFile = new File(dir.getDir() + batchDetails.getoutputFIleName());
-            File targetFile = new File ( dir.setPathFromRoot(rhapsodyDetails.getDirectory()) + batchDetails.getoutputFIleName());
+            File targetFile = new File ( directoryPath + rhapsodyDetails.getDirectory() + batchDetails.getoutputFIleName());
             //move the file over and update the status to complete
             Files.move(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             
@@ -1915,8 +2426,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
             }
             
-        } catch (Exception e) {
-        	e.printStackTrace();
+        } catch (Exception ex) {
+        	try{
+        		transactionInManager.sendEmailToAdmin(("RhapsodyTargetFile - Error occurred trying to move a batch target. batchId: " + batchId + "<br/>"+  ex.toString() + "<br/>" + Arrays.toString(ex.getStackTrace())), " RhapsodyTargetFile Error ");
+        	} catch (Exception e) {
+        		ex.printStackTrace();
+                System.err.println("RhapsodyTargetFile - Error occurred trying to move a batch target. batchId: " + batchId);
+        	}
+        	ex.printStackTrace();
             System.err.println("RhapsodyTargetFile - Error occurred trying to move a batch target. batchId: " + batchId);
         }
 
@@ -1924,8 +2441,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
 
     @Override
-    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId) {
-        return transactionOutDAO.getuploadBatchesByConfigAndSource(configId, orgId);
+    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId, Integer userOrgId) {
+        return transactionOutDAO.getuploadBatchesByConfigAndSource(configId, orgId, userOrgId);
     }
 
 	@Override
@@ -1935,9 +2452,723 @@ public class transactionOutManagerImpl implements transactionOutManager {
 		 transactionOutDAO.updateTransactionTargetStatusOutBound(batchDLId, transactionId,fromStatusId , toStatusId);
 		
 	}
+	
+	
+	
+	/** 
+     * The 'SendSoapMessage' function will get the WS details and move the file to the
+     * output folder defined in 
+     *
+     * @param batchId The id of the batch to move to archivesOut folder
+     */
+    private Integer SendWSMessage(int batchId, configurationTransport transportDetails)  {
 
+        try {
+
+            /* Update the status of the batch to locked */
+            transactionOutDAO.updateBatchStatus(batchId, 22);
+
+            List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
+            
+            /** we reject is targets are more than one, web service should only be sending one message at a time **/
+            if (targets.size() > 1) {
+            	transactionOutDAO.updateBatchStatus(batchId, 30);
+            	/**insert error**/
+            	transactionInManager.insertProcessingError(20, null, batchId, null, null, null, null, false, true, "There should only be one message per web service batch.");
+            	updateTargetTransasctionStatus(batchId, 33);
+            	return null;
+            }
+        	
+        	
+            /** we lock targets **/
+            if (!targets.isEmpty()) {
+
+                for (transactionTarget target : targets) {
+
+                    /* Need to update the uploaded batch status */
+                    transactionInManager.updateBatchStatus(target.getbatchUploadId(), 22, "");
+
+                    /* Need to update the uploaded batch transaction status */
+                    transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 37);
+
+                    /* Update the downloaded batch transaction status */
+                    transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 37);
+
+                  //check inbound for clearing options
+                    if (configurationTransportManager.getTransportDetails(transactionInManager.getTransactionDetails(target.gettransactionInId()).getconfigId()).getclearRecords()) {
+                    	//we insert into clearAfterDelivery
+                    	batchClearAfterDelivery cad = new batchClearAfterDelivery();
+	                    cad.setBatchDLId(batchId);
+	                    cad.setBatchUploadId(target.getbatchUploadId());
+	                    cad.setTransactionInId(target.gettransactionInId());
+	                    cad.setTransactionTargetId(target.getId());
+	                    transactionInManager.saveBatchClearAfterDelivery(cad);
+                    }
+                }
+
+            }
+
+            /* get the batch details */
+            batchDownloads batchDetails = transactionOutDAO.getBatchDetails(batchId);
+
+            /* Get the WS Details  - do we need this? */
+            configurationWebServiceFields wsDetails = configurationTransportManager.getTransWSDetailsPush(transportDetails.getId());
+
+            // the file is in output folder already, we need to encrypt it and populate soap message
+            
+            //1. we read file
+            
+            fileSystem dir = new fileSystem();
+            String filelocation = transportDetails.getfileLocation();
+            filelocation = filelocation.replace("/bowlink/", "");
+            dir.setDirByName(filelocation);
+            
+            File sourceFile = new File(dir.getDir() + batchDetails.getoutputFIleName());
+            //get content
+            String fileContent = filemanager.readTextFile(sourceFile.getAbsolutePath());
+            
+            
+            //to get the original sender's email, we need to get the originalTargetId from TransactionIn and then look up the batchId
+            List <String> emails = getWSSenderFromBatchDLId((Arrays.asList(batchId)));
+            
+            wsMessagesOut wsMessagesOut = new wsMessagesOut();
+            wsMessagesOut.setOrgId(batchDetails.getOrgId());
+            //String fileContent, String toEmail, String fromEmail, Integer batchId
+            wsMessagesOut.setFromEmail(wsDetails.getEmail());
+            wsMessagesOut.setToEmail(emails.get(0));
+            wsMessagesOut.setBatchDownloadId(batchId);
+            wsMessagesOut.setMimeType(wsDetails.getMimeType());
+            wsMessagesOut = wsManager.sendHIESoapMessage(wsMessagesOut, fileContent);
+            
+            String result = wsMessagesOut.getMessageResult();
+            
+            
+        	if (result.equalsIgnoreCase("success")) {
+        		transactionOutDAO.updateBatchStatus(batchId, 23);
+        	} else {
+        		transactionOutDAO.updateBatchStatus(batchId, 30);
+        		transactionInManager.insertProcessingError(21, null, batchId, null, null, null, null, false, true, "Web Service Message Failed to send.");
+            	updateTargetTransasctionStatus(batchId, 33);
+            	return null;
+        		
+        	}
+            for (transactionTarget target : targets) {
+
+                /* Need to update the uploaded batch status */
+                transactionInManager.updateBatchStatus(target.getbatchUploadId(), 23, "");
+
+                /* Need to update the uploaded batch transaction status */
+                transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 20);
+
+                /* Update the downloaded batch transaction status */
+                transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 20);
+
+            }
+            
+        } catch (Exception ex) {
+        	try{
+        		transactionInManager.sendEmailToAdmin(("SendWSMessage - Error occurred trying to move a batch target. batchId: " + batchId + "<br/>"+  ex.toString() + "<br/>" + Arrays.toString(ex.getStackTrace())), " SendWSMessage Error ");
+        	} catch (Exception e) {
+        		e.printStackTrace();
+                System.err.println("SendWSMessage - Error occurred trying to move a batch target. batchId: " + batchId);
+        	}
+        	ex.printStackTrace();
+            System.err.println("SendWSMessage - Error occurred trying to move a batch target. batchId: " + batchId);
+            return null;
+        }
+        return 1;
+    }
+
+	@Override
+	public List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception {
+		return transactionOutDAO.getWSSenderFromBatchDLId(batchDLIds);
+	}
+	
+	
+	@Override
+	public List<transactionTarget> getTTByStatusId(int batchId,
+			List<Integer> statusIds) throws Exception {
+		return transactionOutDAO.getTTByStatusId(batchId, statusIds);
+	}
+
+	@Override
+	public List<Integer> getTargetConfigsForBatch(int batchId,
+			List<Integer> statusIds) throws Exception {
+		return transactionOutDAO.getTargetConfigsForBatch(batchId, statusIds);
+	}
+
+	@Override
+	public Integer writeOutputToTextFile(configurationTransport transportDetails, Integer batchDownLoadId, String filePathAndName, String fieldNos) throws Exception { 
+				return transactionOutDAO.writeOutputToTextFile(transportDetails, batchDownLoadId, filePathAndName, fieldNos);
+	}
+	
+	@Override
+	public void updateTTBatchIdByUploadBatch(Integer batchUploadId,
+			Integer batchDownloadId) throws Exception {
+		 	transactionOutDAO.updateTTBatchIdByUploadBatch(batchUploadId, batchDownloadId);
+	}
+	
+	@Override
+	public String generateDLBatchName(configurationTransport transportDetails, configuration configDetails,
+			batchUploads batchUploadDetails, Date date) throws Exception {
+		
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
+        
+		String batchName = "";
+		String sourceFileName = batchUploadDetails.getoriginalFileName();
+		if (transportDetails.gettargetFileName() == null) {
+            /* Create the batch name (OrgId+MessageTypeId) */
+            batchName = new StringBuilder().append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).toString();
+        } else if ("USE SOURCE FILE".equals(transportDetails.gettargetFileName())) {
+            int lastPeriodPos = sourceFileName.lastIndexOf(".");
+
+            if (lastPeriodPos <= 0) {
+                batchName = sourceFileName;
+            } else {
+                batchName = sourceFileName.substring(0, lastPeriodPos);
+            }
+
+        } else {
+            batchName = transportDetails.gettargetFileName();
+
+        }
+
+        /* Append the date time */
+        if (transportDetails.getappendDateTime() == true) {
+            batchName = new StringBuilder().append(batchName).append(dateFormat.format(date)).toString();
+        }
+        
+        return batchName;
+	}
+	
+	
+	@Override
+	public void  massInsertSummaryEntry(batchDownloads batchDowloadDetails, configuration configDetails, batchUploads batchUploadDetails) throws Exception {
+		transactionOutDAO.massInsertSummaryEntry(batchDowloadDetails, configDetails, batchUploadDetails);
+	}
+	
+	@Override
+	public void setUpTransactionTranslatedOut (
+			batchDownloads batchDowloadDetails, configuration configDetails, Integer statusId)  throws Exception{
+		transactionOutDAO.setUpTransactionTranslatedOut(batchDowloadDetails, configDetails, statusId);
+	}
+	
+	@Override
+	public List <ConfigOutboundForInsert> setConfigOutboundForInsert(int configId, int batchDownloadId) throws Exception {
+		return transactionOutDAO.setConfigOutboundForInsert(configId, batchDownloadId);
+	}
+	
+	
+	@Override
+	public void massUpdateTTO(ConfigOutboundForInsert outboundConfig, Integer statusId) throws Exception {
+		 transactionOutDAO.massUpdateTTO(outboundConfig, statusId);
+	}
+	
+	@Override
+	public String getConfigFieldsForOutput(Integer configId) throws Exception {
+		return transactionOutDAO.getConfigFieldsForOutput(configId);
+	}
+	
+	@Override
+	public void insertFailedRequiredFields(configurationFormFields cff, Integer batchDLId, Integer transactionTargetId)
+	throws Exception {
+		transactionOutDAO.insertFailedRequiredFields(cff, batchDLId, transactionTargetId);
+	}
+	
+	
+	@Override
+	public void moveTranslatedRecordsByBatch(int batchDownloadId) throws Exception{
+		transactionOutDAO.moveTranslatedRecordsByBatch(batchDownloadId);
+	}
+	
+	
+	
+	
+	@Override
+    public void runValidations(Integer batchDownloadId, Integer configId, Integer transactionId) throws Exception {
+        //1. we get validation types
+        //2. we skip 1 as that is not necessary
+        //3. we skip date (4) as there is no isDate function in MySQL
+        //4. we skip the ids that are not null as Mysql will bomb out checking character placement
+        //5. back to date, we grab transaction info and we loop (errId 7)
+
+        /**
+         * MySql RegEXP validate numeric - ^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$ validate email - ^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$ validate url - ^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct - might have to run in java as mysql is not catching all. validate phone - should be no longer than 11 digits ^[0-9]{7,11}$ validate date - doing this in java
+         *
+         */
+        //TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
+      
+		List<configurationFormFields> configurationFormFields
+                = configurationTransportManager.getCffByValidationType(configId, 0);
+
+        for (configurationFormFields cff : configurationFormFields) {
+            String regEx = "";
+            Integer validationTypeId = cff.getValidationType();
+            switch (cff.getValidationType()) {
+                case 1:
+                    break; // no validation
+                //email calling SQL to validation and insert - one statement
+                case 2:
+                     genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
+                    break;
+                //phone  calling SP to validation and insert - one statement 
+                case 3:
+                    genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
+                    break;
+                // need to loop through each record / each field
+                case 4:
+                    dateValidation(cff, validationTypeId, batchDownloadId, transactionId);
+                    break;
+                //numeric   calling SQL to validation and insert - one statement      
+                case 5:
+                    genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
+                    break;
+                //url - need to rethink as regExp is not validating correctly
+                case 6:
+                    urlValidation(cff, validationTypeId, batchDownloadId, transactionId);
+                    break;
+                //anything new we hope to only have to modify sp
+                default:
+                    genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
+                    break;
+            }
+           
+
+        } 
+    }
+
+    @Override
+    public void genericValidation(configurationFormFields cff,
+            Integer validationTypeId, Integer batchDownloadId, String regEx, Integer transactionId) throws Exception {
+        	transactionOutDAO.genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
+    }
+
+    @Override
+    public void urlValidation(configurationFormFields cff,
+            Integer validationTypeId, Integer batchDownloadId, Integer transactionId) throws Exception{
+        
+            //1. we grab all transactionInIds for messages that are not length of 0 and not null 
+            List<transactionRecords> trs = null;
+            //1. we grab all transactionInIds for messages that are not length of 0 and not null 
+            if (transactionId == 0) {
+                trs = getFieldColAndValues(batchDownloadId, cff);
+            } else {
+                trs = getFieldColAndValueByTransactionId(cff, transactionId);
+            }
+            //2. we look at each column and check each value to make sure it is a valid url
+            for (transactionRecords tr : trs) {
+                //System.out.println(tr.getfieldValue());
+                if (tr.getfieldValue() != null) {
+                	 if (tr.getfieldValue().length() != 0) {
+                    //we append http:// if url doesn't start with it
+                    String urlToValidate = tr.getfieldValue();
+                    if (!urlToValidate.startsWith("http")) {
+                        urlToValidate = "http://" + urlToValidate;
+                    }
+                    if (!transactionInManager.isValidURL(urlToValidate)) {
+                        insertValidationError(tr, cff, batchDownloadId);
+                    }
+                }
+                }
+            }
+    }
+    
+    @Override
+    public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff,
+            Integer transactionId) throws Exception {
+        return transactionOutDAO.getFieldColAndValueByTransactionId(cff, transactionId);
+    }
+    
+    @Override
+    public List<transactionRecords> getFieldColAndValues(Integer batchDownloadId, configurationFormFields cff) throws Exception {
+        return transactionOutDAO.getFieldColAndValues(batchDownloadId, cff);
+    }
+
+    @Override
+    public void updateFieldValue(transactionRecords tr, String newValue) throws Exception{
+        transactionOutDAO.updateFieldValue(tr, newValue);
+    }
+    
+    @Override
+    public void insertValidationError(transactionRecords tr,
+            configurationFormFields cff, Integer batchUploadId) throws Exception {
+        transactionOutDAO.insertValidationError(tr, cff, batchUploadId);
+    }
+    
+    
+	@Override
+	public void updateErrorStatusForTT(Integer batchDownloadId,
+			Integer newStatusId, Integer transactionTargetId) throws Exception{
+		transactionOutDAO.updateErrorStatusForTT(batchDownloadId, newStatusId, transactionTargetId);
+	}
+    
+    
+    @Override
+    public void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchDownloadId, Integer transactionId) throws Exception {
+       
+            List<transactionRecords> trs = null;
+            //1. we grab all transactionInIds for messages that are not length of 0 and not null 
+            if (transactionId == 0) {
+                trs = getFieldColAndValues(batchDownloadId, cff);
+            } else {
+                trs = getFieldColAndValueByTransactionId(cff, transactionId);
+            }
+            //2. we look at each column and check each value by trying to convert it to a date
+            for (transactionRecords tr : trs) {
+                if (tr.getfieldValue() != null) {
+                	 if (tr.getfieldValue().length() != 0) {
+                    //sql is picking up dates in mysql format and it is not massive inserting, running this check to avoid unnecessary sql call
+                    //System.out.println(tr.getFieldValue());
+                    //we check long dates
+                    Date dateValue = null;
+                    String mySQLDate = transactionInManager.chkMySQLDate(tr.getFieldValue());
+
+                    if (dateValue == null && mySQLDate.equalsIgnoreCase("")) {
+                        dateValue = transactionInManager.convertLongDate(tr.getFieldValue());
+                    }
+                    if (dateValue == null && mySQLDate.equalsIgnoreCase("")) {
+                        dateValue = transactionInManager.convertDate(tr.getfieldValue());
+                    }
+
+                    String formattedDate = null;
+                    if (dateValue != null && mySQLDate.equalsIgnoreCase("")) {
+                        formattedDate = transactionInManager.formatDateForDB(dateValue);
+                        //3. if it converts, we update the column value
+                        updateFieldValue(tr, formattedDate);
+                    }
+
+                    if (formattedDate == null && (mySQLDate.equalsIgnoreCase("") || mySQLDate.equalsIgnoreCase("ERROR"))) {
+                        insertValidationError(tr, cff, batchDownloadId);
+                    }
+                 }
+                }
+            }
+    }
+    
+   
+    /** 
+	 * this will select an upload batch that has status of 24, check its config to make sure it is for 
+	 * mass translation and start translating
+	 * configuration that is for mass translation
+	 */
+	@Override
+	public void processMassOutputBatches() throws Exception {
+		//get all inbound batches with mass translation = true
+		List<batchUploads> inboundBatches = transactionInManager.getMassTranslateBatchForOutput(1);
+			//we lock the batch so it won't get picked up again
+		for (batchUploads inboundBatch : inboundBatches) {
+			transactionInManager.updateBatchStatus(inboundBatch.getId(), 25, "");
+			processMassOutputBatch(inboundBatch.getId());
+		}
+	}
+	
+	
+	@Override
+    public void clearTransactionTranslatedOutByBatchId(Integer batchDownloadId) throws Exception {
+        transactionOutDAO.clearTransactionTranslatedOutByBatchId(batchDownloadId);
+    }
+    
+
+	@Override
+	public Integer processMassOutputBatch(Integer batchUploadId) throws Exception {
+				//we get the configs for the file
+				List<Integer> configIds = getTargetConfigsForBatch(batchUploadId, Arrays.asList(19));
+				
+				//there should be only one - we reject if there is more than one config
+				if (configIds.size() != 1) {
+					//error out the transactions
+					transactionInManager.updateTransactionTargetStatus(batchUploadId, 0, 0, 33);
+					
+					//we leave transaction in status alone in case admin wants to fix configs and reset batch status by hand
+					//transactionInManager.updateTransactionStatus(batchUploadId, 0, 0, 33);
+					
+					//error out the inbound batch
+					transactionInManager.updateBatchStatus(batchUploadId, 30, "endDateTime");
+					//insert error 
+					transactionInManager.insertProcessingError(30, null, batchUploadId, null, null, null, null, false, false, "Multiple target configurations found for inbound mass translation batch", 0);
+                    //email admin
+                    transactionInManager.sendEmailToAdmin(("Multiple targets configs were found for inbound batch - " + batchUploadId), "Mass translation config error");
+               
+					return 1;
+					
+				}
+				
+				//we give it a name	
+				/* Create the batch name (OrgId+MessageTypeId+Date/Time) - need milliseconds as computer is fast and files have the same name*/
+		        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
+		        Date date = new Date();
+		        
+		        //get transport & config details
+		        configuration configDetails = configurationManager.getConfigurationById(configIds.get(0));
+		        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configDetails.getId());
+		        
+		        //we get upload details
+				batchUploads batchUploadDetails = transactionInManager.getBatchDetails(batchUploadId);
+				
+		        String utbatchName = new StringBuilder().append(transportDetails.gettransportMethodId()).append("_m_").append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
+		        
+		        /* Get the connection id for the configuration */
+		        List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(configDetails.getId());
+
+		        int userId = 0;
+		        if (!connections.isEmpty()) {
+		            for (configurationConnection connection : connections) {
+		                List<configurationConnectionReceivers> receivers = configurationManager.getConnectionReceivers(connection.getId());
+
+		                if (!receivers.isEmpty()) {
+		                    for (configurationConnectionReceivers receiver : receivers) {
+		                        userId = receiver.getuserId();
+		                    }
+		                }
+
+		            }
+		        }
+		        
+		        
+		        //we create a batchDownloads
+				batchDownloads batchDownload  = new batchDownloads();
+				
+		        //set batch download details
+		        batchDownload.setutBatchName(utbatchName);
+		        //set it to interim status
+		        batchDownload.setstatusId(25);
+				
+				//we determine output file name
+				batchDownload.setoutputFIleName(generateDLBatchName(transportDetails, configDetails, batchUploadDetails, date) + "." + transportDetails.getfileExt());
+				batchDownload.setmergeable(false);
+				batchDownload.setstartDateTime(new Date());
+				batchDownload.settransportMethodId(transportDetails.gettransportMethodId());
+				batchDownload.setOrgId(configDetails.getorgId());
+				batchDownload.setuserId(userId);
+		        batchDownload.settotalErrorCount(0);
+		        batchDownload.settotalRecordCount(1);
+		        batchDownload.setdeleted(false);
+		        batchDownload.setdateCreated(new Date());
+		        /* Submit a new batch */
+		        int batchDLId = (int) transactionOutDAO.submitBatchDownload(batchDownload);
+		        batchDownload.setId(batchDLId);
+		        
+		        /* Need to update the target transaction with new  batch Id, file only contains good records*/
+		        transactionOutDAO.updateTTBatchIdByUploadBatch(batchUploadId, batchDLId);
+		        
+		        /* Need to submit the batch summary for transactionTarget with statusId = 19 */
+		        //mass insert 
+		        massInsertSummaryEntry(batchDownload, configDetails, batchUploadDetails);
+		        
+		        Integer statusId = 37;
+		        //we set the transactionTargets for this config in batch to Load 37 
+		        updateTransactionTargetStatusOutBound(batchDLId,0, 19, statusId);
+		        
+		        
+		        // we set up transactionTranslatedOut
+		        setUpTransactionTranslatedOut(batchDownload,configDetails, statusId);
+		        
+		        //we look up config info and insert transactions into transactionTranslatedOut
+		        List<ConfigOutboundForInsert> setConfigOutboundForInsertList = setConfigOutboundForInsert(configDetails.getId(),  batchDLId);
+		        
+		        //we loop the configuration and insert into transactionTranslatedOut
+		        for (ConfigOutboundForInsert outboundConfig : setConfigOutboundForInsertList) {
+		        	massUpdateTTO(outboundConfig, statusId);
+		        }
+		        
+			        Integer transactionId = 0;
+			        //we run translations, macros and crosswalks
+		            Integer configId = configDetails.getId();
+	                //we need to run all checks before insert regardless *
+	                
+		            /**
+	                 * we are reordering 1. cw/macro, 2. required and 3. validate *
+	                 */
+		       		translateTargetRecords(0, configId, batchDLId, 1);
+
+	                //check R/O
+	                List<configurationFormFields> reqFields = transactionInManager.getRequiredFieldsForConfig(configId);
+
+	                for (configurationFormFields cff : reqFields) {
+	                		insertFailedRequiredFields(cff, batchDLId, transactionId);
+	                }
+	                
+	                // update status of the failed records to ERR - 14
+	                updateErrorStatusForTT(batchDLId, 14,  transactionId);
+
+	                //run validation
+	                runValidations(batchDLId, configId, transactionId);
+	                
+	                // update status of the failed records to ERR - 14
+	                updateErrorStatusForTT(batchDLId, 14,  transactionId);
+	                
+	                //we do not release the batch if there are outbound errors - everything should be in final status
+	                // now we are done with processing we set the 37 records to 18
+					//we update status of these transactions from 37 to 18
+                    updateTransactionTargetStatusOutBound(batchDLId,0, statusId, 18);
+					
+	                
+	                if (transactionInManager.getRecordCounts(batchDLId, transRELId,  true, false) > 0) {
+	                	//error out batch
+	                	transactionInManager.updateBatchStatus(batchUploadId, 41, "");
+	                    transactionOutDAO.updateTargetBatchStatus(batchDLId, 41, "endDateTime");
+	                	return 1;
+	                } else {
+	                
+	                //we are not copying to transactionOutRecords 
+	                	//moveTranslatedRecordsByBatch(batchDLId);
+		           
+	                /* Generate the file according to transportDetails 
+	                 * 1. we generate output file according to encoding in transportDetails
+	                 * 2. we always save an encrypted copy to archivesOut
+	                 * */
+			       		
+			       		
+			       		//get list of config fields here
+			       		
+			       		 String configFields = getConfigFieldsForOutput(configId);
+			       		 //we move the file extension
+				       	 String fileExt = transportDetails.getfileExt();
+		            		
+				       	 boolean encryptMessage = false;
+		                 // we only support base64 for now
+		                 if (transportDetails.getEncodingId() == 2) {        
+		                     encryptMessage = true;
+		             	}
+		                /** **/
+			       		String generatedFilePath = generateTargetFile(true, 0, batchDLId, transportDetails, encryptMessage);       
+			       		transportDetails.setDelimChar(messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter()));
+			       		//make sure we remove old file
+			       		File generatedFile = new File(generatedFilePath);
+			       		if (generatedFile.exists()) {
+			       			generatedFile.delete();
+	            		}
+	            		
+			       		
+			       		/**
+			       		mysql is the fastest way to output a file, but the permissions are tricky
+			      		we write to massoutfiles where both tomcat and mysql has permission. 
+			      		Then we can create, copy and delete
+			      		**/
+			       		fileSystem fileSystemOutput = new fileSystem();
+                    	File massOutFile = new File ( fileSystemOutput.setPathFromRoot(massOutPutPath) + batchDownload.getutBatchName()+ "." + fileExt);
+                    	//check to see if file is there, if so remove old file
+                    	if (massOutFile.exists()) {
+                    		massOutFile.delete();
+                		}
+			       		
+			       		//writeOutputToTextFile(transportDetails, batchDLId, massOutFile.getAbsolutePath(), configFields);
+			       		
+                    	//here we need to pass to mysql method the db path from mysql which is massOutPutPathMysqlPath
+			       		Integer writeOutCome = writeOutputToTextFile(transportDetails, batchDLId, (massOutPutPathMysqlPath + batchDownload.getutBatchName()+ "." + fileExt), configFields);
+			       		if (!massOutFile.exists()) {
+			       			//we induce time because file is not done writing
+			       			System.out.println("in time delay one");
+			       			TimeUnit.SECONDS.sleep(30);
+			       		}
+			       		//check one more time to be safe
+			       		if (!massOutFile.exists()) {
+			       			//we induce time because file is not done writing
+			       			System.out.println("in time delay two");
+			       			TimeUnit.SECONDS.sleep(30);
+			       		}
+			       		//cp file to archiveOut and correct putput folder
+	                    fileSystem fileSystem = new fileSystem();
+		                    	File archiveFile = new File ( fileSystem.setPathFromRoot(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
+	                    	
+	                    		//at this point, message it not encrypted
+	                    		//we always encrypt the archive file
+	                    		String strEncodedFile = filemanager.encodeFileToBase64Binary(massOutFile);
+	                    		if (archiveFile.exists()) {
+	                    			archiveFile.delete();
+	                    		}
+	                    		//write to archive folder
+	                    		filemanager.writeFile(archiveFile.getAbsolutePath(), strEncodedFile);
+	                    		
+	                    		// if we don't need to encrypt file for users to download
+	                    		if (!encryptMessage)  {
+	                    			Files.copy(massOutFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		} else { //we copy the encrypted file over
+	                    			Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		}   
+	                    		//we have file already, we just need to move it
+	                    		if (transportDetails.gettransportMethodId() == 5) {
+	                    			/* Get the Rhapsody Details */
+	                                configurationRhapsodyFields rhapsodyDetails = configurationTransportManager.getTransRhapsodyDetailsPush(transportDetails.getId());
+
+	                                // the file is in output folder already, we need to rebuild path and move it
+	                                
+	                                fileSystem dir = new fileSystem();
+	                                String filelocation = transportDetails.getfileLocation();
+	                                filelocation = filelocation.replace("/bowlink/", "");
+	                                dir.setDirByName(filelocation);
+	                                
+	                                File targetFile = new File ( directoryPath + rhapsodyDetails.getDirectory() + batchDownload.getoutputFIleName());
+	                                Files.copy(archiveFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		}
+	                    		
+	                    		//now we delete massoutput file
+		                    	massOutFile.delete();
+		                    	
+	                    	}
+
+	                		//we need to update status
+	                		transactionInManager.updateTransactionStatus(batchUploadId, 0, 19, 40);
+	                		updateTransactionTargetStatusOutBound(batchDLId, 0, 18, 40);
+	                		//we need to update our totals
+                			transactionInManager.updateRecordCounts(batchDownload.getId(), rejectIds, true, "totalErrorCount");
+                			transactionInManager.updateRecordCounts(batchDownload.getId(), new ArrayList<Integer>(), true, "totalRecordCount");
+                			
+                		//here we insert dropped values
+                		insertDroppedValuesForConfigPair(batchUploadDetails.getConfigId(), configDetails.getId(),batchUploadDetails.getId());
+                   
+	                    //now we delete the data from transactionTranslatedIn, transactionTranslatedOut, transactionInRecords
+	                    //we will schedule a job to delete from message tables as it takes too long if we are not adding batchId there
+	                    
+	                    //we insert into batchMassTranslate so we can run it as a job and delete
+	                    /** do not want to add batchId to every message table and the delete will be slow **/
+	                    //if the inbound configuration is set to Clear Records after Delivery , we clear message tables
+	                    if (configurationTransportManager.getTransportDetails(batchUploadDetails.getConfigId()).getclearRecords()) {
+	                    	clearTransactionTranslatedOutByBatchId(batchDLId);
+		                    transactionInManager.clearTransactionInRecords(batchUploadId, 0);
+		                    transactionInManager.clearTransactionTranslatedIn(batchUploadId, 0);
+		                    batchClearAfterDelivery bmt = new batchClearAfterDelivery();
+		                    bmt.setBatchDLId(batchDLId);
+		                    bmt.setBatchUploadId(batchUploadId);
+		                    transactionInManager.saveBatchClearAfterDelivery(bmt);
+	                    }
+	                    //we update status of batch
+	                    transactionInManager.updateBatchStatus(batchUploadId, 28, "");
+	                    transactionOutDAO.updateTargetBatchStatus(batchDLId, 28, "endDateTime");
+					
+	                    
+						return 0;
+	                }
+
+	@Override
+	public void insertDroppedValuesForConfigPair(Integer inConfigId, Integer outConfigId, Integer batchUploadId)
+			throws Exception {
+		//1. get the form fields
+		List <configurationFormFields> cffList = configurationTransportManager.getInBoundFieldsForConfigConnection(inConfigId, outConfigId);
+		
+		configurationMessageSpecs cms = configurationManager.getMessageSpecs(inConfigId);
+		
+		//build our headerColStrings
+		List <String> headerInfo = configurationManager.getConfigHeaderCols(cms);
+		configurationFormFields cffForEntity3 = configurationTransportManager.getConfigurationFieldsByFieldDesc(inConfigId, "rrEntity3");
+		
+		for (configurationFormFields cff : cffList) {
+			 insertDroppedValues(cff, headerInfo, batchUploadId, cffForEntity3.getFieldNo());
+		}		
+	}
+
+	@Override
+	public void insertDroppedValues(configurationFormFields cff,
+			List <String>  headerInfo, Integer batchUploadId, Integer entityIdFCol) throws Exception {
+		transactionOutDAO.insertDroppedValues(cff, headerInfo, batchUploadId, entityIdFCol);
+		
+	}
 
 }
+
+
+
+
 
 
 

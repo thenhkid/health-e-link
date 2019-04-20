@@ -32,38 +32,38 @@ public class productSuiteController {
     }
     
     /**
-     * The '/health-e-net' request will display the health-e-net information page.
+     * The '/universal-hie' request will display the Universal HIE information page.
      */
-    @RequestMapping(value = "/health-e-net", method = RequestMethod.GET)
-    public ModelAndView healthenet() throws Exception {
+    @RequestMapping(value = "/universal-hie", method = RequestMethod.GET)
+    public ModelAndView universalhie() throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/healthenet");
-        mav.addObject("pageTitle", "Health-e-Net");
+        mav.setViewName("/universal-hie");
+        mav.addObject("pageTitle", "Universal HIE");
         return mav;
     }
     
     /**
-     * The '/health-e-data' request will display the health-e-data information page.
+     * The '/clinical-data-warehouse' request will display the Clinical Data Warehouse information page.
      */
-    @RequestMapping(value = "/health-e-data", method = RequestMethod.GET)
-    public ModelAndView healthedata() throws Exception {
+    @RequestMapping(value = "/clinical-data-warehouse", method = RequestMethod.GET)
+    public ModelAndView clinicaldatawarehouse() throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/healthedata");
-        mav.addObject("pageTitle", "Health-e-Data");
+        mav.setViewName("/clinical-data-warehouse");
+        mav.addObject("pageTitle", "Clinical Data Warehouse");
         return mav;
     }
     
     /**
-     * The '/health-e-web' request will display the health-e-web information page.
+     * The '/careConnector' request will display the care connect information page.
      */
-    @RequestMapping(value = "/health-e-web", method = RequestMethod.GET)
-    public ModelAndView healtheweb() throws Exception {
+    @RequestMapping(value = "/careConnector", method = RequestMethod.GET)
+    public ModelAndView careConnector() throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/healtheweb");
-        mav.addObject("pageTitle", "Health-e-Web");
+        mav.setViewName("/careConnector");
+        mav.addObject("pageTitle", "Care Connector");
         return mav;
     }
     

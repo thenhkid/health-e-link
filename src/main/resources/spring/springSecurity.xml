@@ -4,24 +4,37 @@
              xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/security
-    http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+    http://www.springframework.org/schema/security/spring-security-4.2.xsd">
 
     <http pattern="/css/**" security="none"/>
     <http pattern="/javascript/**" security="none" />
+    <http pattern="/headerImages/**" security="none"/>
+    <http pattern="/files/**" security="none"/>
     
 
-    <http auto-config="true" use-expressions="true" disable-url-rewriting="false" >
-        <intercept-url access="hasAnyRole('ROLE_ADMIN','ROLE_PROCESSINGADMIN')" pattern="/administrator/**"></intercept-url>
+    <http auto-config="true" use-expressions="true" disable-url-rewriting="true" >
+        <intercept-url access="hasAnyRole('ROLE_ADMIN')" pattern="/administrator/processing-activity/wsmessage/**"></intercept-url>
+        <intercept-url access="hasAnyRole('ROLE_ADMIN')" pattern="/administrator/processing-activity/wsmessageOut/**"></intercept-url>
+        <intercept-url access="hasAnyRole('ROLE_ADMIN','ROLE_PROCESSINGADMIN','ROLE_SYSTEMADMIN')" pattern="/administrator/**"></intercept-url>
         <intercept-url access="hasRole('ROLE_USER')" pattern="/profile/**"></intercept-url>
-        <intercept-url access="hasRole('ROLE_USER')" pattern="/Health-e-Web/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/reports/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/clients/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/dashboard/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/associations/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/CareConnector/**"></intercept-url>
+        <intercept-url access="hasRole('ROLE_USER')" pattern="/OrgProfile/**"></intercept-url>
+        
         <intercept-url access="hasRole('ROLE_USER')" pattern="/Health-e-Connect/**"></intercept-url>
-        <intercept-url access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER','ROLE_PROCESSINGADMIN')" pattern="/FileDownload/**"></intercept-url>
+        <intercept-url access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER','ROLE_PROCESSINGADMIN','ROLE_SYSTEMADMIN')" pattern="/FileDownload/**"></intercept-url>
         <intercept-url access="permitAll" pattern="/scheduleTask/**"></intercept-url>
         <intercept-url access="permitAll" pattern="/login/*"></intercept-url>
         <intercept-url access="permitAll" pattern="/logout"></intercept-url>
         <logout invalidate-session="true" delete-cookies="JSESSIONID" logout-success-url="/login" logout-url="/logout"></logout>
-        <form-login authentication-success-handler-ref="authenticationSuccessRedirecthandler" authentication-failure-url="/loginfailed" login-page="/login"></form-login>
-        <session-management invalid-session-url="/"></session-management>
+        <form-login authentication-success-handler-ref="authenticationSuccessRedirecthandler" 
+        authentication-failure-url="/loginfailed" 
+        authentication-details-source-ref="customWebAuthenticationDetails"
+        login-page="/login"></form-login>
+        <session-management invalid-session-url="/login"></session-management>
         <headers>
             <cache-control />
             <content-type-options />
@@ -29,10 +42,21 @@
             <frame-options policy="SAMEORIGIN" />
             <xss-protection />
         </headers>
+        <csrf disabled="true"></csrf>
     </http>
-    
-    
-
+   
+     
+    <authentication-manager>
+        	<authentication-provider ref="customAuthenticationProvider">
+        	</authentication-provider>
+    </authentication-manager>
+     
+    <beans:bean class="com.ut.healthelink.security.CustomWebAuthenticationDetails" id="customWebAuthenticationDetails"></beans:bean>
+    <beans:bean class="com.ut.healthelink.security.CustomAuthenticationProvider" id="customAuthenticationProvider"></beans:bean>
+    <beans:bean class="com.ut.healthelink.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
+    <!--  -->
+ <!--
+ 
     <authentication-manager>
         <authentication-provider>
             <jdbc-user-service data-source-ref="dataSource"
@@ -46,5 +70,5 @@
     </authentication-manager>
      
     <beans:bean class="com.ut.healthelink.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
-   
+   -->
 </beans:beans>

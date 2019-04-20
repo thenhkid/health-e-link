@@ -19,6 +19,7 @@ import com.ut.healthelink.model.lutables.lu_Procedures;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.lutables.lu_Tests;
 import com.ut.healthelink.model.Macros;
+import com.ut.healthelink.model.MoveFilesLog;
 import com.ut.healthelink.model.mainHL7Details;
 import com.ut.healthelink.model.mainHL7Elements;
 import com.ut.healthelink.model.mainHL7Segments;
@@ -173,4 +174,11 @@ public interface sysAdminManager {
     List<lu_ProcessStatus> getAllProcessStatus() throws Exception;
     
     List<lu_ProcessStatus> getAllHistoryFormProcessStatus() throws Exception;
+    
+    Long findTotalUsers() throws Exception;
+    
+    List <MoveFilesLog> getMoveFilesLog (Integer statusId) throws Exception;
+    
+    void deleteMoveFilesLog(MoveFilesLog moveFilesLog) throws Exception;
+
 }

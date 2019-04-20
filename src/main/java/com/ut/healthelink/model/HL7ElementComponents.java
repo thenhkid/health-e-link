@@ -45,6 +45,10 @@ public class HL7ElementComponents {
     @Column(name = "displayPos", nullable = true)
     private int displayPos = 1;
     
+    @NoHtml
+    @Column(name = "defaultValue", nullable = true)
+    private String defaultValue = "";
+    
     
     public int getId() {
         return id;
@@ -92,6 +96,14 @@ public class HL7ElementComponents {
     
     public void setdisplayPos(int displayPos) {
         this.displayPos = displayPos;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
     
 }

@@ -54,6 +54,9 @@ public interface messageTypeDAO {
 
     @SuppressWarnings("rawtypes")
     List getDelimiters();
+    
+    @SuppressWarnings("rawtypes")
+    List getFieldTypes();
 
     Long getTotalFields(int messageTypeId);
 
@@ -85,5 +88,9 @@ public interface messageTypeDAO {
     List<validationType> getValidationTypes1();
     
     List<messageType> getAssociatedMessageTypes(int orgId);
+    
+    void updateCrosswalk(Crosswalks crosswalkDetails);
+    
+    void executeSQLStatement(String sqlStmt);
 
 }

@@ -24,7 +24,7 @@
                 </div>
                 <div class="form-group">
                      <label class="control-label" for="templateImage">Current Front End Logo
-                     	<img src="../../dspResources/img/front-end/health-e-link/${logoDetails.frontEndLogoName}" border="0"/>
+                         <img src="../../dspResources/img/front-end/health-e-link/${logoDetails.frontEndLogoName}" alt="Health-e-link" border="0"/>
                      </label>
                      
                 </div>
@@ -42,7 +42,7 @@
                 </div>
                 <div class="form-group">
                      <label class="control-label" for="templateFile">Current Back End Logo</label>
-                     <img src="../../dspResources/img/admin/health-e-link/${logoDetails.backEndLogoName}" border="0"/>
+                     <img src="../../dspResources/img/admin/health-e-link/${logoDetails.backEndLogoName}" alt="Health-e-link" border="0"/>
                 </div>
                 <div id="backEndFileDiv" class="form-group">
                      <spring:bind path="backEndFile">

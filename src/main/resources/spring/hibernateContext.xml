@@ -44,34 +44,4 @@
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     
-    <beans profile="local">
-        <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-            <property name="locations">
-                <list>
-                    <value>classpath:local.database.properties</value>
-                </list>
-            </property>
-        </bean>
-    </beans>
-    	
-    <beans profile="healthelink-test">
-        <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-            <property name="locations">
-                <list>
-                    <value>classpath:healthelink-test.database.properties</value>
-                </list>
-            </property>
-        </bean>
-    </beans>
-    
-    <beans profile="healthelink-prod">
-        <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-            <property name="locations">
-                <list>
-                    <value>classpath:healthelink-prod.database.properties</value>
-                </list>
-            </property>
-        </bean>
-    </beans>
-    
 </beans>

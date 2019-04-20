@@ -20,7 +20,7 @@ require(['./main'], function() {
         //status
         $(document).on('click', '.viewStatus', function() {
             $.ajax({
-                url: '/Health-e-Web/viewStatus' + $(this).attr('rel'),
+                url: '/CareConnector/viewStatus' + $(this).attr('rel'),
                 type: "GET",
                 success: function(data) {
                     $("#statusModal").html(data);

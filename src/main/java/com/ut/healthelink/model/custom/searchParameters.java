@@ -19,6 +19,7 @@ public class searchParameters {
     String searchTerm = "";
     int page = 1;
     String section = "";
+    Integer viewOnly = 0;
     
     public Date getfromDate() {
         return fromDate;
@@ -58,6 +59,14 @@ public class searchParameters {
     
     public void setsection(String section) {
         this.section = section;
+    }
+
+    public Integer getViewOnly() {
+        return viewOnly;
+    }
+
+    public void setViewOnly(Integer viewOnly) {
+        this.viewOnly = viewOnly;
     }
     
 }

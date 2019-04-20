@@ -47,6 +47,31 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="orgType">Organization Type *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="orgType" path="orgType" value="1"/> Health Care Provider
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="orgType" path="orgType" value="2"/> CBO 
+                                </label>
+                            </div>
+                        </div>        
+                        <spring:bind path="parentId">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="parentId">Parent Organization</label>
+                                <form:select id="parentId" path="parentId" cssClass="form-control half">
+                                    <option value="0"> - No Parent - </option>
+                                    <c:forEach items="${organizationList}" var="org">
+                                        <c:if test="${org.id != id}">
+                                            <option value="${org.id}" ${organization.parentId == org.id ? 'selected' : ''}>${org.orgName} - (<c:choose><c:when test="${org.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</option>
+                                        </c:if>
+                                    </c:forEach>
+                                </form:select>
+                                <form:errors path="parentId" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>
                         <spring:bind path="orgName">
                             <div class="form-group ${status.error ? 'has-error' : '' } ${not empty existingOrg ? 'has-error' : ''}">
                                 <label class="control-label" for="orgName">Name *</label>
@@ -107,6 +132,13 @@
                                 <form:errors path="fax" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
+                        <spring:bind path="infoURL">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="infoURL">Information URL</label>
+                                <form:input path="infoURL" id="infoURL" class="form-control" type="text" maxLength="255" />
+                                <form:errors path="infoURL" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>        
                         <c:if test="${id > 0}">
                             <c:if test="${not empty organization.parsingTemplate}">
                                 <div class="form-group">
@@ -122,11 +154,55 @@
                                     <form:errors path="file" cssClass="control-label" element="label" />
                                     <span id="parsingTemplateMsg" class="control-label"></span>
                                 </div>
-                            </spring:bind>  
-                        </c:if>      
-                        </div>
+                            </spring:bind>
+                            <c:if test="${not empty organization.headerLogo}">
+                                <div class="form-group">
+                                    <label class="control-label" for="headerLogo">Current Header Logo</label>
+                                    <input type="text" disabled id="headerLogo" class="form-control" value="${organization.headerLogo}" />
+                                    <form:hidden id="headerLogo" path="headerLogo" />
+                                </div>
+                            </c:if>
+                            <spring:bind path="headerLogoFile">
+                                <div id="headerLogoDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                    <label class="control-label" for="headerLogoFile">Header Logo</label>
+                                    <form:input path="headerLogoFile" id="headerLogoFile" class="form-control" type="file" />
+                                    <form:errors path="headerLogoFile" cssClass="control-label" element="label" />
+                                    <span id="headerLogoMsg" class="control-label"></span>
+                                </div>
+                            </spring:bind>
+                            <c:if test="${not empty organization.headerBackground}">
+                                <div class="form-group">
+                                    <label class="control-label" for="headerBackground">Current Background Header Image</label>
+                                    <input type="text" disabled id="headerBackground" class="form-control" value="${organization.headerBackground}" />
+                                    <form:hidden id="headerBackground" path="headerBackground" />
+                                </div>
+                            </c:if>
+                            <spring:bind path="headerBackgroundFile">
+                                <div id="headerBackgroundDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                    <label class="control-label" for="headerBackgroundFile">Background Header Image</label>
+                                    <form:input path="headerBackgroundFile" id="headerBackgroundFile" class="form-control" type="file" />
+                                    <form:errors path="headerBackgroundFile" cssClass="control-label" element="label" />
+                                    <span id="headerBackgroundFileMsg" class="control-label"></span>
+                                </div>
+                            </spring:bind>
+                        </c:if>    
+                        <spring:bind path="longitude">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="longitude">Longitude</label>
+                                <form:input path="longitude" id="longitude" class="form-control" type="text" maxLength="255" />
+                                <form:errors path="longitude" cssClass="control-label" element="label" />
+                                </div>
+                        </spring:bind>
+                        <spring:bind path="latitude">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="latitude">Latitude</label>
+                                <form:input path="latitude" id="latitude" class="form-control" type="text" maxLength="255" />
+                                <form:errors path="latitude" cssClass="control-label" element="label" />
+                                </div>
+                        </spring:bind>     
                     </div>
-                </section>
+                </div>
+            </section>
         </form:form>
     </div>
 </div>

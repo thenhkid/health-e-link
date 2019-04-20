@@ -32,6 +32,7 @@ public class historyResults {
     private int statusId = 0;
     private int transactionId;
     private String patientId = null;
+    private int batchId = 0;
     
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = false)
@@ -172,7 +173,13 @@ public class historyResults {
     public void setStatusId(int statusId) {
         this.statusId = statusId;
     }
-    
-    
+
+    public int getBatchId() {
+        return batchId;
+    }
+
+    public void setBatchId(int batchId) {
+        this.batchId = batchId;
+    }
     
 }

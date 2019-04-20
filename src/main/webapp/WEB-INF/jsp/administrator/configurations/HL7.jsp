@@ -145,7 +145,7 @@
 
                                                 <!-- Need to loop through any components -->
                                                 <c:if test="${elements.elementComponents.size() > 0}">
-                                                    <br />
+                                                    <br /><div style="padding-bottom:10px;"><strong style="text-decoration:underline">Components</strong></div>
                                                     <c:forEach items="${elements.elementComponents}" var="elementComponents" varStatus="component">
                                                         <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].id" value="${elementComponents.id}" />
                                                         <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].elementId" value="${elementComponents.elementId}" />
@@ -155,6 +155,14 @@
                                                                 <div class="form-group col-md-6">
                                                                     <label class="control-label" for="fieldDescriptor">Descriptor</label>
                                                                     <input type="text" id="fieldDescriptor" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].fieldDescriptor" value="${elementComponents.fieldDescriptor}" maxLength="255" class="form-control fieldLabel" />
+                                                                </div>
+                                                                <div class="form-group col-md-6">
+                                                                    <label class="control-label" for="defaultValue">Default Value</label>
+                                                                    <input type="text" id="defaultValue" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].defaultValue" value="${elementComponents.defaultValue}" maxLength="45" class="form-control fieldLabel" />
+                                                                </div>
+                                                                <div class="form-group col-md-6">
+                                                                    <label class="control-label" for="fieldAppendText">Append Text</label>
+                                                                    <input type="text" id="fieldAppendText" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].fieldAppendText" value="${elementComponents.fieldAppendText}" maxLength="255" class="form-control fieldLabel" />
                                                                 </div>
                                                                 <div class="form-group col-md-6">
                                                                     <label class="control-label" for="componentField">Field</label>
@@ -190,10 +198,6 @@
                                                                     </select>
                                                                     <br />
                                                                     <a href="javascript:void(0);" rel="${elementComponents.id}" class="btn btn-primary btn-xs btn-action deleteComponent" title="Delete Component">Delete Component</a>
-                                                                </div>
-                                                                <div class="form-group col-md-6">
-                                                                    <label class="control-label" for="fieldAppendText">Append Text</label>
-                                                                    <input type="text" id="fieldAppendText" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].fieldAppendText" value="${elementComponents.fieldAppendText}" maxLength="255" class="form-control fieldLabel" />
                                                                 </div>
                                                             </div>
                                                         </div>

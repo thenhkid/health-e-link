@@ -5,6 +5,8 @@
  */
 package com.ut.healthelink.controller;
 
+import com.ut.healthelink.model.WSMessagesIn;
+import com.ut.healthelink.model.activityReportList;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.TransportMethod;
@@ -17,12 +19,15 @@ import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationTransport;
+import com.ut.healthelink.model.wsMessagesOut;
+import com.ut.healthelink.model.custom.TableData;
 import com.ut.healthelink.model.custom.TransErrorDetail;
 import com.ut.healthelink.model.custom.TransErrorDetailDisplay;
 import com.ut.healthelink.model.custom.searchParameters;
 import com.ut.healthelink.model.fieldSelectOptions;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.pendingDeliveryTargets;
+import com.ut.healthelink.model.referralActivityExports;
 import com.ut.healthelink.model.systemSummary;
 import com.ut.healthelink.model.transactionIn;
 import com.ut.healthelink.model.transactionInRecords;
@@ -30,6 +35,8 @@ import com.ut.healthelink.model.transactionOutRecords;
 import com.ut.healthelink.model.transactionRecords;
 import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.reference.fileSystem;
+import com.ut.healthelink.security.decryptObject;
+import com.ut.healthelink.security.encryptObject;
 import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.configurationTransportManager;
 import com.ut.healthelink.service.fileManager;
@@ -39,12 +46,18 @@ import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.transactionInManager;
 import com.ut.healthelink.service.transactionOutManager;
 import com.ut.healthelink.service.userManager;
+import com.ut.healthelink.webServices.WSManager;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,6 +126,11 @@ public class adminProcessingActivity {
 
     @Autowired
     private fileManager filemanager;
+    
+    @Autowired
+    private  WSManager wsmanager;
+    
+    private String topSecret = "Hello123JavaTomcatMysqlDPHSystem2016";
 
     /**
      * The private maxResults variable will hold the number of results to show per list page.
@@ -120,6 +138,203 @@ public class adminProcessingActivity {
     private static int maxResults = 10;
 
     private String archivePath = "/bowlink/archivesIn/";
+    
+    
+    /**
+     * 
+     */
+    @RequestMapping(value = "/activityReport", method = RequestMethod.GET)
+    public ModelAndView activityReport(HttpSession session) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+        
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/activityReport");
+        
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+        
+        if ("".equals(searchParameters.getsection()) || !"activityReport".equals(searchParameters.getsection())) {
+            searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setsection("activityReport");
+        } else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+        }
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+        
+        /* Get the list of batches for the passed in dates */
+        List<Integer> batchIds = transactionInManager.getBatchesForReport(fromDate, toDate);
+        
+        /* Get totals */
+        BigInteger totalReferrals = transactionInManager.getReferralCount(batchIds);
+        mav.addObject("totalReferrals", totalReferrals);
+        
+        
+        BigInteger totalFBReports = transactionInManager.getFeedbackReportCount(batchIds);
+        mav.addObject("totalFBReports", totalFBReports);
+        
+        BigInteger totalRejected = transactionInManager.getRejectedCount(fromDate, toDate);
+        mav.addObject("totalRejected", totalRejected);
+        
+        /* Get FB List */
+        List<activityReportList> feedbackReportList = transactionInManager.getFeedbackReportList(batchIds);
+        mav.addObject("feedbackReportList", feedbackReportList);
+        
+        Map<String, BigInteger> fbMade = new HashMap<String, BigInteger>();
+        
+        if(feedbackReportList != null && !feedbackReportList.isEmpty()) {
+            for(activityReportList fb : feedbackReportList) {
+
+                if(fbMade.containsKey(fb.getMessageType())) {
+                    BigInteger currTotal = fbMade.get(fb.getMessageType());
+                    currTotal = currTotal.add(fb.getTotal());
+                    fbMade.put(fb.getMessageType(),currTotal);
+                }
+                else {
+                    fbMade.put(fb.getMessageType(), fb.getTotal());
+                }
+            }
+        }
+        mav.addObject("fbTypesMade", fbMade);
+        
+        /* Get Referral List */
+        List<activityReportList> referralList = transactionInManager.getReferralList(batchIds);
+        mav.addObject("referralList", referralList);      
+        
+        Map<String, BigInteger> referralsMade = new HashMap<String, BigInteger>();
+        
+        if(referralList != null && !referralList.isEmpty()) {
+            for(activityReportList referral : referralList) {
+
+                if(referralsMade.containsKey(referral.getMessageType())) {
+                    BigInteger currTotal = referralsMade.get(referral.getMessageType());
+                    currTotal = currTotal.add(referral.getTotal());
+                    referralsMade.put(referral.getMessageType(),currTotal);
+                }
+                else {
+                    referralsMade.put(referral.getMessageType(), referral.getTotal());
+                }
+            }
+        }
+        mav.addObject("referralTypesMade", referralsMade);
+        
+         /* Get the activity status totals */
+        List<Integer> activityStatusTotals = transactionInManager.getActivityStatusTotals(batchIds);
+        if (activityStatusTotals.size() != 0) {
+        	mav.addObject("totalCompleted", activityStatusTotals.get(0));
+        	mav.addObject("totalEnrolled", activityStatusTotals.get(1));
+        } else  {
+        	mav.addObject("totalCompleted", 0);
+        	mav.addObject("totalEnrolled", 0);
+        }
+        
+        
+        return mav;
+
+    }
+    
+    /**
+     * 
+     */
+    @RequestMapping(value = "/activityReport", method = RequestMethod.POST)
+    public ModelAndView activityReport(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/activityReport");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+        searchParameters.setfromDate(fromDate);
+        searchParameters.settoDate(toDate);
+        searchParameters.setsection("activityReport");
+        
+         /* Get the list of batches for the passed in dates */
+        List<Integer> batchIds = transactionInManager.getBatchesForReport(fromDate, toDate);
+        
+        /* Get totals */
+        BigInteger totalReferrals = transactionInManager.getReferralCount(batchIds);
+        mav.addObject("totalReferrals", totalReferrals);
+        
+        BigInteger totalFBReports = transactionInManager.getFeedbackReportCount(batchIds);
+        mav.addObject("totalFBReports", totalFBReports);
+        
+        BigInteger totalRejected = transactionInManager.getRejectedCount(fromDate, toDate);
+        mav.addObject("totalRejected", totalRejected);
+        
+        /* Get FB List */
+        List<activityReportList> feedbackReportList = transactionInManager.getFeedbackReportList(batchIds);
+        mav.addObject("feedbackReportList", feedbackReportList);
+        
+        Map<String, BigInteger> fbMade = new HashMap<String, BigInteger>();
+        
+        if(feedbackReportList != null && !feedbackReportList.isEmpty()) {
+            for(activityReportList fb : feedbackReportList) {
+
+                if(fbMade.containsKey(fb.getMessageType())) {
+                    BigInteger currTotal = fbMade.get(fb.getMessageType());
+                    currTotal = currTotal.add(fb.getTotal());
+                    fbMade.put(fb.getMessageType(),currTotal);
+                }
+                else {
+                    fbMade.put(fb.getMessageType(), fb.getTotal());
+                }
+            }
+        }
+        mav.addObject("fbTypesMade", fbMade);
+        
+        /* Get Referral List */
+        List<activityReportList> referralList = transactionInManager.getReferralList(batchIds);
+        mav.addObject("referralList", referralList);      
+        
+        Map<String, BigInteger> referralsMade = new HashMap<String, BigInteger>();
+        
+        if(referralList != null && !referralList.isEmpty()) {
+            for(activityReportList referral : referralList) {
+
+                if(referralsMade.containsKey(referral.getMessageType())) {
+                    BigInteger currTotal = referralsMade.get(referral.getMessageType());
+                    currTotal = currTotal.add(referral.getTotal());
+                    referralsMade.put(referral.getMessageType(),currTotal);
+                }
+                else {
+                    referralsMade.put(referral.getMessageType(), referral.getTotal());
+                }
+            }
+        }
+        mav.addObject("referralTypesMade", referralsMade);
+        
+        /* Get the activity status totals */
+        List<Integer> activityStatusTotals = transactionInManager.getActivityStatusTotals(batchIds);
+        if (activityStatusTotals.size() != 0) {
+        	mav.addObject("totalCompleted", activityStatusTotals.get(0));
+        	mav.addObject("totalEnrolled", activityStatusTotals.get(1));
+        } else  {
+        	mav.addObject("totalCompleted", 0);
+        	mav.addObject("totalEnrolled", 0);
+        }
+        return mav;
+
+    }
 
     /**
      * The '/inbound' GET request will serve up the existing list of generated referrals and feedback reports
@@ -172,7 +387,7 @@ public class adminProcessingActivity {
             List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, fetchCount);
 
             if (!uploadedBatches.isEmpty()) {
-
+                
                 //we can map the process status so we only have to query once
                 List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
@@ -202,7 +417,51 @@ public class adminProcessingActivity {
                 }
 
                 for (batchUploads batch : uploadedBatches) {
-
+                    
+                    Integer totalOpen = 0;
+                    Integer totalClosed = 0;
+                    
+                    //Get the upload type (Referral or Feedback Report
+                    List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
+                    
+                    if(!transactions.isEmpty()) {
+                        
+                        transactionIn transactionDetails = transactionInManager.getTransactionDetails(transactions.get(0).getId());
+                        if(transactionDetails.gettransactionTargetId() > 0) {
+                            batch.setUploadType("Feedback Report");
+                            
+                            transactionTarget targetDetails = transactionInManager.getTransactionTargetDetails(transactionDetails.gettransactionTargetId());
+                            
+                            if(targetDetails != null) {
+                                /* Get the originating referall batch ID */
+                                batchUploads referringbatch = transactionInManager.getBatchDetails(targetDetails.getbatchUploadId());
+                                batch.setReferringBatch(referringbatch.getutBatchName());
+                            }
+                            else {
+                                batch.setReferringBatch("Not Found");
+                            }
+                            
+                        }
+                        else {
+                            batch.setUploadType("Referral");
+                            
+                            for(transactionIn transaction : transactions) {
+                                if(transaction.getmessageStatus() == 1) {
+                                    totalOpen+=1;
+                                }
+                                else {
+                                    totalClosed += 1;
+                                }
+                            }
+                            
+                            batch.setTotalOpen(totalOpen);
+                            batch.setTotalClosed(totalClosed);
+                        }
+                    }
+                    else {
+                        batch.setUploadType("Referral");
+                    }
+                    
                     //the count is in totalRecordCount already, can skip re-count
                     // batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, false, false));
                     batch.setstatusValue(psMap.get(batch.getstatusId()));
@@ -261,7 +520,7 @@ public class adminProcessingActivity {
         systemSummary summaryDetails = transactionInManager.generateSystemInboundSummary();
         mav.addObject("summaryDetails", summaryDetails);
 
-        /* Get all inbound transactions */
+        /* Get all inbound transactions */ 
         try {
 
             Integer fetchCount = 0;
@@ -298,6 +557,52 @@ public class adminProcessingActivity {
                 }
 
                 for (batchUploads batch : uploadedBatches) {
+                    
+                    Integer totalOpen = 0;
+                    Integer totalClosed = 0;
+                    
+                    //Get the upload type (Referral or Feedback Report
+                    List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
+                    
+                    if(!transactions.isEmpty()) {
+                        transactionIn transactionDetails = transactionInManager.getTransactionDetails(transactions.get(0).getId());
+                        if(transactionDetails.gettransactionTargetId() > 0) {
+                            batch.setUploadType("Feedback Report");
+                            
+                            transactionTarget targetDetails = transactionInManager.getTransactionTargetDetails(transactionDetails.gettransactionTargetId());
+                            
+                            if(targetDetails != null) {
+                                /* Get the originating referall batch ID */
+                                batchUploads referringbatch = transactionInManager.getBatchDetails(targetDetails.getbatchUploadId());
+                                batch.setReferringBatch(referringbatch.getutBatchName());
+                            }
+                            else {
+                                batch.setReferringBatch("Not Found");
+                            }
+                            
+                        }
+                        else {
+                            batch.setUploadType("Referral");
+                            
+                            for(transactionIn transaction : transactions) {
+                                if(transaction.getmessageStatus() == 1) {
+                                    totalOpen+=1;
+                                }
+                                else {
+                                    totalClosed += 1;
+                                }
+                            }
+                            
+                            batch.setTotalOpen(totalOpen);
+                            batch.setTotalClosed(totalClosed);
+                        }
+                    }
+                    else {
+                        batch.setUploadType("Referral");
+                        batch.setTotalOpen(totalOpen);
+                        batch.setTotalClosed(totalClosed);
+                    }
+                    
                     batch.setstatusValue(psMap.get(batch.getstatusId()));
 
                     batch.setorgName(orgMap.get(batch.getOrgId()));
@@ -357,7 +662,7 @@ public class adminProcessingActivity {
         mav.addObject("toDate", toDate);
         mav.addObject("originalDate", originalDate);
 
-        /* Get system inbound summary */
+        /* Get system oubound summary */
         systemSummary summaryDetails = transactionOutManager.generateSystemOutboundSummary();
         mav.addObject("summaryDetails", summaryDetails);
 
@@ -400,7 +705,7 @@ public class adminProcessingActivity {
 
                 for (batchDownloads batch : Batches) {
 
-                    if (batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
+                    if (batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5 || batch.gettransportMethodId() == 6) {
                         String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf(".") + 1);
                         String newfileName = new StringBuilder().append(batch.getutBatchName()).append(".").append(fileDownloadExt).toString();
 
@@ -476,11 +781,11 @@ public class adminProcessingActivity {
         searchParameters.settoDate(toDate);
         searchParameters.setsection("outbound");
 
-        /* Get system inbound summary */
+        /* Get system oubound summary */
         systemSummary summaryDetails = transactionOutManager.generateSystemOutboundSummary();
         mav.addObject("summaryDetails", summaryDetails);
 
-        /* Get all inbound transactions */
+        /* Get all oubound transactions */
         try {
             /* Need to get a list of all uploaded batches */
             List<batchDownloads> Batches = transactionOutManager.getAllBatches(fromDate, toDate);
@@ -518,7 +823,7 @@ public class adminProcessingActivity {
             if (!Batches.isEmpty()) {
                 for (batchDownloads batch : Batches) {
 
-                    if (batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
+                    if (batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5 || batch.gettransportMethodId() == 6) {
                         String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf(".") + 1);
                         String newfileName = new StringBuilder().append(batch.getutBatchName()).append(".").append(fileDownloadExt).toString();
 
@@ -572,11 +877,12 @@ public class adminProcessingActivity {
      *
      * @throws Exception
      */
-    @RequestMapping(value = "/inbound/batch/{batchName}", method = RequestMethod.GET)
-    public ModelAndView listBatchTransactions(@PathVariable String batchName) throws Exception {
+    @RequestMapping(value = "/{path}/batch/{batchName}", method = RequestMethod.GET)
+    public ModelAndView listBatchTransactions(@PathVariable String path, @PathVariable String batchName) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/processing-activity/transactions");
+        mav.addObject("page", path);
 
         /* Get the details of the batch */
         batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
@@ -608,6 +914,7 @@ public class adminProcessingActivity {
                     transactionDetails.setstatusId(transaction.getstatusId());
                     transactionDetails.setdateSubmitted(transaction.getdateCreated());
                     transactionDetails.setconfigId(transaction.getconfigId());
+                    transactionDetails.setmessageStatus(transaction.getmessageStatus());
                     
                     transactionDetails.setstatusValue(psMap.get(transaction.getstatusId()));
 
@@ -772,6 +1079,29 @@ public class adminProcessingActivity {
                     List<transactionRecords> fromFields;
                     if (!sourceInfoFormFields.isEmpty()) {
                         fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
+                        
+                        int sourceOrgAsInt = 0;
+                    
+                        try {
+                            sourceOrgAsInt = Integer.parseInt(fromFields.get(0).getFieldValue().trim());
+                        } catch (Exception e) {
+                            sourceOrgAsInt = 0;
+                        }
+
+                        if(sourceOrgAsInt > 0) {
+                            /* Make sure the org exists */
+                            Organization fromorgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
+                            if(fromorgDetails.getId() == sourceOrgAsInt) {
+                                fromFields = setOrgDetails(sourceOrgAsInt);
+                            }
+                            else {
+                                fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
+                            }
+                        }
+                        else if ("".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                            fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
+                        }
+                        
                     } else {
                         fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                     }
@@ -1065,10 +1395,29 @@ public class adminProcessingActivity {
                 List<transactionRecords> toFields;
                 if (!targetInfoFormFields.isEmpty()) {
                     toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), 0, true, 0);
+                    
+                    int targetOrgAsInt;
 
-                    if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                    try {
+                        targetOrgAsInt = Integer.parseInt(toFields.get(0).getFieldValue().trim());
+                    } catch (Exception e) {
+                        targetOrgAsInt = 0;
+                    }
+
+                    if(targetOrgAsInt > 0) {
+                        /* Make sure the org exists */
+                        Organization orgDetails = organizationmanager.getOrganizationById(targetOrgAsInt);
+                        if(orgDetails.getId() == targetOrgAsInt) {
+                            toFields = setOrgDetails(targetOrgAsInt);
+                        }
+                        else {
+                            toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                        }
+                    }
+                    else if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
                         toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
                     }
+                    
                 } else {
                     toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
                 }
@@ -1126,6 +1475,30 @@ public class adminProcessingActivity {
                 List<transactionRecords> fromFields;
                 if (!senderInfoFormFields.isEmpty()) {
                     fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                    
+                    int sourceOrgAsInt = 0;
+                    
+                    try {
+                        sourceOrgAsInt = Integer.parseInt(fromFields.get(0).getFieldValue().trim());
+                    } catch (Exception e) {
+                        sourceOrgAsInt = 0;
+                    }
+                    
+                    if(sourceOrgAsInt > 0) {
+                        /* Make sure the org exists */
+                        Organization orgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
+                        if(orgDetails.getId() == sourceOrgAsInt) {
+                            fromFields = setOrgDetails(sourceOrgAsInt);
+                        }
+                        else {
+                            fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
+                        }
+                    }
+                    else if ("".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                        fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
+                    }
+                    
+                    
                 } else {
                     fromFields = setOrgDetails(batchInfo.getOrgId());
                 }
@@ -1139,10 +1512,29 @@ public class adminProcessingActivity {
                 List<transactionRecords> toFields;
                 if (!targetInfoFormFields.isEmpty()) {
                     toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                    
+                    int targetOrgAsInt;
 
-                    if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                    try {
+                        targetOrgAsInt = Integer.parseInt(toFields.get(0).getFieldValue().trim());
+                    } catch (Exception e) {
+                        targetOrgAsInt = 0;
+                    }
+
+                    if(targetOrgAsInt > 0) {
+                        /* Make sure the org exists */
+                        Organization orgDetails = organizationmanager.getOrganizationById(targetOrgAsInt);
+                        if(orgDetails.getId() == targetOrgAsInt) {
+                            toFields = setOrgDetails(targetOrgAsInt);
+                        }
+                        else {
+                            toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                        }
+                    }
+                    else if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
                         toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
                     }
+
                 } else {
                     toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
                 }
@@ -1295,12 +1687,12 @@ public class adminProcessingActivity {
                 }
 
                 /* If autopopulate field is set make it read only */
-                if (!tableName.isEmpty() && !tableCol.isEmpty()) {
+                if (tableName != null && tableCol != null && !tableName.isEmpty() && !tableCol.isEmpty()) {
                     field.setreadOnly(true);
                 }
             } else if (orgId > 0) {
 
-                if (!tableName.isEmpty() && !tableCol.isEmpty()) {
+                if (tableName != null && tableCol != null && !tableName.isEmpty() && !tableCol.isEmpty()) {
                     field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, "id", orgId));
                 }
             }
@@ -1525,11 +1917,12 @@ public class adminProcessingActivity {
      *
      * @throws Exception
      */
-    @RequestMapping(value = "/inbound/batchActivities/{batchName}", method = RequestMethod.GET)
-    public ModelAndView listBatchActivities(@PathVariable String batchName) throws Exception {
+    @RequestMapping(value = "/{path}/batchActivities/{batchName}", method = RequestMethod.GET)
+    public ModelAndView listBatchActivities(@PathVariable String path, @PathVariable String batchName) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/processing-activity/batchActivities");
+        mav.addObject("page", path);
 
         /* Get the details of the batch */
         batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
@@ -1597,11 +1990,12 @@ public class adminProcessingActivity {
      *
      * @throws Exception
      */
-    @RequestMapping(value = "/inbound/auditReport/{batchName}", method = RequestMethod.GET)
-    public ModelAndView viewAuditReport(@PathVariable String batchName) throws Exception {
+    @RequestMapping(value = "/{path}/auditReport/{batchName}", method = RequestMethod.GET)
+    public ModelAndView viewInboundAuditReport(@PathVariable String path, @PathVariable String batchName) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/processing-activity/auditReport");
+        mav.addObject("page", path);
         boolean canCancel = false;
         boolean canReset = false;
         boolean canEdit = false;
@@ -1618,19 +2012,19 @@ public class adminProcessingActivity {
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
             batchDetails.setstatusValue(processStatus.getDisplayCode());
 
-            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8, 35);
+            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8, 35, 60);
             if (!cancelStatusList.contains(batchDetails.getstatusId())) {
                 canCancel = true;
             }
 
-            List<Integer> resetStatusList = Arrays.asList(2, 22, 23, 1, 8, 35); //DNP (21) is not a final status for admin
+            List<Integer> resetStatusList = Arrays.asList(2, 22, 23, 1, 8, 35, 60); //DNP (21) is not a final status for admin
             if (!resetStatusList.contains(batchDetails.getstatusId())) {
                 canReset = true;
             }
 
             if (batchDetails.getstatusId() == 5) {
                 // now we check so we don't have to make a db hit if batch status is not 5 
-                if (transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(11, 12, 13, 16), false, false) == 0) {
+                if (transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(11,12,13,16,18,20), false, false) == 0) {
                     canSend = true;
                 }
             }
@@ -1699,10 +2093,11 @@ public class adminProcessingActivity {
 
         if (userInfo != null && batchDetails != null) {
             if (batchOption.equalsIgnoreCase("processBatch")) {
-                if (batchDetails.getstatusId() == 2) {
+                if (batchDetails.getstatusId() == 2 || batchDetails.getstatusId() == 42 ) {
                     strBatchOption = "Loaded Batch";
                     transactionInManager.loadBatch(batchId);
-                } else if (batchDetails.getstatusId() == 3 || batchDetails.getstatusId() == 36) {
+                } else if (batchDetails.getstatusId() == 3 || batchDetails.getstatusId() == 36
+                		|| batchDetails.getstatusId() == 43 ) {
                     strBatchOption = "Processed Batch";
                     transactionInManager.processBatch(batchId, false, 0);
                 }
@@ -1744,7 +2139,30 @@ public class adminProcessingActivity {
                         Path target = newFile.toPath();
                         Files.copy(source, target);
                         
-                    } else {
+                    } else if (batchDetails.gettransportMethodId() == 6) {
+                    	//we reset ws message to 1 so it will get pick up again
+                    	 strBatchOption = "Reset Batch  - Web Service Reset";
+                    	 //we error out old batch
+                    	 transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+                    	 //targets could be created already so we need to update the target status by upload batchId 
+                         transactionInManager.updateTranTargetStatusByUploadBatchId(batchId, 0, 31);
+                         transactionInManager.updateBatchDLStatusByUploadBatchId(batchId, 0, 35, "endDateTime");
+                         transactionInManager.updateTransactionStatus(batchId, 0, 0, 31);
+                         transactionInManager.updateBatchStatus(batchId, 35, "endDateTime");
+                   
+                    	 //we reinsert wsmessageIn
+                         List<WSMessagesIn> wsMessagesList = wsmanager.getWSMessagesInByBatchId(batchDetails.getId());
+                         WSMessagesIn newWSIn = new WSMessagesIn();
+                         WSMessagesIn copyWSIn = wsMessagesList.get(0);
+                         newWSIn.setOrgId(copyWSIn.getOrgId());
+                         newWSIn.setStatusId(1);
+                         newWSIn.setDomain(copyWSIn.getDomain());
+                         newWSIn.setFromAddress(copyWSIn.getFromAddress());
+                         newWSIn.setPayload(copyWSIn.getPayload());
+                         newWSIn.setDateCreated(copyWSIn.getDateCreated());
+                         wsmanager.saveWSMessagesIn(newWSIn);
+                    	
+                    } else{
 
                         transactionInManager.updateBatchStatus(batchId, 4, "");
                         //2. clear
@@ -2147,5 +2565,1050 @@ public class adminProcessingActivity {
         return 1;
 
     }
+    
+    
+    /**
+     * The '/referralActivityExport' GET request will return the latest export created
+     * 
+     * @param session
+     * @return
+     * @throws Exception 
+     */
+    @RequestMapping(value = "/referralActivityExport", method = RequestMethod.GET)
+    public ModelAndView referralActivityExport(HttpSession session) throws Exception {
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+        
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/referralActivityExport");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+        
+        List<referralActivityExports> exports = transactionInManager.getReferralActivityExportsWithUserNames(Arrays.asList(1,2,3,4,6));
+        encryptObject encrypt = new encryptObject();
+        Map<String, String> map;
+        for (referralActivityExports export : exports) {
+        	//Encrypt the use id to pass in the url
+            map = new HashMap<String, String>();
+            map.put("id", Integer.toString(export.getId()));
+            map.put("topSecret", topSecret);
 
+            String[] encrypted = encrypt.encryptObject(map);
+            export.setEncryptedId(encrypted[0]);
+            export.setEncryptedSecret(encrypted[1]);
+        }
+        mav.addObject("exports", exports);
+        
+        return mav;
+    }
+    
+    /**
+     * The '/referralActivityExport' POST method will generate add an entry into the existing table.
+     * @param session
+     * @return
+     * @throws Exception 
+     */
+    @RequestMapping(value = "/referralActivityExport", method = RequestMethod.POST)
+    public ModelAndView referralActivityExport(@RequestParam Date fromDate, @RequestParam Date toDate, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        User userInfo = (User) session.getAttribute("userDetails");
+        
+        /** insert a new export **/
+        referralActivityExports export  = new referralActivityExports();
+        
+        export.setCreatedBy(userInfo.getId());
+        export.setToDate(toDate);
+        export.setFromDate(fromDate);
+        
+        DateFormat selDateRangeFormat = new SimpleDateFormat("MM/dd/yyyy");
+        export.setSelDateRange(selDateRangeFormat.format(fromDate) + " - " + selDateRangeFormat.format(toDate));
+        export.setStatusId(1);
+        transactionInManager.saveReferralActivityExport(export); 
+        
+        
+        ModelAndView mav = new ModelAndView(new RedirectView("referralActivityExport"));
+        return mav;
+        
+    }
+    
+    
+    /**
+     * The '/wsmessage' GET request will serve up the list of inbound web services messages
+     *
+     *
+     * @Objects	(1) An object containing all the found wsMessagesIn
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/wsmessage", method = RequestMethod.GET)
+    public ModelAndView listInBoundWSmessages(HttpSession session) throws Exception {
+    	
+    	int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/wsmessage");
+
+        if ("".equals(searchParameters.getsection()) || !"inbound".equals(searchParameters.getsection())) {
+            searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setsection("inbound");
+        } else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+        }
+
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        /* Get all ws messages */
+        try {
+
+            Integer fetchCount = 0;
+            List<WSMessagesIn> wsMessagesList = wsmanager.getWSMessagesInList(fromDate, toDate, fetchCount);
+
+            if (!wsMessagesList.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+            	List<TableData> errorCodeList = sysAdminManager.getDataList("lu_ErrorCodes", "");
+                Map<Integer, String> errorMap = new HashMap<Integer, String>();
+                for (TableData error : errorCodeList) {
+                    errorMap.put(error.getId(), error.getDisplayText());
+                }
+                
+                //ws status map
+                Map<Integer, String> statusMap = new HashMap<Integer, String>();
+                statusMap.put(1, "To be processed");
+                statusMap.put(2, "Processed");
+                statusMap.put(3, "Rejected");
+                statusMap.put(4, "Being Process");
+                
+                
+                //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+                List<Organization> organizations = organizationmanager.getOrganizations();
+                Map<Integer, String> orgMap = new HashMap<Integer, String>();
+                for (Organization org : organizations) {
+                    orgMap.put(org.getId(), org.getOrgName());
+                }
+
+                for (WSMessagesIn wsIn : wsMessagesList) {
+                	//set error text
+                	wsIn.setErrorDisplayText(errorMap.get(wsIn.getErrorId()));
+                	//set org name
+                	if (wsIn.getOrgId() == 0) {
+                		wsIn.setOrgName("No Org Match");
+                	} else {
+                		wsIn.setOrgName(orgMap.get(wsIn.getOrgId()));
+                	}
+                	//set status
+                	wsIn.setStatusName(statusMap.get(wsIn.getStatusId()));
+                	
+                	if (wsIn.getBatchUploadId() != 0) {
+                		wsIn.setBatchName(transactionInManager.getBatchDetails(wsIn.getBatchUploadId()).getutBatchName());
+                	}
+                }
+            }
+
+            mav.addObject("wsMessages", wsMessagesList);
+
+        } catch (Exception e) {
+            throw new Exception("Error occurred viewing the all web service messages.", e);
+        }
+
+        return mav;
+
+    }
+
+    /**
+     * The '/wsMessage' POST request will serve up a list of 
+     * WSMessages received by the system.
+     *
+     * @param page	The page parameter will hold the page to view when pagination is built.
+     * @return The list of wsMessages
+     *
+     * @Objects	(1) An object containing all the found wsMessages
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/wsmessage", method = RequestMethod.POST)
+    public ModelAndView listWSMessages(@RequestParam Date fromDate, @RequestParam Date toDate, 
+    		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/wsmessage");
+
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+        searchParameters.setfromDate(fromDate);
+        searchParameters.settoDate(toDate);
+        searchParameters.setsection("inbound");
+
+        /* Get all ws in  */ 
+        try {
+        	Integer fetchCount = 0;
+            List<WSMessagesIn> wsMessagesList = wsmanager.getWSMessagesInList(fromDate, toDate, fetchCount);
+
+            if (!wsMessagesList.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+            	List<TableData> errorCodeList = sysAdminManager.getDataList("lu_ErrorCodes", "");
+                Map<Integer, String> errorMap = new HashMap<Integer, String>();
+                for (TableData error : errorCodeList) {
+                    errorMap.put(error.getId(), error.getDisplayText());
+                }
+                
+                //ws status map
+                Map<Integer, String> statusMap = new HashMap<Integer, String>();
+                statusMap.put(1, "To be processed");
+                statusMap.put(2, "Processed");
+                statusMap.put(3, "Rejected");
+                
+                //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+                List<Organization> organizations = organizationmanager.getOrganizations();
+                Map<Integer, String> orgMap = new HashMap<Integer, String>();
+                for (Organization org : organizations) {
+                    orgMap.put(org.getId(), org.getOrgName());
+                }
+
+                for (WSMessagesIn wsIn : wsMessagesList) {
+                	//set error text
+                	wsIn.setErrorDisplayText(errorMap.get(wsIn.getErrorId()));
+                	//set org name
+                	if (wsIn.getOrgId() == 0) {
+                		wsIn.setOrgName("No Org Match");
+                	} else {
+                		wsIn.setOrgName(orgMap.get(wsIn.getOrgId()));
+                	}
+                	//set status
+                	wsIn.setStatusName(statusMap.get(wsIn.getStatusId()));
+                	if (wsIn.getBatchUploadId() != 0) {
+                		wsIn.setBatchName(transactionInManager.getBatchDetails(wsIn.getBatchUploadId()).getutBatchName());
+                	}
+                	
+                }
+            }
+
+            mav.addObject("wsMessages", wsMessagesList);
+            
+
+        } catch (Exception e) {
+            throw new Exception("Error occurred viewing the all uploaded batches.", e);
+        }
+
+        return mav;
+    }
+
+    /**this displays the payload**/
+    @RequestMapping(value= "/wsmessage/viewPayload.do", method = RequestMethod.POST)
+    public @ResponseBody ModelAndView viewPayload(
+    		@RequestParam Integer wsId) 
+    throws Exception {
+    	
+    	ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activities/viewPayload");
+        WSMessagesIn wsMessage = wsmanager.getWSMessagesIn(wsId);   
+        String payload = "";
+        if (wsMessage != null) {
+        	payload = wsMessage.getPayload();
+        }
+        
+        mav.addObject("payload", payload);
+
+        return mav;
+
+    }
+    
+    /**
+     * The '/rejected' GET request will serve up the existing list of referrals with at least one rejected
+     * transaction.
+     *
+     * @param page	The page parameter will hold the page to view when pagination is built.
+     * @return The list of batches with rejected transactions
+     *
+     * @Objects	(1) An object containing all the found batches
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/rejected", method = RequestMethod.GET)
+    public ModelAndView listRejectedBatches(HttpSession session) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/rejected");
+
+        if ("".equals(searchParameters.getsection()) || !"rejected".equals(searchParameters.getsection())) {
+            searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setsection("rejected");
+        } else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+        }
+
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        
+        /* Get all inbound transactions */
+        try {
+
+            Integer fetchCount = 0;
+            List<batchUploads> rejectedBatches = transactionInManager.getAllRejectedBatches(fromDate, toDate, fetchCount);
+
+            if (!rejectedBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getDisplayCode());
+                }
+
+                //same with transport method names
+                List<TransportMethod> transporthMethods = configurationTransportManager.getTransportMethods(Arrays.asList(0, 1));
+                Map<Integer, String> tmMap = new HashMap<Integer, String>();
+                for (TransportMethod tms : transporthMethods) {
+                    tmMap.put(tms.getId(), tms.getTransportMethod());
+                }
+
+                //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+                List<Organization> organizations = organizationmanager.getOrganizations();
+                Map<Integer, String> orgMap = new HashMap<Integer, String>();
+                for (Organization org : organizations) {
+                    orgMap.put(org.getId(), org.getOrgName());
+                }
+
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+
+                for (batchUploads batch : rejectedBatches) {
+                    
+                    //Get the upload type (Referral or Feedback Report
+                    List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
+                    
+                    if(!transactions.isEmpty()) {
+                        
+                        transactionIn transactionDetails = transactionInManager.getTransactionDetails(transactions.get(0).getId());
+                        if(transactionDetails.gettransactionTargetId() > 0) {
+                            batch.setUploadType("Feedback Report");
+                            
+                            transactionTarget targetDetails = transactionInManager.getTransactionTargetDetails(transactionDetails.gettransactionTargetId());
+                            
+                            if(targetDetails != null) {
+                                /* Get the originating referall batch ID */
+                                batchUploads referringbatch = transactionInManager.getBatchDetails(targetDetails.getbatchUploadId());
+                                batch.setReferringBatch(referringbatch.getutBatchName());
+                            }
+                            else {
+                                batch.setReferringBatch("Not Found");
+                            }
+                            
+                        }
+                        else {
+                            batch.setUploadType("Referral");
+                            
+                        }
+                    }
+                    else {
+                        batch.setUploadType("Referral");
+                    }
+                    
+                    //the count is in totalRecordCount already, can skip re-count
+                    // batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, false, false));
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
+
+                    batch.setorgName(orgMap.get(batch.getOrgId()));
+
+                    batch.settransportMethod(tmMap.get(batch.gettransportMethodId()));
+
+                    batch.setusersName(userMap.get(batch.getuserId()));
+
+                }
+            }
+
+            mav.addObject("batches", rejectedBatches);
+
+        } catch (Exception e) {
+            throw new Exception("Error occurred viewing the batches with rejected transactions", e);
+        }
+
+        return mav;
+
+    }
+
+    /**
+     * The '/rejected' POST request will serve up the existing list of referrals with at least one rejected
+     * transaction.
+     *
+     * @param page	The page parameter will hold the page to view when pagination is built.
+     * @return The list of batches with rejected transactions
+     *
+     * @Objects	(1) An object containing all the found batches
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/rejected", method = RequestMethod.POST)
+    public ModelAndView listRejectedBatches(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/rejected");
+
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+        searchParameters.setfromDate(fromDate);
+        searchParameters.settoDate(toDate);
+        searchParameters.setsection("rejected");
+
+        /* Get all inbound transactions */ 
+        try {
+
+            Integer fetchCount = 0;
+            /* Need to get a list of all uploaded batches */
+            List<batchUploads> rejectedBatches = transactionInManager.getAllRejectedBatches(fromDate, toDate, fetchCount);
+
+            if (!rejectedBatches.isEmpty()) {
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getDisplayCode());
+                }
+
+                //same with transport method names
+                List<TransportMethod> transporthMethods = configurationTransportManager.getTransportMethods(Arrays.asList(0, 1));
+                Map<Integer, String> tmMap = new HashMap<Integer, String>();
+                for (TransportMethod tms : transporthMethods) {
+                    tmMap.put(tms.getId(), tms.getTransportMethod());
+                }
+
+                //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+                List<Organization> organizations = organizationmanager.getOrganizations();
+                Map<Integer, String> orgMap = new HashMap<Integer, String>();
+                for (Organization org : organizations) {
+                    orgMap.put(org.getId(), org.getOrgName());
+                }
+
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+
+                for (batchUploads batch : rejectedBatches) {
+                    
+                    //Get the upload type (Referral or Feedback Report
+                    List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
+                    
+                    if(!transactions.isEmpty()) {
+                        transactionIn transactionDetails = transactionInManager.getTransactionDetails(transactions.get(0).getId());
+                        if(transactionDetails.gettransactionTargetId() > 0) {
+                            batch.setUploadType("Feedback Report");
+                            
+                            transactionTarget targetDetails = transactionInManager.getTransactionTargetDetails(transactionDetails.gettransactionTargetId());
+                            
+                            if(targetDetails != null) {
+                                /* Get the originating referall batch ID */
+                                batchUploads referringbatch = transactionInManager.getBatchDetails(targetDetails.getbatchUploadId());
+                                batch.setReferringBatch(referringbatch.getutBatchName());
+                            }
+                            else {
+                                batch.setReferringBatch("Not Found");
+                            }
+                            
+                        }
+                        else {
+                            batch.setUploadType("Referral");
+                            
+                        }
+                    }
+                    else {
+                        batch.setUploadType("Referral");
+                    }
+                    
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
+
+                    batch.setorgName(orgMap.get(batch.getOrgId()));
+
+                    batch.settransportMethod(tmMap.get(batch.gettransportMethodId()));
+
+                    batch.setusersName(userMap.get(batch.getuserId()));
+                }
+            }
+
+            mav.addObject("batches", rejectedBatches);
+
+        } catch (Exception e) {
+            throw new Exception("Error occurred viewing the batches with rejected transactions.", e);
+        }
+
+        return mav;
+    }
+    
+    
+    /**
+     * The '/wsmessageOut' GET request will serve up the list of outbound web services messages
+     *
+     *
+     * @Objects	(1) An object containing all the found wsMessagesOut
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/wsmessageOut", method = RequestMethod.GET)
+    public ModelAndView listInBoundWSmessagesOut(HttpSession session) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/wsmessageOut");
+
+        if ("".equals(searchParameters.getsection()) || !"inbound".equals(searchParameters.getsection())) {
+            searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setsection("inbound");
+        } else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+        }
+
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        /* Get all ws messages */
+        try {
+
+            Integer fetchCount = 0;
+            List<wsMessagesOut> wsMessagesList = wsmanager.getWSMessagesOutList(fromDate, toDate, fetchCount);
+
+            if (!wsMessagesList.isEmpty()) {
+	                    //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+		                List<Organization> organizations = organizationmanager.getOrganizations();
+		                Map<Integer, String> orgMap = new HashMap<Integer, String>();
+		                for (Organization org : organizations) {
+		                    orgMap.put(org.getId(), org.getOrgName());
+		                }
+	
+		                for (wsMessagesOut wsOut : wsMessagesList) {
+		                	//set org name
+		                	if (wsOut.getOrgId() == 0) {
+		                		wsOut.setOrgName("No Org Match");
+		                	} else {
+		                		wsOut.setOrgName(orgMap.get(wsOut.getOrgId()));
+		                	}
+		                	
+		                	if (wsOut.getBatchDownloadId() != 0) {
+		                		wsOut.setBatchName(transactionOutManager.getBatchDetails(wsOut.getBatchDownloadId()).getutBatchName());
+		                	}
+		                }
+	                }
+            
+            mav.addObject("wsMessages", wsMessagesList);
+
+        } catch (Exception e) {
+            throw new Exception("Error occurred viewing the all outbound web service messages.", e);
+        }
+
+        return mav;
+
+    }
+    
+    
+    /**
+     * The '/wsMessageOut' POST request will serve up a list of outbound
+     * WSMessages received by the system.
+     *
+     * @param page	The page parameter will hold the page to view when pagination is built.
+     * @return The list of wsMessages
+     *
+     * @Objects	(1) An object containing all the found wsMessages
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/wsmessageOut", method = RequestMethod.POST)
+    public ModelAndView listWSMessagesOut(@RequestParam Date fromDate, @RequestParam Date toDate, 
+    		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/wsmessageOut");
+
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+        searchParameters.setfromDate(fromDate);
+        searchParameters.settoDate(toDate);
+        searchParameters.setsection("inbound");
+
+        /* Get all ws in  */ 
+        try {
+        	Integer fetchCount = 0;
+            List<wsMessagesOut> wsMessagesList = wsmanager.getWSMessagesOutList(fromDate, toDate, fetchCount);
+
+            if (!wsMessagesList.isEmpty()) {
+                
+                //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+                List<Organization> organizations = organizationmanager.getOrganizations();
+                Map<Integer, String> orgMap = new HashMap<Integer, String>();
+                for (Organization org : organizations) {
+                    orgMap.put(org.getId(), org.getOrgName());
+                }
+
+                for (wsMessagesOut ws : wsMessagesList) {
+                	
+                	if (ws.getOrgId() == 0) {
+                		ws.setOrgName("No Org Match");
+                	} else {
+                		ws.setOrgName(orgMap.get(ws.getOrgId()));
+                	}
+                }
+            }
+
+            mav.addObject("wsMessages", wsMessagesList);
+            
+
+        } catch (Exception e) {
+            throw new Exception("Error occurred viewing the all outbound ws.", e);
+        }
+
+        return mav;
+    }
+
+    
+    /**this displays the soap message**/
+    @RequestMapping(value= "/wsmessage/viewSoapMessage.do", method = RequestMethod.POST)
+    public @ResponseBody ModelAndView viewSoapMessage(
+    		@RequestParam Integer wsId) 
+    throws Exception {
+    	
+    	ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activities/viewSoapMessage");
+        wsMessagesOut wsMessage = wsmanager.getWSMessagesOut(wsId);   
+        mav.addObject("wsMessage", wsMessage);
+
+        return mav;
+
+    }
+    
+    /**this displays the soap response**/
+    @RequestMapping(value= "/wsmessage/viewSoapResponse.do", method = RequestMethod.POST)
+    public @ResponseBody ModelAndView viewSoapResponse(
+    		@RequestParam Integer wsId) 
+    throws Exception {
+    	
+    	ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activities/viewSoapResponse");
+        wsMessagesOut wsMessage = wsmanager.getWSMessagesOut(wsId);   
+        mav.addObject("wsMessage", wsMessage);
+
+        return mav;
+
+    }
+    
+    
+    /**
+     * The '/wsmessageOut' GET request will serve up the list of outbound web services messages
+     *
+     *
+     * @Objects	(1) An object containing all the found wsMessagesOut
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/wsmessageOut/{batchName}", method = RequestMethod.GET)
+    public ModelAndView listSingleWSmessagesOut(HttpSession session, @PathVariable String batchName) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/wsmessageOut");
+
+        if ("".equals(searchParameters.getsection()) || !"inbound".equals(searchParameters.getsection())) {
+            searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setsection("inbound");
+        } else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+        }
+
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        /* Get all ws messages */
+        try {
+
+            /* Get the details of the batch */
+            batchDownloads batchDetails = transactionOutManager.getBatchDetailsByBatchName(batchName);
+
+            List<wsMessagesOut> wsMessagesList = wsmanager.getWSMessagesOutByBatchId(batchDetails.getId());
+
+            if (!wsMessagesList.isEmpty()) {
+	                    for (wsMessagesOut wsOut : wsMessagesList) {
+		                	//set org name
+		                	if (wsOut.getOrgId() == 0) {
+		                		wsOut.setOrgName("No Org Match");
+		                	} else {
+		                		wsOut.setOrgName(organizationmanager.getOrganizationById(wsOut.getOrgId()).getOrgName());
+		                	}
+		                	
+		                	if (wsOut.getBatchDownloadId() != 0) {
+		                		wsOut.setBatchName(transactionOutManager.getBatchDetails(wsOut.getBatchDownloadId()).getutBatchName());
+		                	}
+		                }
+	                }
+            
+            mav.addObject("wsMessages", wsMessagesList);
+
+        } catch (Exception e) {
+            throw new Exception("Error occurred viewing the all web service outbound messages.", e);
+        }
+
+        return mav;
+
+    }
+    
+    /**
+     * The '/wsmessage' GET request will serve up the list of inbound web services messages
+     *
+     *
+     * @Objects	(1) An object containing all the found wsMessagesIn
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/wsmessage/{batchName}", method = RequestMethod.GET)
+    public ModelAndView listInBoundOneWSmessages(HttpSession session, @PathVariable String batchName) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/wsmessage");
+
+        if ("".equals(searchParameters.getsection()) || !"inbound".equals(searchParameters.getsection())) {
+            searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setsection("inbound");
+        } else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+        }
+
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        /* Get all ws messages */
+        try {
+
+        	batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
+            List<WSMessagesIn> wsMessagesList = wsmanager.getWSMessagesInByBatchId(batchDetails.getId());
+
+            if (!wsMessagesList.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+            	List<TableData> errorCodeList = sysAdminManager.getDataList("lu_ErrorCodes", "");
+                Map<Integer, String> errorMap = new HashMap<Integer, String>();
+                for (TableData error : errorCodeList) {
+                    errorMap.put(error.getId(), error.getDisplayText());
+                }
+                
+                //ws status map
+                Map<Integer, String> statusMap = new HashMap<Integer, String>();
+                statusMap.put(1, "To be processed");
+                statusMap.put(2, "Processed");
+                statusMap.put(3, "Rejected");
+                statusMap.put(4, "Being Process");
+
+                for (WSMessagesIn wsIn : wsMessagesList) {
+                	//set error text
+                	wsIn.setErrorDisplayText(errorMap.get(wsIn.getErrorId()));
+                	//set org name
+                	if (wsIn.getOrgId() == 0) {
+                		wsIn.setOrgName("No Org Match");
+                	} else {
+                		wsIn.setOrgName(organizationmanager.getOrganizationById(wsIn.getOrgId()).getOrgName());
+                	}
+                	//set status
+                	wsIn.setStatusName(statusMap.get(wsIn.getStatusId()));
+                	
+                	if (wsIn.getBatchUploadId() != 0) {
+                		wsIn.setBatchName(transactionInManager.getBatchDetails(wsIn.getBatchUploadId()).getutBatchName());
+                	}
+                }
+            }
+
+            mav.addObject("wsMessages", wsMessagesList);
+
+        } catch (Exception e) {
+            throw new Exception("Error occurred viewing the single inbound web service messages.", e);
+        }
+
+        return mav;
+
+    }
+    
+    
+    @RequestMapping(value = "/dlExport", method = {RequestMethod.GET})
+    public void dlExport(@RequestParam String i, @RequestParam String v, 
+    		HttpSession session, HttpServletResponse response) throws Exception {
+    	
+    	User userDetails = new User();
+    	Integer exportId = 0;
+    	
+    	boolean canViewReport = false;
+    	if (session.getAttribute("userDetails") != null) {
+    		userDetails = (User) session.getAttribute("userDetails");
+    		//1 decrpt and get the reportId
+            decryptObject decrypt = new decryptObject();
+            Object obj = decrypt.decryptObject(i, v);
+            String[] result = obj.toString().split((","));
+            exportId = Integer.parseInt(result[0].substring(4));
+            
+            //now we get the report details
+            referralActivityExports export = transactionInManager.getReferralActivityExportById(exportId);
+            
+            if (export != null) {
+            	//we check permission and program
+            	if (userDetails.getRoleId() != 2)  {
+            		canViewReport = true;
+            	}
+            } 
+            //we log them, grab report for them to download
+            //if report doesn't exist we send them back to list with a message
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userDetails.getId());
+            ua.setAccessMethod("POST");
+            ua.setPageAccess("/dlReport");
+           
+            
+            if (!canViewReport) {
+            	//log user activity
+            	ua.setActivity("Tried to View Export - " + exportId);
+                usermanager.insertUserLog(ua);
+            }   else {
+            	ua.setActivity("Viewed Export - " + exportId);
+                usermanager.insertUserLog(ua);
+            	
+                //generate the report for user to download
+            	//need to get report path
+                fileSystem dir = new fileSystem();
+                dir.setDirByName("referralActivityExports/");
+                String filePath = dir.getDir();
+                String fileName = export.getFileName();
+            	try {
+            		File f = new File(dir.getDir() + export.getFileName());
+
+	            	 if(!f.exists()){
+	            		 throw new Exception("Error with File " + dir.getDir() + export.getFileName());
+	            	 }
+            	 } catch (Exception e) {
+            		 try {
+           	    	  //update file to error
+           	    	  export.setStatusId(5);
+           	    	  transactionInManager.updateReferralActivityExport(export);
+           	    	  throw new Exception("File does not exists " + dir.getDir() + export.getFileName());
+           	      } catch (Exception ex1) {
+           	    	  throw new Exception("File does not exists " + dir.getDir() + export.getFileName() + ex1);
+           	      }
+       	    	  
+       	      	}
+
+          	  
+            	try {
+            		  // get your file as InputStream
+            		  InputStream is = new FileInputStream(filePath+fileName);
+            	      // copy it to response's OutputStream
+            	      
+            	      String mimeType = "application/octet-stream";
+            		  response.setContentType(mimeType);
+            		  response.setHeader("Content-Transfer-Encoding", "binary");
+                      response.setHeader("Content-Disposition", "attachment;filename=\"" + fileName + "\"");
+                      org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+                      response.flushBuffer();
+            	      is.close();
+            	      
+            	      
+            	      
+                      //update status
+                      if (export.getStatusId() == 3) {
+                    	  export.setStatusId(4);
+                    	  transactionInManager.updateReferralActivityExport(export);
+                      }
+            	    } catch (IOException ex) {
+            	    	ex.printStackTrace();
+            	    	System.out.println("Error writing file to output stream. Filename was '{}'"+ fileName + ex);
+            	      try {
+            	    	  //update file to error
+            	    	  export.setStatusId(5);
+            	    	  transactionInManager.updateReferralActivityExport(export);
+            	    	  throw new Exception("Error with File " +filePath + fileName + ex);
+            	      } catch (Exception e) {
+            	    	  throw new Exception("Error with File " +filePath + fileName + ex);
+            	      }
+            	    }
+            	}
+            
+        } else {
+    		//someone somehow got to this link, we just log
+    		//we log who is accessing 
+            //now we have report id, we check to see which program it belongs to and if the user has permission
+        	UserActivity ua = new UserActivity();
+            ua.setUserId(userDetails.getId());
+            ua.setAccessMethod("POST");
+            ua.setPageAccess("/dlReport");
+            ua.setActivity("Tried to view export - " + exportId);
+            usermanager.insertUserLog(ua);
+            throw new Exception("invalid export view - " + exportId);	
+    	}
+    	
+    }  
+    
+    @RequestMapping(value = "/delExport", method = {RequestMethod.GET})
+    public ModelAndView delExport(@RequestParam String i, @RequestParam String v, 
+    		HttpSession session, HttpServletResponse response) throws Exception {
+    	
+    	User userDetails = new User();
+    	Integer exportId = 0;
+    	
+    	boolean canDeleteReport = false;
+    	if (session.getAttribute("userDetails") != null) {
+    		userDetails = (User) session.getAttribute("userDetails");
+    		//1 decrpt and get the reportId
+            decryptObject decrypt = new decryptObject();
+            Object obj = decrypt.decryptObject(i, v);
+            String[] result = obj.toString().split((","));
+            exportId = Integer.parseInt(result[0].substring(4));
+            
+            //now we get the report details
+            referralActivityExports export = transactionInManager.getReferralActivityExportById(exportId);
+            
+            if (export != null) {
+            	//we check permission and program
+            	if (userDetails.getRoleId() != 2)  {
+            		canDeleteReport = true;
+            	}
+            } 
+            //we log them, grab report for them to download
+            //if report doesn't exist we send them back to list with a message
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userDetails.getId());
+            ua.setAccessMethod("GET");
+            ua.setPageAccess("/delReport");
+           
+            
+            if (!canDeleteReport) {
+            	//log user activity
+            	ua.setActivity("Tried to Delete Export - " + exportId);
+                usermanager.insertUserLog(ua);
+            }   else {
+            	ua.setActivity("Deleted Export - " + exportId);
+                usermanager.insertUserLog(ua);
+            	export.setStatusId(5);
+            	transactionInManager.updateReferralActivityExport(export);
+            }
+            
+        } else {
+    		//someone somehow got to this link, we just log
+    		//we log who is accessing 
+            //now we have report id, we check to see which program it belongs to and if the user has permission
+        	UserActivity ua = new UserActivity();
+            ua.setUserId(userDetails.getId());
+            ua.setAccessMethod("GET");
+            ua.setPageAccess("/dlReport");
+            ua.setActivity("Tried to delete export - " + exportId);
+            usermanager.insertUserLog(ua);
+            throw new Exception("invalid delete export view - " + exportId);	
+    	}
+    	
+    	ModelAndView mav = new ModelAndView(new RedirectView("referralActivityExport"));
+        return mav;
+    	
+    }  
 }

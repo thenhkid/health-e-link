@@ -15,9 +15,18 @@ require(['./main'], function() {
         
         $('.submitMessage').click(function() {
             var errorsFound = 0;
-
             //Only check form fields if Sending or Releasing the message
             errorsFound = checkFormFields();
+            
+            //interestedIn
+		if ( ! $('input[name="interestedIn"]').is(':checked') ) {
+			var fieldId = "interestedIn";
+			$('#fieldDiv_' + fieldId).addClass("has-error");
+		    $('#errorMsg_' + fieldId).addClass("has-error");
+		    $('#errorMsg_' + fieldId).html('<br/>This is a required field.');
+		    errorsFound = 1;
+		}
+           
 
             if (errorsFound == 0) {
                 $('#contactForm').submit();

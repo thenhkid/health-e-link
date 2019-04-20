@@ -79,7 +79,7 @@
                                 <c:forEach var="org" items="${latestOrgs}">
                                     <tr>
                                         <td>
-                                            <a href="administrator/organizations/${org.cleanURL}" title="Edit this Organization"><strong>${org.orgName}</strong></a>
+                                            <a href="administrator/organizations/${org.cleanURL}/" title="Edit this Organization"><strong>${org.orgName}</strong></a>
                                             <address>
                                                 ${org.address} <c:if test="${not empty org.address2}"><br />${org.address2}</c:if>
                                                 <br />${org.city} ${org.state}, ${org.postalCode}
@@ -99,7 +99,7 @@
                                             </c:choose>
                                         </td>
                                         <td class="actions-col">
-                                            <a href="administrator/organizations/${org.cleanURL}" class="btn btn-link" title="Edit this Organization">
+                                            <a href="administrator/organizations/${org.cleanURL}/" class="btn btn-link" title="Edit this Organization">
                                                 <span class="glyphicon glyphicon-edit" role="button"></span>
                                                 Edit
                                             </a>
@@ -201,7 +201,7 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Connections</h3>
                 </div>
-                <div class="panel-body"  style="height:385px;" >
+                <div class="panel-body"  style="height:385px; overflow: auto" >
                     <h4>Latest Connections</h4>
                     <c:choose>
                         <c:when test="${not empty connections}">
@@ -213,10 +213,6 @@
                                                 <a href="administrator/configurations/connections" title="Edit this Connection"><strong>${connection.srcConfigDetails.getOrgName()}</strong></a>
                                                 <br/> <strong>Message Type:</strong>  ${connection.srcConfigDetails.getMessageTypeName()}
                                                 <br/> <strong>Transport Method:</strong> ${connection.srcConfigDetails.gettransportMethod()}
-                                                <br /><br />Authorized User(s): <br />
-                                                <c:forEach items="${connection.connectionSenders}" var="sender" varStatus="sIndex">
-                                                    ${sIndex.index+1}. ${sender.firstName}&nbsp;${sender.lastName} (<c:choose><c:when test="${sender.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
-                                                </c:forEach>
                                             </td>
                                             <td>
                                                 Sending To <span class="glyphicon  glyphicon-arrow-right"></span>
@@ -225,10 +221,6 @@
                                                 <a href="administrator/configurations/connections" title="Edit this Connection"><strong>${connection.tgtConfigDetails.getOrgName()}</strong></a>
                                                 <br/> <strong>Message Type:</strong>  ${connection.srcConfigDetails.getMessageTypeName()}
                                                 <br/> <strong>Transport Method:</strong> ${connection.tgtConfigDetails.gettransportMethod()}
-                                                <br /><br />Authorized User(s): <br />
-                                                <c:forEach items="${connection.connectionReceivers}" var="receiver" varStatus="rIndex">
-                                                    ${rIndex.index+1}. ${receiver.firstName}&nbsp;${receiver.lastName} (<c:choose><c:when test="${receiver.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
-                                                </c:forEach>
                                             </td>
                                         </tr>
                                     </c:forEach>

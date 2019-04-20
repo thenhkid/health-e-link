@@ -1,7 +1,7 @@
 require.config({
     urlArgs: "bust=" + (new Date()).getTime(),
     paths: {
-        'jquery': '../vendor/jquery-1.10.1',
+        'jquery': '../vendor/jquery-1.12.2',
         'bootstrap': '../vendor/bootstrap',
         'responsive-tables': '../vendor/responsive-tables',
         'mediaModal': '../mediaModal',
@@ -10,17 +10,25 @@ require.config({
         'fixed-header': '../fixed-header',
         'moment': '../vendor/moment',
         'daterangepicker': '../vendor/daterangepicker',
-        'dataTables': '../vendor/jquery.dataTables.min'
+        'datepicker': '../date-time/bootstrap-datepicker.min',
+        'dataTables': '../vendor/jquery.dataTables.min',
+        'maps': '../vendor/mapmarker.jquery',
+        'ajaxupload': 'ajaxupload.min',
+        'Chart': '../vendor/Chart'
     },
     shim: {
         'bootstrap': ['jquery'],
         'responsive-tables': ['jquery'],
         'daterangepicker': ['jquery', 'bootstrap'],
-        'dataTables': ['jquery']
+        'datepicker': ['jquery', 'bootstrap'],
+        'dataTables': ['jquery'],
+        'maps': ['jquery'],
+        'ajaxupload' : ['jquery'],
+        'Chart' : ['jquery']
     }
 });
 
-define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker', 'dataTables'], function($, fixedHeader, moment) {
+define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker', 'dataTables', 'ajaxupload', 'datepicker', 'Chart'], function($, fixedHeader, moment) {
 
     var primaryNav = $('.primary-nav');
     var primaryNavHeight = primaryNav.outerHeight();

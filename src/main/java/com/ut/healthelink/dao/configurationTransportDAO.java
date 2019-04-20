@@ -10,7 +10,11 @@ import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationTransportMessageTypes;
+import com.ut.healthelink.model.configurationWebServiceSenders;
+
 import org.springframework.stereotype.Repository;
+
+import com.ut.healthelink.model.configurationWebServiceFields;
 
 @Repository
 public interface configurationTransportDAO {
@@ -80,7 +84,7 @@ public interface configurationTransportDAO {
     
     List<configurationTransport> getDistinctDelimCharForFileExt(String fileExt, Integer transportMethodId);
     
-    void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields);
+    void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) throws Exception;
     
     List<configurationRhapsodyFields> getTransRhapsodyDetails(int transportDetailId) throws Exception;
     
@@ -95,5 +99,30 @@ public interface configurationTransportDAO {
     List <TransportMethod> getTransportMethods(List <Integer> statusIds);
     
     List <configurationTransport> getConfigurationTransportFileExtByFileType(Integer orgId, Integer transportMethodId, List<Integer> fileTypeIds, List <Integer> statusIds, boolean distinctOnly, boolean foroutboundProcessing);
-
+    
+    List<configurationWebServiceFields> getTransWSDetails(int transportDetailId) throws Exception;
+    
+    void saveTransportWebService(configurationWebServiceFields wsFields) throws Exception;
+    
+    List<configurationTransport> getDistinctTransportDetailsForOrgByTransportMethodId(Integer transportMethodId, Integer status, Integer orgId);
+    
+    List<configurationTransport> getCTForOrgByTransportMethodId(Integer transportMethodId, Integer status, Integer orgId);
+    
+    configurationWebServiceFields getTransWSDetailsPush(int transportDetailId) throws Exception;
+    
+    configurationWebServiceFields getTransWSDetailsPull(int transportDetailId) throws Exception;
+    
+    List <configurationWebServiceSenders> getWSSenderList(int transportDetailId) throws Exception;
+    
+    void saveWSSender(configurationWebServiceSenders wsSender) throws Exception;
+    
+    void deleteWSSender(configurationWebServiceSenders wsSender) throws Exception;
+    
+    boolean hasConfigsWithMasstranslations(Integer orgId, Integer transportMethodId) throws Exception;
+    
+    List<configurationFormFields> getInBoundFieldsForConfigConnection(Integer inConfigId, Integer outConfigId) throws Exception;
+    
+    configurationFormFields getConfigurationFieldsByFieldDesc(int configId, String fieldDesc) throws Exception;
+        
+     
 }

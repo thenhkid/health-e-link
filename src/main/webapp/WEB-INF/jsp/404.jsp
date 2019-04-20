@@ -1,3 +1,4 @@
+<%@ page session="false" %>
 <!DOCTYPE html>
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
@@ -37,11 +38,10 @@
             <div class="login-container notFound">
                 <div class="login">
                     <header class="login-header">
-                        <div class="login-header-content"><span class="logo ir" alt="{Company Name Logo}">Comany Name</span></div>
+                        <div class="login-header-content"><span class="logo ir" alt="{Company Name Logo}">Company Name</span></div>
                     </header>
                     <h1>404 Page Not Found</h1>
                     <p>Sorry, the page you have requested was not found.</p>
-                    <p class="login-note"><a href="" id="back-btn" title="" class="btn btn-primary">Go Back</a></p>
                 </div>
             </div>
         </div>

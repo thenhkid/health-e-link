@@ -1,7 +1,8 @@
 package com.ut.healthelink.dao.impl;
 
 import java.util.List;
-
+import java.util.Properties;
+import javax.annotation.Resource;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Order;
@@ -10,7 +11,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.ut.healthelink.dao.messageTypeDAO;
 import com.ut.healthelink.model.Crosswalks;
 import com.ut.healthelink.model.configuration;
@@ -30,9 +30,12 @@ import org.hibernate.criterion.Disjunction;
 @Repository
 public class messageTypeDAOImpl implements messageTypeDAO {
 
+    @Resource(name = "myProps")
+    private Properties myProps;
+
     @Autowired
     private SessionFactory sessionFactory;
-
+    
     /**
      * The 'createMessageType" function will create the new brochure
      *
@@ -306,7 +309,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
             Integer transportDetailId = (Integer) transportDetails.uniqueResult();
 
             //Bulk insert the new fieldinto the configurationTransportDetails table for the online form
-            Query bulkInsert = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 0, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where id = :newfieldId");
+            Query bulkInsert = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 0, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType FROM messageTypeFormFields where id = :newfieldId");
             bulkInsert.setParameter("configId", configuration.getId());
             bulkInsert.setParameter("transportDetailId", transportDetailId);
             bulkInsert.setParameter("newfieldId", lastId);
@@ -322,7 +325,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getInformationTables() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' and TABLE_NAME LIKE 'message\\_%'");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" + myProps.getProperty("schemaName") + "' and TABLE_NAME LIKE 'message\\_%'");
 
         return query.list();
     }
@@ -334,7 +337,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getAllTables() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator'");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" + myProps.getProperty("schemaName") + "'");
 
         return query.list();
     }
@@ -347,7 +350,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getTableColumns(String tableName) {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' AND TABLE_NAME = :tableName and COLUMN_NAME not in ('id', 'dateCreated', 'transactionInId') order by COLUMN_NAME")
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" + myProps.getProperty("schemaName") + "' AND TABLE_NAME = :tableName and COLUMN_NAME not in ('id', 'dateCreated', 'transactionInId') order by COLUMN_NAME")
                 .setParameter("tableName", tableName);
 
         return query.list();
@@ -363,6 +366,18 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     public List getValidationTypes() {
         Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, validationType FROM ref_validationTypes order by id asc");
 
+        return query.list();
+    }
+    
+    /**
+     * The 'getFieldTypes' function will return a list of available field types
+     */
+    @Override
+    @SuppressWarnings("rawtypes")
+    @Transactional
+    public List getFieldTypes() {
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, fieldType FROM ref_fieldTypes order by id asc");
+        
         return query.list();
     }
 
@@ -639,5 +654,36 @@ public class messageTypeDAOImpl implements messageTypeDAO {
         Query query = sessionFactory.getCurrentSession().createQuery("from validationType order by id asc");
         return query.list();
     }
+    
+    /**
+     * The 'updateCrosswalk" function will update the existing crosswalk
+     *
+     * @Table	crosswalks
+     *
+     * @param	crosswalkDetails	This will hold the crosswalk object from the form
+     *
+     * @return The function will return the id of the new crosswalk
+     *
+     */
+    @Override
+    @Transactional
+    public void updateCrosswalk(Crosswalks crosswalkDetails) {
+    	sessionFactory.getCurrentSession().update(crosswalkDetails);
+    }
+    
+    
+    @Transactional
+    public void executeSQLStatement(String sqlStmt) {
+	if(sqlStmt != null) {
+	    if(!"".equals(sqlStmt)) {
+		 //Need to insert all the fields into the crosswalk data Fields table
+                Query query = sessionFactory.getCurrentSession().createSQLQuery(sqlStmt);
+
+                query.executeUpdate();
+
+	    }
+	}
+    }
+    
 
 }

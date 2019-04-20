@@ -6,22 +6,20 @@
         http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd"
     version="1.8">
  
-    <schedule>
+   <schedule>
         <job>
             <name>ProcessOutputFiles</name>
             <group>processGroup</group>
             <description>This process will run every five minute to check if any outbound files must be processed</description>
             <job-class>com.ut.healthelink.jobs.processOutputRecords</job-class>
         </job>
- 
+ 		<!--  changed to every 10 seconds because we are processing one by one -->
         <trigger>
             <cron>
-                <name>60SecTrigger</name>
+                <name>ProcessOutputFilesTrigger</name>
                 <job-name>ProcessOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <!-- seconds, minutes /(at) minute to start, hours, day of month, month, day of week, year (optional) -->
-                <!-- starts on 22 every minute-->
-                <cron-expression>22 0/1 * * * ?</cron-expression>
+                 <cron-expression>0/10 * * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -35,11 +33,10 @@
  
         <trigger>
             <cron>
-                <name>5MinTrigger</name>
+                <name>GenerateOutputFilesTrigger</name>
                 <job-name>GenerateOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <!--  starts on 5 every 2 mins  -->
-                <cron-expression>12 0/2 * * * ?</cron-expression>
+                <cron-expression>0 0/5 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -54,7 +51,7 @@
  
         <trigger>
             <cron>
-                <name>10MinsTrigger</name>
+                <name>LoadBatchesTrigger</name>
                 <job-name>LoadBatches</job-name>
                 <job-group>processGroup</job-group>
                 <cron-expression>10/30 * * * * ?</cron-expression>
@@ -62,9 +59,28 @@
         </trigger>
     </schedule>
     
+         <schedule>
+        <job>
+            <name>LoadMassBatches</name>
+            <group>processGroup</group>
+            <description>This process will run every 5 minutes to look for large files</description>
+            <job-class>com.ut.healthelink.jobs.loadMassBatches</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>LoadMassBatchesTrigger</name>
+                <job-name>LoadMassBatches</job-name>
+                <job-group>processGroup</job-group>
+                <!-- <cron-expression>0 15/0 1,4,7,10,13,16,19,22 * * ?</cron-expression> -->
+                <cron-expression>0 0/1 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+
      <schedule>
         <job>
-            <name>ProcessBatches</name>
+            <name>ProcessInBoundBatches</name>
             <group>processGroup</group>
             <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
             <job-class>com.ut.healthelink.jobs.processBatches</job-class>
@@ -72,15 +88,72 @@
  
         <trigger>
             <cron>
-                <name>10on15MinsTrigger</name>
-                <job-name>ProcessBatches</job-name>
+                <name>ProcessInBoundBatchesTrigger</name>
+                <job-name>ProcessInBoundBatches</job-name>
                 <job-group>processGroup</job-group>
                 <cron-expression>5/30 * * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
-    <!--  -->
+    
     <schedule>
+        <job>
+            <name>ProcessMassInBoundBatches</name>
+            <group>processGroup</group>
+            <description>This process will run every 6 </description>
+            <job-class>com.ut.healthelink.jobs.processMassBatches</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>ProcessMassInBoundBatchesTrigger</name>
+                <job-name>ProcessMassInBoundBatches</job-name>
+                <job-group>processGroup</job-group>
+                <!-- <cron-expression>0 0/0 0,3,6,9,12,15,18,21 * * ?</cron-expression> -->
+                 <cron-expression>0 0/2 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+
+    <schedule>
+        <job>
+            <name>ProcessMassOutputBatches</name>
+            <group>processGroup</group>
+            <description>This process will run every 15 mins on the 5 minute  to check if any loaded files will need to be process</description>
+            <job-class>com.ut.healthelink.jobs.processMassOutputRecords</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>ProcessMassOutputBatchesTrigger</name>
+                <job-name>ProcessMassOutputBatches</job-name>
+                <job-group>processGroup</job-group>
+                <cron-expression>0 0/5 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+    
+    <schedule>
+        <job>
+            <name>ClearAfterDeliveryBatches</name>
+            <group>processGroup</group>
+            <description>This process will run every 10 minutes on the 2 minute to check if any clear after delivery message tables need to be cleared</description>
+            <job-class>com.ut.healthelink.jobs.clearAfterDelivery</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>ClearAfterDeliveryBatchesTrigger</name>
+                <job-name>ClearAfterDeliveryBatches</job-name>
+                <job-group>processGroup</job-group>
+                <cron-expression>* 0/5 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+     
+    
+    <!--  -->
+    <!--<schedule>
         <job>
             <name>MoveSFTPFiles</name>
             <group>processGroup</group>
@@ -96,25 +169,46 @@
                 <cron-expression>38 0/10 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>
+    </schedule>-->
 
+    <!---->
     <schedule>
         <job>
-            <name>MoveRhapsodyFiles</name>
+            <name>MoveRRFiles</name>
             <group>processGroup</group>
             <description>This process will run every minute starting at 8 mins of the hour to check if any Rhapsody file will need to be moved and logged</description>
-            <job-class>com.ut.healthelink.jobs.MoveRhapsodyFiles</job-class>
+            <job-class>com.ut.healthelink.jobs.MoveRRFiles</job-class>
         </job>
  
         <trigger>
             <cron>
-                <name>moveRhapTrigger</name>
-                <job-name>MoveRhapsodyFiles</job-name>
+                <name>moveRRTrigger</name>
+                <job-name>MoveRRFiles</job-name>
                 <job-group>processGroup</job-group>
                 <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
+    
+    <!--<schedule>
+        <job>
+            <name>processWebServiceMessages</name>
+            <group>processGroup</group>
+            <description>This process will run every 5 minutes starting at 8 mins of the hour to check if any WSMessage need to be written to file</description>
+            <job-class>com.ut.healthelink.jobs.ProcessWebServiceMessages</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>processWebServiceMessagesTrigger</name>
+                <job-name>processWebServiceMessages</job-name>
+                <job-group>processGroup</job-group>
+                <cron-expression>0 0/1 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>    -->
+    
+      
     
     
 </job-scheduling-data>

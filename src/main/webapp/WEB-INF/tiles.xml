@@ -164,6 +164,17 @@
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/HL7.js" />
     </definition>
     
+    <definition name="/administrator/configurations/CCD" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-ccd" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - CCD Configuration" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=CCD" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=CCD" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/CCD.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/CCD.js" />
+    </definition>
+    
     <definition name="/administrator/configurations/preprocessing" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-Preprocessing" />
         <put-attribute name="page-section" value="section-preprocessing" />
@@ -184,6 +195,11 @@
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=postprocessing" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/postprocessing.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/postprocessing.js" />
+    </definition>
+    
+	<definition name="/administrator/configurations/domainSenders" extends="base.definition.admin">
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/domainSenders.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/domainSenders.js" />
     </definition>
 
     <!-- Admin Organization Definitions -->
@@ -262,6 +278,23 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/brochures/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/brochures.js" />
     </definition>
+    
+    <definition name="/administrator/organizations/resources" extends="base.definition.admin">
+        <put-attribute name="page-id" value="organization-resourcelist" />
+        <put-attribute name="page-section" value="section-organizations" />
+        <put-attribute name="title" value="Administrator - Manage Organization Resources" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgResources" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=resources" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/resources/details.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/resources.js" />
+    </definition>
+    
+    <!--  login as -->
+     <definition name="/administrator/organizations/users/login" extends="base.definition.admin">
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/users/loginAs.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/loginAs.js" />
+    </definition>
 
     <!-- Admin Message Type Library Definitions -->
     <definition name="/administrator/messageTypeLibrary/list" extends="base.definition.admin">
@@ -315,6 +348,7 @@
         <put-attribute name="page-section" value="section-dashboard" />
         <put-attribute name="title" value="Administrator" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/index.js" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/index.jsp" />
     </definition>
     
@@ -401,6 +435,41 @@
         <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/hl7/details.js" />
     </definition>
     
+    <!--  this displays the login as form -->
+    <definition name="/administrator/sysadmin/loginAs" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-loginAs" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - Login As" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=loginAs" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=loginAs" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/loginAs/loginForm.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/loginAs/loginForm.js" />
+    </definition>
+    
+    
+    <definition name="/administrator/sysadmin/moveFilePaths" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-moveFilePaths" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - moveFilePaths" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=moveFilePaths" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=moveFilePaths" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/moveFilePaths/moveFilePaths.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/moveFilePaths/moveFilePaths.js" />
+    </definition>
+    
+    <definition name="/administrator/processing-activity/activityReport" extends="base.definition.admin">
+        <put-attribute name="page-id" value="processing-activityReport" />
+        <put-attribute name="page-section" value="section-processing" />
+        <put-attribute name="title" value="Administrator - Processing Activities" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=report" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=report" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/activityReport.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/activityReport.js" />
+    </definition>
+    
     <!--  this lists all news articles -->    
     <definition name="/administrator/sysadmin/news" extends="base.definition.admin">
         <put-attribute name="page-id" value="sysadmin-news" />
@@ -448,14 +517,47 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/outbound.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/outbound.js" />
     </definition>
+    
+    <definition name="/administrator/processing-activity/rejected" extends="base.definition.admin">
+        <put-attribute name="page-id" value="processing-rejected" />
+        <put-attribute name="page-section" value="section-processing" />
+        <put-attribute name="title" value="Administrator - Processing Activities" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=rejected" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=rejected" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/rejected.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/rejected.js" />
+    </definition>
+    
+    <definition name="/administrator/processing-activity/wsmessage" extends="base.definition.admin">
+        <put-attribute name="page-id" value="processing-wsmessage" />
+        <put-attribute name="page-section" value="section-processing" />
+        <put-attribute name="title" value="Administrator - Processing Activities" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=wsmessage" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=wsmessage" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/wsmessage.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/wsmessage.js" />
+    </definition>
+    
+    <definition name="/administrator/processing-activity/wsmessageOut" extends="base.definition.admin">
+        <put-attribute name="page-id" value="processing-wsmessage" />
+        <put-attribute name="page-section" value="section-processing" />
+        <put-attribute name="title" value="Administrator - Processing Activities" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=wsmessage" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=wsmessage" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/wsmessageOut.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/wsmessageOut.js" />
+    </definition>
 
     <definition name="/administrator/processing-activity/transactions" extends="base.definition.admin">
         <put-attribute name="page-id" value="processing-inbound" />
         <put-attribute name="page-section" value="section-processing" />
         <put-attribute name="title" value="Administrator - Processing Activities" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
-        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=inbound" />
-        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=inbound" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/transactions.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/transactions.js" />
     </definition>
@@ -509,8 +611,8 @@
         <put-attribute name="page-section" value="section-processing" />
         <put-attribute name="title" value="Administrator - Processing Activities" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
-        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=inbound" />
-        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=inbound" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/batchActivities.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/batchActivities.js" />
     </definition>
@@ -520,8 +622,8 @@
         <put-attribute name="page-section" value="section-processing" />
         <put-attribute name="title" value="Administrator - Processing Activities" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
-        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=inbound" />
-        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=inbound" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/auditReport.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/auditReport.js" />
     </definition>
@@ -536,6 +638,18 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/ERG.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/ERG.js" />
     </definition>
+    
+     <definition name="/administrator/processing-activity/referralActivityExport" extends="base.definition.admin">
+        <put-attribute name="page-id" value="processing-inbound" />
+        <put-attribute name="page-section" value="section-processing" />
+        <put-attribute name="title" value="Administrator - Processing Activities" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=refActivityExport" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=refActivityExport" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/referralActivityExport.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/referralActivityExport.js" />
+    </definition>
+    
 
 
     <!--  end sysadmin definitions -->
@@ -552,6 +666,8 @@
     <definition name="/home" extends="base.definition.frontEnd">
         <put-attribute name="page-id" value="home" />
         <put-attribute name="page-section" value="home" />
+        <put-attribute name="description" value="Promoting Better Health and Health Care One Community at a Time. Our products and services enable health information exchange between
+groups of health care providers, community partners, as well as federal, state and local health agencies." />
         <put-attribute name="title" value="Data exchange software connecting the healthcare community" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=home" />
         <put-attribute name="body" value="/WEB-INF/jsp/home.jsp" />
@@ -559,66 +675,77 @@
 
     <!-- Information Pages -->
     <definition name="/productSuite" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="title" value="Health-e-Link - Product Suite" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/productSuite.jsp?page=overview" />
     </definition>
     
-    <definition name="/healthenet" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Health-e-Link - Health-e-Net" />
+    <definition name="/universal-hie" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="The Health-e-Link Universal HIE solution is the one 'flexible' health information exchange network that allows healthcare partners in your community to share patient information even when their technology-based systems are incompatible. The Universal HIE allows you to define individual partnerships on the network and the technical specifications that support data exchange for each partnership." />
+        <put-attribute name="title" value="Health-e-Link - Universal HIE" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/health-e-net.jsp?page=healthenet" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/universal-hie.jsp?page=universal-hie" />
     </definition>
     
-    <definition name="/healtheweb" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Health-e-Link - Health-e-Web" />
+    <definition name="/careConnector" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="Health-e-link's care connector system connects healthcare providers with their community-based partners and supports fully integrated eReferral communications regardless of the technology-based capabilities of the eReferral partners. Using Health-e-link's care connector system, all referral types with all collaborating partners are managed from a single location. Health-e-Link's care connector system spans the virtual boundaries between healthcare partners in your community. " />
+        <put-attribute name="title" value="Health-e-Link - Care Connector" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/health-e-web.jsp?page=healtheweb" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/careConnector.jsp?page=careConnector" />
     </definition>
     
-    <definition name="/healthedata" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Health-e-Link - Health-e-Data" />
+    <definition name="/clinical-data-warehouse" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="Health-e-link's Clinical Data Warehouse is a highly configurable and flexible data warehouse and program registry for collaborating healthcare professionals. Health-e-link serves as a single platform for managing data collection, data access, data management, data analysis and reporting needs across the healthcare community." />
+        <put-attribute name="title" value="Health-e-Link - Clinical Data Warehouse" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/health-e-data.jsp?page=healthedata" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/clinical-data-warehouse.jsp?page=clinical-data-warehouse" />
     </definition>
     
     <definition name="/doculink" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="" />
         <put-attribute name="title" value="Health-e-Link - DOC-u-Link" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/doc-u-link.jsp?page=doculink" />
     </definition>
     
     <definition name="/solutionOverivew" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="" />
         <put-attribute name="title" value="Health-e-Link - Solutions" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=solutions" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/solutions/overview.jsp?page=overview" />
     </definition>
     
     <definition name="/services" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="Health-e-link staff collaborates with our customers to understand partnerships within your network of care, the level of maturity of your collaborative business models, your vision for integrated care models and your current and planned utilization of technology. Working with you, we use this information to develop strategies for implementing transformative care delivery and program management models enabled by our technology solutions. " />
         <put-attribute name="title" value="Health-e-Link - Professional Services" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=solutions" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/solutions/services.jsp?page=services" />
     </definition>
     
     <definition name="/casestudies" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="" />
         <put-attribute name="title" value="Health-e-Link - Case Studies" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=solutions" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/solutions/caseStudies.jsp?page=casestudies" />
     </definition>
     
     <definition name="/about" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="With a foundation in community-based healthcare and public health programs, Health-e-link was established to provide cost-effective solutions for managing healthcare information for community-based organizations and public health agencies. Historically, Health-e-link has focused specifically on helping our clients meet the data management needs of federal and state funded healthcare programs. " />
         <put-attribute name="title" value="Health-e-Link - About Us" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=about" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/about.jsp?page=about" />
     </definition>
     
-    <definition name="/howwework" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Health-e-Link - How We Work" />
+    <definition name="/networkcapabilities" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="Health-e-link's technology-based solutions including eReferral, Universal HIE and Clinical Data Warehouse. Health-e-link solutions are hosted within our secure data center and are available for customer use on an ongoing basis. Clients can be configured and operational on Health-e-link within a matter of days. Licensed software may be installed, configured and operated by your IT staff with Health-e-link resources available for technical support as required. Health-e-link solutions are developed on Java and Microsoft SQL Server platforms. " />
+        <put-attribute name="title" value="Health-e-Link - Network Capabilities" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=about" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/howwework.jsp?page=howwework" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/networkcapabilities.jsp?page=networkcapabilities" />
     </definition>
     
     <definition name="/contact" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="Health-e-link's staff would be happy to contact you and discuss how our technology solutions and support services may help you create expanded service delivery and patient care models, improve your ability manage your network of collaborating healthcare professionals, and track program and population-based health data. Please complete the form below, provide any information you feel is relevant and we'll be in touch soon! " />
         <put-attribute name="title" value="Health-e-Link - Contact Us" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=contact" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/contact.jsp" />
@@ -626,26 +753,37 @@
     </definition>
     
     <definition name="/privacy" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="" />
         <put-attribute name="title" value="Health-e-Link - Privacy" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=privacy" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/privacy.jsp" />
     </definition>
     
     <definition name="/partners" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="" />
         <put-attribute name="title" value="Health-e-Link - Partners" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=partners" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/partners.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/partners.js" />
     </definition>
     
+    <definition name="/partnersmap" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Partners" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=map" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/partnersMap.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/partnersMap.js" />
+    </definition>
+    
     <!-- News Article Pages -->
     <definition name="/news/list" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="" />
         <put-attribute name="title" value="Health-e-Link - News Article" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/news/list.jsp" />
     </definition>
     
     <definition name="/news/articleDetails" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="" />
         <put-attribute name="title" value="Health-e-Link - News Article" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/news/article.jsp" />
@@ -653,94 +791,117 @@
 
     <!-- Profile (Account) Pages -->
     <definition name="/profile/index" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=home&amp;page=profile" />
         <put-attribute name="body" value="/WEB-INF/jsp/profile/index.jsp" />
     </definition>
-    
-    <!-- Health-e-Web (ERG) Pages -->
-    
-    <!-- Inbox -->
-    <definition name="/Health-e-Web/inbox" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=inbox" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/inbox.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/inbox.js" />
+    <!-- Profile (settings) Pages -->
+    <definition name="/profile/details" extends="base.definition.frontEnd">
+    <put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=home&amp;page=profile" />
+        <put-attribute name="body" value="/WEB-INF/jsp/profile/settings.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/profile/settings.js" />
     </definition>
     
-    <definition name="/Health-e-Web/feedbackReports" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=inbox" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/feedbackReports.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/feedbackReports.js" />
+    
+    
+    
+    <!-- CareConnector (ERG) Pages -->
+    
+    <!-- Inbox -->
+    <definition name="/CareConnector/inbox" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=inbox" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/inbox.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/inbox.js" />
+    </definition>
+    
+    <definition name="/CareConnector/feedbackReports" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=inbox" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/feedbackReports.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/feedbackReports.js" />
     </definition>
     
     <!-- Sent Items -->
-    <definition name="/Health-e-Web/sent" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=sent" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/sent.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/sent.js" />
+    <definition name="/CareConnector/sent" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=sent" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/sent.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/sent.js" />
     </definition>
     
-    <definition name="/Health-e-Web/sentmessageDetails" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=sent" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/sentmessageDetails.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/sentDetails.js" />
+    <definition name="/CareConnector/sentmessageDetails" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=sent" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/sentmessageDetails.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/sentDetails.js" />
     </definition>
     
     
     <!-- Create New Message List Page -->
-    <definition name="/Health-e-Web/create" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=create" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/create.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/create.js" />
+    <definition name="/CareConnector/create" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=create" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/create.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/create.js" />
     </definition>
     
-    <definition name="/Health-e-Web/messageDetailsForm" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=create" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/messageDetailsForm.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/messageForm.js" />
+    <definition name="/CareConnector/messageDetailsForm" extends="base.definition.frontEnd">
+   		<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=create" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/messageDetailsForm.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/messageForm.js" />
         <put-attribute name="otherscript" value="/dspResources/js/front-end/ajaxupload.js" />
     </definition>
     
     <!-- Pending Items -->
-    <definition name="/Health-e-Web/pending" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=pending" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/pending.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/pending.js" />
+    <definition name="/CareConnector/pending" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=pending" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/pending.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/pending.js" />
     </definition>
     
-    <definition name="/Health-e-Web/batchTransactions" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/batchTransactions.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/batchTransactions.js" />
+    <definition name="/CareConnector/batchTransactions" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/batchTransactions.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/batchTransactions.js" />
     </definition>
     
-    <definition name="/Health-e-Web/pendingmessageDetailsForm" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=pending" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/messageDetailsForm.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/messageForm.js" />
+    <definition name="/CareConnector/pendingmessageDetailsForm" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=pending" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/messageDetailsForm.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/messageForm.js" />
         <put-attribute name="otherscript" value="/dspResources/js/front-end/ajaxupload.js" />
     </definition>
     
-    <definition name="/Health-e-Web/history" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=history" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/historySearch.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/historySearch.js" />
+    <definition name="/CareConnector/history" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=history" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/historySearch.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/historySearch.js" />
     </definition>
     
-    <definition name="/Health-e-Web/historySummary" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=history" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/historySummary.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/historySummary.js" />
+    <definition name="/CareConnector/historySummary" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=history" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/historySummary.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/historySummary.js" />
     </definition>
     
-    <definition name="/Health-e-Web/historyDetails" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=history" />
-        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/historyDetails.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/historyDetails.js" />
+    <definition name="/CareConnector/historyDetails" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=CareConnector&amp;page=history" />
+        <put-attribute name="body" value="/WEB-INF/jsp/CareConnector/historyDetails.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/CareConnector/historyDetails.js" />
     </definition>
     
     <!-- Health-e-Connect (Exchange) Pages -->
     <!-- Upload -->
     <definition name="/Health-e-Connect/upload" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=upload" />
         <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/upload.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/upload.js" />
@@ -748,6 +909,7 @@
     
     <!-- Download -->
     <definition name="/Health-e-Connect/download" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=download" />
         <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/download.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/download.js" />
@@ -755,18 +917,21 @@
     
     <!-- Audit Reports -->
     <definition name="/Health-e-Connect/auditReports" extends="base.definition.frontEnd">
+   		<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=audit" />
         <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/auditReports.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/auditReports.js" />
     </definition>
     
     <definition name="/Health-e-Connect/auditReport" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=audit" />
         <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/auditReport.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/auditReport.js" />
     </definition>
     <!--  upload ERG -->
     <definition name="/Health-e-Connect/ERG" extends="base.definition.frontEnd">
+   		<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=audit" />
         <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/ERG.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/ERG.js" />
@@ -774,6 +939,7 @@
     
     <!-- Organization Profile Pages -->
     <definition name="/OrgProfile/editProfile" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=editProfile" />
         <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/editProfile.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/editProfile.js" />
@@ -781,18 +947,21 @@
     
     <!-- Organization Providers -->
     <definition name="/OrgProfile/providers" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=providers" />
         <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/providers.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/providers.js" />
     </definition>
     
     <definition name="/OrgProfile/createProvider" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=createProvider" />
         <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/createProvider.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/createProvider.js" />
     </definition>
     
     <definition name="/OrgProfile/editProvider" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=providers" />
         <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/editProvider.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/editProvider.js" />
@@ -800,25 +969,105 @@
     
     <!-- Organization Brochures -->
     <definition name="/OrgProfile/brochures" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=brochures" />
         <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/brochures.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/brochures.js" />
     </definition>
     
+    <!-- Organization Resources -->
+    <definition name="/OrgProfile/resources" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=resources" />
+        <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/resources.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/resources.js" />
+    </definition>
+    
     <!-- Associated Organizations -->
     <definition name="/organizations/associated" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=associations" />
         <put-attribute name="body" value="/WEB-INF/jsp/organizations/associated.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/associations/associated.js" />
     </definition>
     
     <definition name="/organizations/associated/orgDetails" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=associations" />
         <put-attribute name="body" value="/WEB-INF/jsp/organizations/orgDetails.jsp" />
     </definition>
-        
+    
+    <!-- Resource Management -->
+    <definition name="/resources/search" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Resources&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/resources/search.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/resources/search.js" />
+    </definition>    
+    
+    <definition name="/resources/searchResults" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Resources&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/resources/searchResults.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/resources/searchResults.js" />
+    </definition> 
+    
+    <!-- Clients -->
+    <definition name="/clients/search" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Clients&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/clients/search.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/clients/search.js" />
+    </definition>    
+    
+    <definition name="/clients/searchResults" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Clients&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/clients/searchResults.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/clients/searchResults.js" />
+    </definition> 
+    
+    <definition name="/clients/assessments/assessmentForm" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Clients&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/clients/assessments/assessmentForm.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/clients/assessments/assessmentForm.js" />
+    </definition>  
+    
+    <definition name="/clients/assessments/assessmentConclusion" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Clients&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/clients/assessments/assessmentConclusion.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/clients/assessments/assessmentConclusion.js" />
+    </definition>   
+    
+    <!-- Dashboard -->
+    <definition name="/dashboard/dashboard" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=dashboard" />
+        <put-attribute name="body" value="/WEB-INF/jsp/dashboard/dashboard.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/dashboard/dashboard.js" />
+    </definition>  
+    
+    <!-- Reporting -->
+    <definition name="/reports/request" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=reports&amp;page=request" />
+        <put-attribute name="body" value="/WEB-INF/jsp/reports/request.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/reports/request.js" />
+    </definition>  
+    
+    <definition name="/reports/requestedReports" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=reports&amp;page=reports" />
+        <put-attribute name="body" value="/WEB-INF/jsp/reports/requestedReports.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/reports/requestedReports.js" />
+    </definition>  
+    
+    
     <!-- Exception handling -->
     <definition name="/exception" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp" />
         <put-attribute name="body" value="/WEB-INF/jsp/exception.jsp" />
     </definition>

@@ -40,4 +40,13 @@ public class siteSections {
         this.featureName = featureName;
     }
 
+    public String getFeatureName() {
+        return featureName;
+    }
+
+    public void setFeatureName(String featureName) {
+        this.featureName = featureName;
+    }
+
+    
 }

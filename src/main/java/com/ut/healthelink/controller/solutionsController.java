@@ -16,32 +16,21 @@ import org.springframework.web.servlet.ModelAndView;
  * @author chadmccue
  */
 @Controller
-@RequestMapping("/solutions")
+@RequestMapping("/support-services")
 public class solutionsController {
     
     /**
      * The '' request will display the solutions overview page.
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public ModelAndView solutionOverivew() throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/solutionOverivew");
-        mav.addObject("pageTitle", "Solutions");
-        return mav;
-    }
-    
-    /**
-     * The '/services' request will display the professional services page.
-     */
-    @RequestMapping(value = "/services", method = RequestMethod.GET)
-    public ModelAndView services() throws Exception {
+    public ModelAndView consultingservices() throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/services");
-        mav.addObject("pageTitle", "Professional Services");
+        mav.addObject("pageTitle", "Support Services");
         return mav;
     }
+    
     
     /**
      * The '/case-studies' request will display the case studies page.

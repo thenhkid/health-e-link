@@ -45,10 +45,12 @@
                                         <tr>
                                             <td scope="row">
                                                 <strong>${connection.srcConfigDetails.getOrgName()}</strong>
-                                                <br />Authorized User(s): <br />
-                                                <c:forEach items="${connection.connectionSenders}" var="sender" varStatus="sIndex">
-                                                    ${sIndex.index+1}. ${sender.firstName}&nbsp;${sender.lastName} (<c:choose><c:when test="${sender.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
-                                                </c:forEach>
+                                                <%--<br />Authorized User(s): <br />
+                                                <div style="height:150px; overflow: auto">
+                                                    <c:forEach items="${connection.connectionSenders}" var="sender" varStatus="sIndex">
+                                                        ${sIndex.index+1}. ${sender.firstName}&nbsp;${sender.lastName} (<c:choose><c:when test="${sender.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose> - ${sender.orgName})<br />
+                                                    </c:forEach>
+                                                </div>--%>
                                             </td>
                                             <td>
                                                ${connection.srcConfigDetails.getMessageTypeName()}
@@ -58,10 +60,12 @@
                                             </td>
                                             <td scope="row">
                                                 <strong>${connection.tgtConfigDetails.getOrgName()}</strong>
-                                                <br />Authorized User(s): <br />
-                                                <c:forEach items="${connection.connectionReceivers}" var="receiver" varStatus="rIndex">
-                                                    ${rIndex.index+1}. ${receiver.firstName}&nbsp;${receiver.lastName} (<c:choose><c:when test="${receiver.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
-                                                </c:forEach>
+                                                <%--<br />Authorized User(s): <br />
+                                                <div style="height:150px; overflow: auto">
+                                                    <c:forEach items="${connection.connectionReceivers}" var="receiver" varStatus="rIndex">
+                                                        ${rIndex.index+1}. ${receiver.firstName}&nbsp;${receiver.lastName} (<c:choose><c:when test="${receiver.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose> - ${receiver.orgName})<br />
+                                                    </c:forEach>
+                                                </div>--%>
                                             </td>
                                             <td class="center-text">
                                                ${connection.tgtConfigDetails.gettransportMethod()}
@@ -70,10 +74,10 @@
                                             <td class="center-text actions-col">
                                                <c:choose>
                                                     <c:when test="${connection.status == true}">
-                                                        <a href="javascript:void(0);" class="btn btn-link changeStatus" rel2="false" rel="${connection.id}" title="Make this connection inactive" role="button">Active</a>
+                                                        Active
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <a href="javascript:void(0);" class="btn btn-link changeStatus" rel2="true" rel="${connection.id}" title="Make this connection active" role="button">Inactive</a>
+                                                        Inactive
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>

@@ -247,7 +247,7 @@
                     <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
                         <strong>An error has occurred in one of the above fields!</strong>
                     </div>
-                    <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Save Changes"/>
+                    <input type="button" id="send" class="btn btn-primary submitMessage" value="Save Changes"/>
                 </div>
            </form:form>
         </div>

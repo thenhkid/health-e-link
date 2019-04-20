@@ -1,6 +1,7 @@
 package com.ut.healthelink.dao.impl;
 
 import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+
 import com.ut.healthelink.dao.configurationTransportDAO;
 import com.ut.healthelink.model.TransportMethod;
 import com.ut.healthelink.model.configurationFTPFields;
@@ -17,6 +19,8 @@ import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationTransportMessageTypes;
+import com.ut.healthelink.model.configurationWebServiceFields;
+import com.ut.healthelink.model.configurationWebServiceSenders;
 
 import java.util.Iterator;
 
@@ -133,7 +137,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             while (it.hasNext()) {
                 Object row[] = (Object[]) it.next();
                 id = (Integer) row[0];
-                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId and id = :id");
+                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType FROM messageTypeFormFields where messageTypeId = :messageTypeId and id = :id");
                 query.setParameter("configId", configId);
                 query.setParameter("messageTypeId", messageTypeId);
                 query.setParameter("transportDetailId", transportId);
@@ -156,7 +160,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
                 }
             }
         } else {
-            Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType FROM messageTypeFormFields where messageTypeId = :messageTypeId");
             query.setParameter("configId", configId);
             query.setParameter("messageTypeId", messageTypeId);
             query.setParameter("transportDetailId", transportId);
@@ -564,7 +568,8 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 
             String sql = ("select * "
                     + " from configurationTransportDetails "
-                    + " where fileext = :fileExt and transportmethodId = :transportMethodId and status = :status");
+                    + " where fileext = :fileExt and transportmethodId = :transportMethodId and status = :status "
+                    + " and configId in (select id from configurations where type = 1) ");
             if (transportMethodId == 5) {
             	sql = sql + " and id in (select transportId from rel_transportrhapsodydetails where directory  = :inputPath and method = 1);";
             } else if (transportMethodId == 3)  {
@@ -734,12 +739,12 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      */
     @Override
     @Transactional
-    public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) {
+    public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) throws Exception {
         try {
             sessionFactory.getCurrentSession().saveOrUpdate(rhapsodyFields);
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("saveTransportFTP " + ex.getCause());
+            System.err.println("saveTransportRhapsody " + ex.getCause());
         }
     }
 
@@ -905,6 +910,213 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
          }
 	}
     
-    
+	@Override
+    @Transactional
+    public List<configurationWebServiceFields> getTransWSDetails(int transportDetailId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationWebServiceFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId));
 
+        return criteria.list();
+    }   
+
+    @Override
+    @Transactional
+    public void saveTransportWebService(configurationWebServiceFields wsFields) throws Exception {
+        sessionFactory.getCurrentSession().saveOrUpdate(wsFields);
+    }
+
+	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationTransport> getDistinctTransportDetailsForOrgByTransportMethodId (Integer transportMethodId, Integer status, Integer orgId) {
+        try {
+
+            String sql = ("select distinct fileExt, delimChar, containsHeaderRow , "
+            		+ " fileDelimiter, fileLocation, encodingId "
+            		+ " from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+                    + " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
+                    + " and transportmethodId = :transportMethodId"
+                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1 and status = :status and orgId = :orgId)");
+            if (transportMethodId == 5) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportrhapsodydetails where method = 1) ";
+            } else if  (transportMethodId == 3) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportftpdetails where method = 1) ";
+            }else if  (transportMethodId == 6) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportWebServiceDetails where method = 1) ";
+            }
+            
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));
+            query.setParameter("orgId", orgId);
+            query.setParameter("transportMethodId", transportMethodId);
+            query.setParameter("status", status);
+            
+            List<configurationTransport> configurationTransports = query.list();
+
+            return configurationTransports;
+
+        } catch (Exception ex) {
+            System.err.println("getDistinctTransportDetailsForOrgByTransportMethodId " + ex.getCause());
+            ex.printStackTrace();
+
+            return null;
+        }
+    }
+    
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationTransport> getCTForOrgByTransportMethodId (Integer transportMethodId, Integer status, Integer orgId) {
+        try {
+
+            String sql = ("select configurationTransportDetails.* "
+            		+ " from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+                    + " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
+                    + " and transportmethodId = :transportMethodId"
+                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1 and status = :status and orgId = :orgId)");
+            if (transportMethodId == 5) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportrhapsodydetails where method = 1) ";
+            } else if  (transportMethodId == 3) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportftpdetails where method = 1) ";
+            }else if  (transportMethodId == 6) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportWebServiceDetails where method = 1) ";
+            }
+            
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));
+            query.setParameter("orgId", orgId);
+            query.setParameter("transportMethodId", transportMethodId);
+            query.setParameter("status", status);
+            
+            List<configurationTransport> configurationTransports = query.list();
+
+            return configurationTransports;
+
+        } catch (Exception ex) {
+            System.err.println("getCTForOrgByTransportMethodId " + ex.getCause());
+            ex.printStackTrace();
+
+            return null;
+        }
+    }
+    
+    
+    /**
+     * The 'getTransRhapsodyDetailsPush' function will return the PUSH Rhapsody details for the passed in transportDetailsId.
+     *
+     * @param transportDetailsId The id of the selected transport method
+     *
+     * @return This function will return the PUSH Rhapsody details
+     */
+    @Override
+    @Transactional
+    public configurationWebServiceFields getTransWSDetailsPush(int transportDetailId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationWebServiceFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId))
+                .add(Restrictions.eq("method", 2));
+
+        return (configurationWebServiceFields) criteria.uniqueResult();
+
+    }
+
+    /**
+     * The 'configurationRhapsodyFields' function will return the PULL Rhapsody details for the passed in transportDetailsId.
+     *
+     * @param transportDetailsId The id of the selected transport method
+     *
+     * @return This function will return the PULL Rhapsody details
+     */
+    @Override
+    @Transactional
+    public configurationWebServiceFields getTransWSDetailsPull(int transportDetailId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationWebServiceFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId))
+                .add(Restrictions.eq("method", 1));
+
+        return (configurationWebServiceFields) criteria.uniqueResult();
+
+    }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List <configurationWebServiceSenders> getWSSenderList(int transportId)
+			throws Exception {
+		 Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationWebServiceSenders.class)
+	                .add(Restrictions.eq("transportId", transportId));
+
+	        return criteria.list();
+	}
+	
+
+	@Override
+	@Transactional
+	public void saveWSSender(configurationWebServiceSenders wsSender)
+			throws Exception {
+		sessionFactory.getCurrentSession().saveOrUpdate(wsSender);	
+	}
+
+	@Override
+	@Transactional
+	public void deleteWSSender(configurationWebServiceSenders wsSender)
+			throws Exception {
+		sessionFactory.getCurrentSession().delete(wsSender);		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	
+	public boolean hasConfigsWithMasstranslations(
+			Integer orgId, Integer transportMethodId) throws Exception {
+		 String sql = ("select masstranslation from configurationTransportDetails "
+                    + " where transportMethodId = :transportMethodId and masstranslation = true "
+                    + " and configurationTransportDetails.configId in "
+                    + "(select id from configurations where orgId = :orgId and type = 1);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("orgId", orgId);
+            query.setParameter("transportMethodId", transportMethodId);
+            
+            if (query.list().size() > 0)  {
+            		return true;
+            } else {
+            	return false;
+            }
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<configurationFormFields> getInBoundFieldsForConfigConnection(
+			Integer inConfigId, Integer outConfigId) throws Exception {
+		String sql = (" select inFieldLabel fieldLabel, inFieldNo fieldNo, configId from "
+				+ " (select configId, concat(saveToTableName, '_', saveToTableCol) matchCols,  "
+				+ " fieldLabel as inFieldLabel, fieldNo as inFieldNo "
+				+ " from configurationformfields where configId = :inConfigId and usefield = 1 "
+				+ " and required  = 0) inConfigInfo join  "
+				+ " (select  concat(saveToTableName, '_', saveToTableCol) matchCols "
+				+ " from configurationformfields where configId = :outConfigId  and usefield = 1) outConfigInfo"
+				+ " on  inConfigInfo.matchCols = outConfigInfo.matchCols order by inFieldNo;");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                Transformers.aliasToBean(configurationFormFields.class));
+        query.setParameter("inConfigId", inConfigId);
+        query.setParameter("outConfigId", outConfigId);
+
+        List<configurationFormFields> inboundFormFields = query.list();
+
+        return inboundFormFields;
+	}
+	
+	@Override
+    @Transactional
+    public configurationFormFields getConfigurationFieldsByFieldDesc(int configId, String fieldDesc) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
+                .add(Restrictions.eq("configId", configId))
+                .add(Restrictions.eq("fieldDesc", fieldDesc));
+
+        return (configurationFormFields) criteria.uniqueResult();
+    }
 }

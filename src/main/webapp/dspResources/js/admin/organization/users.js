@@ -42,10 +42,46 @@ require(['./main'], function () {
         //Function to submit the changes to an existing user or 
         //submit the new user fields from the modal window.
         $(document).on('click', '#submitButton', function(event) {
-            var currentPage = $('#currentPageHolder').attr('rel');
+            var currentPage = $('#submitButton').attr('rel');
             var passwordVal = $('#password').val();
             var confirmPasswordVal = $('#confirmPassword').val();
-
+            
+            /** reset form **/
+            $('div.form-group').removeClass("has-error");
+            $('span.control-label').removeClass("has-error");
+            $('span.control-label').html("");
+           
+            
+            if (currentPage == 'Create') {
+            	if (passwordVal.trim() == '') {
+            		$('#confirmPasswordDiv').addClass("has-error");
+                    $('#passwordDiv').addClass("has-error");
+                    $('#confimPasswordMsg').addClass("has-error");
+                    $('#confimPasswordMsg').html('Password must contain letters or numbers.');
+                    event.preventDefault();
+                    return false;
+            	}
+            	
+            }
+            
+            if (passwordVal.trim() == '' && passwordVal.length > 0) {
+            	$('#confirmPasswordDiv').addClass("has-error");
+                $('#passwordDiv').addClass("has-error");
+                $('#confimPasswordMsg').addClass("has-error");
+                $('#confimPasswordMsg').html('Invalid password.  Password must contain letters or numbers.');
+                event.preventDefault();
+                return false;
+        	}
+            
+            var fields = $("input[name='sectionList']").serializeArray(); 
+            if (fields.length == 0) {
+         	   $('#sectionListDiv').addClass("has-error");
+         	   $('#sectionListMsg').addClass("has-error");
+         	   $('#sectionListMsg').html('<br/>Please assign at least one section to user.');
+                event.preventDefault();
+                return false;
+            }
+            
             if (passwordVal != confirmPasswordVal) {
                 $('#confirmPasswordDiv').addClass("has-error");
                 $('#passwordDiv').addClass("has-error");
@@ -95,6 +131,26 @@ require(['./main'], function () {
 
         });
         
+        /** modal for loginAs **/
+        $(document).on('click', '.loginAs', function(event) {
+        		var userName = $(this).attr('rel');
+        		var actionValue = "loginAs";
+
+                $.ajax({
+                    url: actionValue,
+                    data: {'loginAsUser': userName},
+                    type: "POST",
+                    async: false,
+                    success: function(data) {
+                    		$("#loginAsModal").html(data);
+                    }
+                });
+                event.preventDefault();
+                return false;
+          
+
+        });
+         
     });
 });
 

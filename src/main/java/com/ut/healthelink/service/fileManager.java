@@ -11,4 +11,7 @@ public interface fileManager {
 	byte[] fileToBytes(File file) throws IOException;
 	String readTextFile(String fileName);
 	void writeFile(String strFileName, String strFile);
+	void decode(String sourceFile, String targetFile) throws Exception;
+	void writeByteArraysToFile(String fileName, byte[] content) throws IOException;
+	byte[] loadFileAsBytesArray(String fileName) throws Exception;
 }

@@ -10,10 +10,15 @@ import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.mailMessage;
 import com.ut.healthelink.service.emailMessageManager;
 import com.ut.healthelink.service.userManager;
-import java.net.InetAddress;
+
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Properties;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,7 +31,10 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @ControllerAdvice
 public class ExceptionControllerAdvice {
-   
+	
+	@Resource(name = "myProps")
+	private Properties myProps;
+	
     @Autowired
     private emailMessageManager emailMessageManager;
     
@@ -34,20 +42,33 @@ public class ExceptionControllerAdvice {
     private userManager usermanager;
  
     @ExceptionHandler(Exception.class)
-    public ModelAndView exception(HttpSession session, Exception e, Authentication authentication) throws Exception {
-        
+    public ModelAndView exception(HttpSession session, Exception e, HttpServletRequest request, 
+    		Authentication authentication) throws Exception {
+       
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/exception");
-        
+        try {
         mailMessage messageDetails = new mailMessage();
         
-        messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
-        messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
-        messageDetails.setmessageSubject("Exception Error " + InetAddress.getLocalHost().getHostAddress());
+        messageDetails.settoEmailAddress(myProps.getProperty("admin.email"));
+        messageDetails.setfromEmailAddress("support@health-e-link.net");
+        messageDetails.setmessageSubject("Exception Error "  + " " + myProps.getProperty("server.identity"));
         
         StringBuilder sb = new StringBuilder();
+
+        //we log page with error and ip of remote client if possible
+        try {
+        	if (request.getHeader("HTTP_X_FORWARDED_FOR") != null) {
+        		sb.append("HTTP_X_FORWARDED_FOR: " + request.getHeader("HTTP_X_FORWARDED_FOR") + "<br/>");      
+        	}
+        	sb.append("Remote Address: " + request.getRemoteAddr() + "<br/>"); 
+        	sb.append("Web Page: " + request.getRequestURL() + "<br/>"); 
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
         
         /* If a user is logged in then send along the user details */
+        
         if(session.getAttribute("userDetails") != null || authentication != null) {
             User userInfo = (User)session.getAttribute("userDetails");
             
@@ -74,6 +95,10 @@ public class ExceptionControllerAdvice {
         messageDetails.setmessageBody(sb.toString());
         emailMessageManager.sendEmail(messageDetails); 
         /*mav.addObject("messageBody",sb.toString());*/
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        	System.err.println(ex.toString() + " error at exception");
+        }
         
         return mav;
     }

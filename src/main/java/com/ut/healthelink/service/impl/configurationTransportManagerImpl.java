@@ -4,18 +4,23 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.ut.healthelink.model.TransportMethod;
 import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
+import com.ut.healthelink.model.configurationWebServiceFields;
+import com.ut.healthelink.model.configurationWebServiceSenders;
 import com.ut.healthelink.dao.configurationTransportDAO;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.configurationFTPFields;
 import com.ut.healthelink.model.configurationTransportMessageTypes;
 import com.ut.healthelink.reference.fileSystem;
+import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.configurationTransportManager;
 import com.ut.healthelink.service.organizationManager;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,6 +38,9 @@ public class configurationTransportManagerImpl implements configurationTransport
     
     @Autowired
     private organizationManager organizationManager;
+    
+    @Autowired
+    private configurationManager configurationManager;
     
     @Override
     @Transactional
@@ -54,7 +62,57 @@ public class configurationTransportManagerImpl implements configurationTransport
 
     @Override
     @Transactional
-    public Integer updateTransportDetails(configurationTransport transportDetails) {
+    public Integer updateTransportDetails(configurationTransport transportDetails) throws Exception {
+        
+        MultipartFile CCDTemplatefile = transportDetails.getCcdTemplatefile();
+        //If a file is uploaded
+        if (CCDTemplatefile != null && !CCDTemplatefile.isEmpty()) {
+        
+            String CCDTemplatefileName = CCDTemplatefile.getOriginalFilename();
+            
+            int orgId = configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId();
+            
+            Organization orgDetails = organizationManager.getOrganizationById(orgId);
+            
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            
+            try {
+                inputStream = CCDTemplatefile.getInputStream();
+                File newCCDTemplateFile = null;
+
+                //Set the directory to save the uploaded message type template to
+                fileSystem orgdir = new fileSystem();
+
+                orgdir.setDir(orgDetails.getcleanURL(), "templates");
+
+                newCCDTemplateFile = new File(orgdir.getDir() + CCDTemplatefileName);
+
+                if (newCCDTemplateFile.exists()) {
+                    newCCDTemplateFile.delete();
+                }
+                newCCDTemplateFile.createNewFile();
+                
+                outputStream = new FileOutputStream(newCCDTemplateFile);
+                int read = 0;
+                byte[] bytes = new byte[1024];
+
+                while ((read = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, read);
+                }
+                outputStream.close();
+
+                //Set the filename to the file name
+                transportDetails.setCcdSampleTemplate(CCDTemplatefileName);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new Exception(e);
+                
+            }
+            
+        }
+        
         
         int transportDetailId;
         
@@ -112,7 +170,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 
     @Override
     @Transactional
-    public void saveTransportFTP(int orgId, configurationFTPFields FTPFields) {
+    public void saveTransportFTP(int orgId, configurationFTPFields FTPFields) throws Exception {
         
         /* Need to upload the certificate if uploaded */
         if (FTPFields.getfile() != null && FTPFields.getfile().getSize() > 0) {
@@ -154,6 +212,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception(e);
             }
 
         }
@@ -266,7 +325,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 	}
 
 	@Override
-	public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) {
+	public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) throws Exception {
 		configurationTransportDAO.saveTransportRhapsody(rhapsodyFields);	
 	}
 	
@@ -311,4 +370,100 @@ public class configurationTransportManagerImpl implements configurationTransport
 			List<Integer> fileTypeIds, List<Integer> statusIds, boolean distinctOnly, boolean foroutboundProcessing) {
 		 return configurationTransportDAO.getConfigurationTransportFileExtByFileType(orgId,transportMethodId, fileTypeIds, statusIds, distinctOnly, foroutboundProcessing);
 	}
+	
+    @Override
+    @Transactional
+    public List<configurationWebServiceFields> getTransWSDetails(int transportDetailId) throws Exception {
+    	List<configurationWebServiceFields> wsFieldsList = configurationTransportDAO.getTransWSDetails(transportDetailId);
+    	for (configurationWebServiceFields wsFields : wsFieldsList) {
+    		if (wsFields.getMethod() == 1) {
+    			wsFields.setSenderDomainList(getWSSenderList(transportDetailId));
+    		}
+    	}
+    	return wsFieldsList;
+    }
+    
+    @Override
+	public void saveTransportWebService(configurationWebServiceFields wsFields) throws Exception{
+		configurationTransportDAO.saveTransportWebService(wsFields);	
+	}
+
+
+	@Override
+	public List<configurationTransport> getDistinctTransportDetailsForOrgByTransportMethodId(
+			Integer transportMethodId, Integer status, Integer orgId) {
+		return configurationTransportDAO.getDistinctTransportDetailsForOrgByTransportMethodId(transportMethodId, status, orgId);
+	}
+	
+	@Override
+	public List<configurationTransport> getCTForOrgByTransportMethodId(
+			Integer transportMethodId, Integer status, Integer orgId) {
+		return configurationTransportDAO.getCTForOrgByTransportMethodId(transportMethodId, status, orgId);
+	}
+	
+	@Override
+    @Transactional
+    public configurationWebServiceFields getTransWSDetailsPush(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransWSDetailsPush(transportDetailId);
+    }
+
+    @Override
+    @Transactional
+    public configurationWebServiceFields getTransWSDetailsPull(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransWSDetailsPull(transportDetailId);
+    }
+
+	@Override
+	public List<configurationWebServiceSenders> getWSSenderList(
+			int transportDetailId) throws Exception {
+		return configurationTransportDAO.getWSSenderList(transportDetailId);
+	}
+
+	@Override
+	public void saveWSSender(configurationWebServiceSenders wsSender)
+			throws Exception {
+		configurationTransportDAO.saveWSSender(wsSender);
+	}
+
+	@Override
+	public void deleteWSSender(configurationWebServiceSenders wsSender)
+			throws Exception {
+		configurationTransportDAO.deleteWSSender(wsSender);
+	}
+
+	@Override
+	public boolean hasConfigsWithMasstranslations(
+			Integer orgId, Integer transportMethodId) throws Exception {
+		return configurationTransportDAO.hasConfigsWithMasstranslations(orgId, transportMethodId);
+	}
+
+	@Override
+	public void checkAndCreateDirectory(configurationRhapsodyFields rhapsodyInfo)
+			throws Exception {
+		// TODO Auto-generated method stub
+		fileSystem dir = new fileSystem();
+		String newPath = dir.addPathToProjectDir(rhapsodyInfo.getDirectory());
+		File rrDirectory = new File(newPath);
+        if (!rrDirectory.exists()) {
+        	rrDirectory.mkdir();
+        }
+
+	}
+
+	@Override
+	public List<configurationFormFields> getInBoundFieldsForConfigConnection(
+			Integer inConfigId, Integer outConfigId) throws Exception {
+		return configurationTransportDAO.getInBoundFieldsForConfigConnection(inConfigId, outConfigId);
+	}
+
+	@Override
+	public configurationFormFields getConfigurationFieldsByFieldDesc(
+			int configId, String fieldDesc) throws Exception {
+		return configurationTransportDAO.getConfigurationFieldsByFieldDesc(configId, fieldDesc);
+	}
+
+	
+    
+    
 }
+

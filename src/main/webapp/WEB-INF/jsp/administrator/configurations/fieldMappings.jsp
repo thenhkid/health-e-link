@@ -45,15 +45,16 @@
                                     <tr>
                                         <th scope="col" class="center-text">Field No</th>
                                         <th scope="col">Field Name</th>
-                                        <th scope="col" class="center-text">Required</th> 
                                         <th scope="col" class="center-text">Use Field</th>
+                                        <th scope="col" class="center-text">Required</th> 
+                                        <th scope="col" class="center-text">Validation</th> 
                                         <th scope="col" class="center-text">Matching Field</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <c:forEach var="i" begin="1" end="6">
                                         <tr>
-                                            <td colspan="5"><strong><c:choose><c:when test="${i==1}"> (Sender Organization Information)</c:when><c:when test="${i==2}"> (Sender Provider Information)</c:when><c:when test="${i==3}">(Recipient Organization Information)</c:when><c:when test="${i==4}">(Recipient Provider Information)</c:when><c:when test="${i==5}"> (Patient Information)</c:when><c:when test="${i==6}"> (Details)</c:when></c:choose></strong></td>
+                                            <td colspan="6"><strong><c:choose><c:when test="${i==1}"> (Sender Organization Information)</c:when><c:when test="${i==2}"> (Sender Provider Information)</c:when><c:when test="${i==3}">(Recipient Organization Information)</c:when><c:when test="${i==4}">(Recipient Provider Information)</c:when><c:when test="${i==5}"> (Patient Information)</c:when><c:when test="${i==6}"> (Details)</c:when></c:choose></strong></td>
                                         </tr>
                                         <c:forEach items="${transportDetails.fields}" var="mappings" varStatus="field">
                                             <c:if test="${mappings.bucketNo == i}">
@@ -67,7 +68,6 @@
                                                         <input type="hidden" name="fields[${field.index}].fieldDesc" value="${mappings.fieldDesc}" />
                                                         <input type="hidden" name="fields[${field.index}].fieldLabel" value="${mappings.fieldLabel}" />
                                                         <input type="hidden" name="fields[${field.index}].bucketDspPos" value="${mappings.bucketDspPos}" />
-                                                        <input type="hidden" id="validationType_${field.index}" name="fields[${field.index}].validationType" value="${mappings.validationType}" />
                                                         <input type="hidden" id="saveToTableName_${field.index}" name="fields[${field.index}].saveToTableName" value="${mappings.saveToTableName}" />
                                                         <input type="hidden" id="saveToTableCol_${field.index}" name="fields[${field.index}].saveToTableCol" value="${mappings.saveToTableCol}" />
                                                         <input type="hidden" name="fields[${field.index}].autoPopulateTableName" value="${mappings.autoPopulateTableName}" />
@@ -76,10 +76,17 @@
                                                     </td>
                                                     <td>${mappings.fieldDesc}</td>
                                                     <td class="center-text">
+                                                        <input type="checkbox" name="fields[${field.index}].useField" <c:if test="${mappings.useField == true}">checked</c:if> />
+                                                    </td>
+                                                    <td class="center-text">
                                                         <input type="checkbox" name="fields[${field.index}].required"  <c:if test="${mappings.required == true}">checked</c:if>  />
                                                     </td>
                                                     <td class="center-text">
-                                                        <input type="checkbox" name="fields[${field.index}].useField" <c:if test="${mappings.useField == true}">checked</c:if> />
+                                                        <select name="fields[${field.index}].validationType" class="formField">
+                                                            <c:forEach items="${validationTypes}"  var="fieldvalidationtypes" varStatus="vtype">
+                                                                <option value="${validationTypes[vtype.index][0]}" <c:if test="${mappings.validationType == validationTypes[vtype.index][0]}">selected</c:if>>${validationTypes[vtype.index][1]}</option>
+                                                            </c:forEach>
+                                                        </select>    
                                                     </td>
                                                     <td class="center-text">
                                                         <select name="fields[${field.index}].messageTypeFieldId" id="matchingField_${mappings.fieldNo}" rel="${field.index}" class="formField matchingField">

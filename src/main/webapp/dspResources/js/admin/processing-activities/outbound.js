@@ -22,6 +22,10 @@ require(['./main'], function () {
             });
         });
         
+        var oSettings = datatable.fnSettings();
+        
+        datatable.fnSort( [ [6,'desc'] ] );
+        
    });
 });
 
@@ -32,6 +36,11 @@ function searchByDateRange() {
     
    $('#fromDate').val(fromDate);
    $('#toDate').val(toDate);
+   
+   $('body').overlay({
+        glyphicon : 'floppy-disk',
+        message : 'Processing...'
+    }); 
    
    $('#searchForm').submit();
 

@@ -2,7 +2,7 @@
 require.config({
     urlArgs: "bust=" + (new Date()).getTime(),
     paths: {
-        'jquery': '../vendor/jquery-1.10.1.min',
+        'jquery': '../vendor/jquery-1.12.2.min',
         'bootstrap': '../vendor/bootstrap',
         'responsive-tables': '../vendor/responsive-tables',
         'mediaModal': '../mediaModal',
@@ -10,23 +10,20 @@ require.config({
         'sprintf': '../vendor/sprintf',
         'moment': '../vendor/moment',
         'daterangepicker': '../vendor/daterangepicker',
-        'dataTables': '../vendor/jquery.dataTables.min',
-        'bootstrapwysihtlm5': '../vendor/bootstrap-wysihtml5',
-        'wysihtlm5': '../vendor/wysihtml5-0.3.0.min'
+        'dataTables': '../vendor/jquery.dataTables.min'
     },
     shim: {
         'bootstrap': ['jquery'],
         'responsive-tables': ['jquery'],
         'daterangepicker': ['jquery', 'bootstrap'],
-        'dataTables': ['jquery'],
-        'bootstrapwysihtlm5': ['jquery','wysihtlm5'],
-        'wysihtlm5': ['jquery']
+        'dataTables': ['jquery']
     }
 });
 
-
+var datatable;
 
 define(['jquery', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker', 'dataTables'], function($, moment) {
+    
 
     $.ajaxSetup({
         cache: false
@@ -201,21 +198,19 @@ define(['jquery', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'ove
     });
 
     /* Table initialisation */
-    $(document).ready(function() {
-        $('#dataTable').dataTable({
-            "sPaginationType": "bootstrap",
-            "oLanguage": {
-                "sSearch": "_INPUT_",
-                "sLengthMenu": '<select class="form-control" style="width:150px">'+
-                      '<option value="10">10 Records</option>'+
-                      '<option value="20">20 Records</option>'+
-                      '<option value="30">30 Records</option>'+
-                      '<option value="40">40 Records</option>'+
-                      '<option value="50">50 Records</option>'+
-                      '<option value="-1">All</option>'+
-                      '</select>'
-            }
-        });
+    datatable = $('#dataTable').dataTable({
+        "sPaginationType": "bootstrap",
+        "oLanguage": {
+            "sSearch": "_INPUT_",
+            "sLengthMenu": '<select class="form-control" style="width:150px">'+
+                  '<option value="10">10 Records</option>'+
+                  '<option value="20">20 Records</option>'+
+                  '<option value="30">30 Records</option>'+
+                  '<option value="40">40 Records</option>'+
+                  '<option value="50">50 Records</option>'+
+                  '<option value="-1">All</option>'+
+                  '</select>'
+        }
     });
 
 });

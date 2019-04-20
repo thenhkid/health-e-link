@@ -80,10 +80,10 @@
                                                 <table class="table table-striped table-hover bucketTable_${i}">
                                                 <thead>
                                                     <tr>
-                                                        <th scope="col" style="width:100px; min-width:100px" class="center-text">Use This Field</th>
+                                                        <th scope="col" style="width:50px; min-width:50px; max-width:50px" class="center-text">Use This Field</th>
                                                         <th scope="col" style="width:100px; min-width:100px">Display POS</th>
-                                                        <th scope="col" style="width:150px; min-width:150px;">Field Name</th>
-                                                        <th scope="col" style="width:150px; min-width:150px;">Field Label *</th>
+                                                        <th scope="col" style="width:100px; min-width:100px;">Field Name</th>
+                                                        <th scope="col" style="width:200px; min-width:200px;">Field Label *</th>
                                                         <th scope="col" style="width:150px; min-width:150px;">Field Validation</th>
                                                     </tr>
                                                 </thead>
@@ -140,6 +140,25 @@
                                                                         <input type="text" name="fields[${field.index}].fieldLabel"  value="${fieldDetails.fieldLabel}" rel="${field.index}" class="form-control fieldLabel formField" style="width:200px;" />
                                                                         <span id="fieldLabelMsg_${field.index}" class="control-label"></span>
                                                                     </div>
+                                                                    <div>
+                                                                        <div id="fieldType_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
+                                                                            <strong>Field Type</strong><br/>
+                                                                            <select name="fields[${field.index}].fieldType" class="form-control half">
+                                                                                <option value="1" label=" - Select - " >- Select -</option>
+                                                                                <c:forEach items="${fieldTypes}" varStatus="ftype">
+                                                                                    <option value="${fieldTypes[ftype.index][0]}" <c:if test="${fieldDetails.fieldType == fieldTypes[ftype.index][0]}">selected</c:if>>${fieldTypes[ftype.index][1]}</option>
+                                                                                </c:forEach>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <c:if test="${fieldDetails.bucketNo == 5 || fieldDetails.bucketNo == 6}">           
+                                                                    <div>
+                                                                        <div id="fieldHelp_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
+                                                                            <strong>Field Help</strong><br/>
+                                                                            <textarea cols="8" rows="3" name="fields[${field.index}].fieldHelp" rel="${field.index}" class="form-control formField">${fieldDetails.fieldHelp}</textarea>
+                                                                        </div>
+                                                                    </div>
+                                                                    </c:if>     
                                                                 </td>
                                                                 <td>
                                                                     <div class="form-group validationTypes">

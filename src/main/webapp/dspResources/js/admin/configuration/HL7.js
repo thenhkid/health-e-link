@@ -152,13 +152,13 @@ require(['./main'], function() {
             $('#fieldValueMsg').html('');
 
             //Make sure a name is added
-            if ($('#newFieldValue').val() == '') {
+            if ($('#newFieldValue').val() == '' && $('#newdefaultValue').val() == '') {
                 $('#fieldValueDiv').addClass("has-error");
                 $('#fieldValueMsg').addClass("has-error");
-                $('#fieldValueMsg').html('The field value is a required field.');
+                $('#fieldValueMsg').html('Either a default value must be entered or a field value must be selected.');
                 errorFound = 1;
             }
-
+            
 
             if (errorFound == 1) {
                 event.preventDefault();

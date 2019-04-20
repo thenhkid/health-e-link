@@ -14,19 +14,23 @@
         <div class="row">
             <aside class="col-md-3 col-sm-3 secondary hidden-xs">
                 <div class="fixed-region">
-                    <div class="module sidebar-module">
-                        <dl class="vcard info-list">
-                            <dt>Contact Us By Phone</dt>
-                            <dd class="tel">(508) 721-1977</dd>
+                    <dl class="vcard info-list">
+                        <dt>Contact Us By Phone</dt>
+                        <dd class="tel">(774) 272-0313</dd>
 
-                            <dt>Contact Us By Fax</dt>
-                            <dd class="tel">(508) 721-1978</dd>
+                        <dt>Contact Us By Fax</dt>
+                        <dd class="tel">(508) 721-1978</dd>
 
-                            <dt>Contact Us By Email</dt>
-                            <dd class="email"><a href="" title="">info@health-e-link.net</a></dd>
+                        <dt>Contact Us By Email</dt>
+                        <dd class="email"><a href="mailto:information@health-e-link.net" title="">information@health-e-link.net</a></dd>
 
-                        </dl>
-                    </div>
+                        <%--<dt>Connect</dt>
+                        <dd class="margin-small top">
+                            <a href="" title="" class="icon-social icon-facebook ir-inline">Facebook</a>
+                            <a href="" title="" class="icon-social icon-linked-in ir-inline">Linked In</a>
+                            <a href="" title="" class="icon-social icon-twitter ir-inline">Twitter</a>
+                        </dd>--%>
+                    </dl>
                 </div>
             </aside>
 

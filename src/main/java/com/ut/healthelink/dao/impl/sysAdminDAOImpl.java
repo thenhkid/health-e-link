@@ -1,6 +1,8 @@
 package com.ut.healthelink.dao.impl;
 
 import java.util.List;
+import java.util.Properties;
+
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.transform.Transformers;
@@ -8,6 +10,7 @@ import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.ut.healthelink.dao.sysAdminDAO;
 import com.ut.healthelink.dao.UtilitiesDAO;
 import com.ut.healthelink.model.Macros;
@@ -24,10 +27,15 @@ import com.ut.healthelink.model.lutables.lu_Medications;
 import com.ut.healthelink.model.lutables.lu_Procedures;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.lutables.lu_Tests;
+import com.ut.healthelink.model.MoveFilesLog;
 import com.ut.healthelink.model.mainHL7Details;
 import com.ut.healthelink.model.mainHL7Elements;
 import com.ut.healthelink.model.mainHL7Segments;
+
 import java.util.ArrayList;
+
+import javax.annotation.Resource;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -45,8 +53,9 @@ public class sysAdminDAOImpl implements sysAdminDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
-    private String schemaName = "universalTranslator";
-
+	@Resource(name = "myProps")
+	private Properties myProps;
+    
     /**
      * this gets a list of Lookup tables *
      */
@@ -81,7 +90,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
                 .addScalar("description", StandardBasicTypes.STRING)
                 .setResultTransformer(
                         Transformers.aliasToBean(LookUpTable.class))
-                .setParameter("schemaName", schemaName)
+                .setParameter("schemaName",  myProps.getProperty("schemaName"))
                 .setParameter("searchTerm", searchTerm);
 
        
@@ -866,4 +875,34 @@ public class sysAdminDAOImpl implements sysAdminDAO {
         
     }
 
+	@Override
+	@Transactional
+	public Long findTotalUsers() throws Exception {
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalUsers from User");
+        Long totalUsers = (Long) query.uniqueResult();
+        return totalUsers;
+	}
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<MoveFilesLog> getMoveFilesLog(Integer statusId) throws Exception {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MoveFilesLog.class);
+		if (statusId != null) {
+			criteria.add(Restrictions.eq("statusId",statusId));
+		}
+       
+		List<MoveFilesLog> moveLogList = criteria.list();
+        return moveLogList;
+	}
+
+	@Override
+	@Transactional
+    public void deleteMoveFilesLog(MoveFilesLog moveFileLog) throws Exception {
+        Query deleteFields = sessionFactory.getCurrentSession().createQuery("delete from MoveFilesLog where id = :moveFilePathId");
+        deleteFields.setParameter("moveFilePathId", moveFileLog.getId());
+        deleteFields.executeUpdate();
+	
+	}
+	
 }
