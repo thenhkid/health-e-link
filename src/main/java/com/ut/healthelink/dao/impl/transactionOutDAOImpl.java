@@ -1806,11 +1806,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 				+ " and statusId = 18 and configId = :configId"
 				+ " INTO OUTFILE  '" + filePathAndName + "'"
 						+ " FIELDS TERMINATED BY '" + transportDetails.getDelimChar() 
-						+ "' LINES TERMINATED BY '\\n';";
+						+ "' LINES TERMINATED BY '"+transportDetails.getLineTerminator()+"';";
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("batchDownloadId", batchDownloadId);
         query.setParameter("configId", transportDetails.getconfigId());
-        
         try {
         	query.list();
         } catch (Exception ex) {

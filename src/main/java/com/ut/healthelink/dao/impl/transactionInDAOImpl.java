@@ -3165,12 +3165,13 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow) {
+    public Integer insertLoadData(Integer batchId, String delimChar, 
+    		String fileWithPath, String loadTableName, boolean containsHeaderRow, String lineTerminator) {
         try {
             String sql = ("LOAD DATA LOCAL INFILE '" + fileWithPath + "' INTO TABLE "
                     + loadTableName + " fields terminated by '" + delimChar + "' "
                     + " ENCLOSED BY '\"' ESCAPED BY ''"
-                    + " LINES TERMINATED BY '\\n'");
+                    + " LINES TERMINATED BY '"+lineTerminator+"'");
             if (containsHeaderRow) {
                 sql = sql + "  IGNORE 1 LINES";
             }

@@ -238,7 +238,7 @@ public interface transactionInManager {
 
     Integer copyTransactionInStatusToTarget(Integer batchId, Integer transactionId);
 
-    Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow);
+    Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow, String lineTerminator);
 
     Integer createLoadTable(String loadTableName);
 
