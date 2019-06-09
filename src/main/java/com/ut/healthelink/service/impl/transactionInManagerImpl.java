@@ -1305,7 +1305,7 @@ public class transactionInManagerImpl implements transactionInManager {
         if (pattern2.matcher(date).matches()) {
             //we have y-m-d format, we transform and return date
             try {
-                SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-mm-dd");
+                SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
                 dateformat.setLenient(false);
                 Date dateValue = dateformat.parse(date);
                 return dateValue;
