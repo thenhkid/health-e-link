@@ -2170,7 +2170,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 				+ " from (select f"+cff.getFieldNo() +",";
 				
 		sql += " transactionInId , "+reportHeaderCols.get(0)+" "
-				+ " from transactioninrecords where batchid =  :batchUploadId and length(f"+cff.getFieldNo()+") > 0 and f"+cff.getFieldNo()+" is not null) tir join "
+				+ " from transactioninrecords where batchid =  :batchUploadId and length(trim(f"+cff.getFieldNo()+")) > 0 and f"+cff.getFieldNo()+" is not null) tir join "
 				+ " (select f"+cff.getFieldNo()+"," ;
 				if (entityIdFCol > 0) {
 					sql += " F"+entityIdFCol+" entity3Col,";
