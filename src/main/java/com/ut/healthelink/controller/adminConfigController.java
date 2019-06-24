@@ -534,15 +534,19 @@ public class adminConfigController {
         
         
         if(rhapsodyFields.isEmpty()) {
-        	
+        	String parentDirectory = "";
+        	if (orgDetails.getParentId() != 0) {
+        		 Organization parentOrgDetails = organizationmanager.getOrganizationById(orgDetails.getParentId());
+        		 parentDirectory = "/" + parentOrgDetails.getcleanURL();
+        	}
             List<configurationRhapsodyFields> emptyRhapsodyFields = new ArrayList<configurationRhapsodyFields>();
             configurationRhapsodyFields pushRFields = new configurationRhapsodyFields();
             pushRFields.setMethod(1);
-            pushRFields.setDirectory("/UT/"+orgDetails.getcleanURL()+"/input/");
+            pushRFields.setDirectory(parentDirectory + "/rrInput/"+ orgDetails.getcleanURL());
             
             configurationRhapsodyFields getRFields = new configurationRhapsodyFields();
             getRFields.setMethod(2);
-            getRFields.setDirectory("/UT/"+orgDetails.getcleanURL()+"/output/"); 
+            getRFields.setDirectory(parentDirectory + "/rrOutput/"); 
             
             emptyRhapsodyFields.add(pushRFields);
             emptyRhapsodyFields.add(getRFields);
