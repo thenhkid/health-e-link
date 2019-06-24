@@ -6,60 +6,9 @@
         http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd"
     version="1.8">
  
-   <schedule>
-        <job>
-            <name>ProcessOutputFiles</name>
-            <group>processGroup</group>
-            <description>This process will run every five minute to check if any outbound files must be processed</description>
-            <job-class>com.ut.healthelink.jobs.processOutputRecords</job-class>
-        </job>
- 		<!--  changed to every 10 seconds because we are processing one by one -->
-        <trigger>
-            <cron>
-                <name>ProcessOutputFilesTrigger</name>
-                <job-name>ProcessOutputFiles</job-name>
-                <job-group>processGroup</job-group>
-                 <cron-expression>0/10 * * * * ?</cron-expression>
-            </cron>
-        </trigger>
-    </schedule>
+
+    
     <schedule>
-        <job>
-            <name>GenerateOutputFiles</name>
-            <group>processGroup</group>
-            <description>This process will look to see if any output files need to be generated runs every 5 minutes.</description>
-            <job-class>com.ut.healthelink.jobs.generateOutputFiles</job-class>
-        </job>
- 
-        <trigger>
-            <cron>
-                <name>GenerateOutputFilesTrigger</name>
-                <job-name>GenerateOutputFiles</job-name>
-                <job-group>processGroup</job-group>
-                <cron-expression>0 0/5 * * * ?</cron-expression>
-            </cron>
-        </trigger>
-    </schedule>
-    
-     <schedule>
-        <job>
-            <name>LoadBatches</name>
-            <group>processGroup</group>
-            <description>This process will run every 3o seconds starting at 10 second on the minute to check if any uploaded files need to be loaded</description>
-            <job-class>com.ut.healthelink.jobs.loadBatches</job-class>
-        </job>
- 
-        <trigger>
-            <cron>
-                <name>LoadBatchesTrigger</name>
-                <job-name>LoadBatches</job-name>
-                <job-group>processGroup</job-group>
-                <cron-expression>10/30 * * * * ?</cron-expression>
-            </cron>
-        </trigger>
-    </schedule>
-    
-         <schedule>
         <job>
             <name>LoadMassBatches</name>
             <group>processGroup</group>
@@ -73,30 +22,12 @@
                 <job-name>LoadMassBatches</job-name>
                 <job-group>processGroup</job-group>
                 <!-- <cron-expression>0 15/0 1,4,7,10,13,16,19,22 * * ?</cron-expression> -->
-                <cron-expression>0 0/1 * * * ?</cron-expression>
+                <cron-expression>0 0/2 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
-
-     <schedule>
-        <job>
-            <name>ProcessInBoundBatches</name>
-            <group>processGroup</group>
-            <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
-            <job-class>com.ut.healthelink.jobs.processBatches</job-class>
-        </job>
- 
-        <trigger>
-            <cron>
-                <name>ProcessInBoundBatchesTrigger</name>
-                <job-name>ProcessInBoundBatches</job-name>
-                <job-group>processGroup</job-group>
-                <cron-expression>5/30 * * * * ?</cron-expression>
-            </cron>
-        </trigger>
-    </schedule>
-    
-    <schedule>
+	
+	<schedule>
         <job>
             <name>ProcessMassInBoundBatches</name>
             <group>processGroup</group>
@@ -110,7 +41,7 @@
                 <job-name>ProcessMassInBoundBatches</job-name>
                 <job-group>processGroup</job-group>
                 <!-- <cron-expression>0 0/0 0,3,6,9,12,15,18,21 * * ?</cron-expression> -->
-                 <cron-expression>0 0/2 * * * ?</cron-expression>
+                 <cron-expression>0 0/3 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -189,26 +120,5 @@
             </cron>
         </trigger>
     </schedule>
-    
-    <!--<schedule>
-        <job>
-            <name>processWebServiceMessages</name>
-            <group>processGroup</group>
-            <description>This process will run every 5 minutes starting at 8 mins of the hour to check if any WSMessage need to be written to file</description>
-            <job-class>com.ut.healthelink.jobs.ProcessWebServiceMessages</job-class>
-        </job>
- 
-        <trigger>
-            <cron>
-                <name>processWebServiceMessagesTrigger</name>
-                <job-name>processWebServiceMessages</job-name>
-                <job-group>processGroup</job-group>
-                <cron-expression>0 0/1 * * * ?</cron-expression>
-            </cron>
-        </trigger>
-    </schedule>    -->
-    
-      
-    
-    
+
 </job-scheduling-data>
