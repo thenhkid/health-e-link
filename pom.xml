@@ -30,7 +30,7 @@
         <jackson-annotations.version>2.9.7</jackson-annotations.version>
         <poi.version>3.16</poi.version>
         <poi-ooxml.version>3.16</poi-ooxml.version>
-        <log4j.version>2.0-beta8</log4j.version>
+        <log4j.version>2.13.2</log4j.version>
         <quartz.version>2.2.1</quartz.version>
         <commons-validator.version>1.4.0</commons-validator.version>
         <sax.version>2.0.1</sax.version>
