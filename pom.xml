@@ -10,7 +10,7 @@
   
     <properties>
         <org.springframework.version>4.3.2.RELEASE</org.springframework.version>
-        <org.spring.security.version>4.2.8.RELEASE</org.spring.security.version>
+        <org.spring.security.version>5.3.3.RELEASE</org.spring.security.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <jsp-api.version>2.2</jsp-api.version>
         <org.slf4j.version>1.6.1</org.slf4j.version>
